@@ -1,0 +1,15 @@
+# vim: ft=sh:
+
+#compdef nix-channel
+#autoload
+
+_nix_channels() {
+  _values 'Nix Channels' $(nix-channel --list | awk '{ print $1 }' ORS=' ')
+}
+
+_arguments \
+  '(- *)--add[Subscribe to a channel]: :'\
+  '(- *)--remove[Unsubscribe from a channel]: :_nix_channels'\
+  '(- *)--list[List subscribed channels]: :'\
+  '(- *)--update[Update and activate channels]: :_nix_channels'\
+  '(- *)--rollback[Revert the previous nix-channel --update]: :'
