@@ -9,3 +9,5 @@ _arguments \
   '(- --print* --delete)--print-dead[Print store paths not reachable from roots]'\
   '(- --print* --delete)--delete[Garbage collect all dead paths from the store]'\
   '--dry-run[Print what would have been done, without doing it]'
+
+# vim: set ft=zsh:

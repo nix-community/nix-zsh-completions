@@ -6,3 +6,4 @@ _arguments \
   "--no-out-link[Do not create a 'result' symlink]"\
   '1:Network Nix Expression:_files -g \*.nix'
 
+# vim: set ft=zsh:
