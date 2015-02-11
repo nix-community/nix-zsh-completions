@@ -1,5 +1,3 @@
-# vim: ft=sh:
-
 #compdef nix-channel
 #autoload
 

@@ -1,5 +1,3 @@
-# vim: set ft=sh:
-
 #compdef nix-collect-garbage
 #autoload
 

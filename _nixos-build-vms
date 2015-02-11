@@ -1,5 +1,3 @@
-# vim: set ft=sh:
-
 #compdef nixos-build-vms
 #autoload
 
