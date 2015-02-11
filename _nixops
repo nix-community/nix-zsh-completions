@@ -122,7 +122,7 @@ case "$words[1]" in
       '--include[Only start the specified machines]:Machine Names:( )'\
       '--exclude[Do not start the specified machines]:Machine Names:( )'
     ;;
-  list)
+  info)
     _arguments \
       $_nixops_common_arguments\
       '--all[Print information about all resources in all known deployments]'\
@@ -195,5 +195,9 @@ case "$words[1]" in
     _arguments \
       $_nixops_common_arguments\
       '--include-keys[]'
+    ;;
+  *)
+    _arguments \
+      $_nixops_common_arguments\
     ;;
 esac
