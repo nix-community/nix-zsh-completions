@@ -1,0 +1,199 @@
+#compdef nixops
+#autoload
+
+# List of valid commands
+local -a _1st_arguments
+_1st_arguments=(
+  "list:list all known deployments"\
+  "create:create a new deployment"\
+  "modify:modify an existing deployment"\
+  "clone:clone an existing deployment"\
+  "delete:delete a deployment"\
+  "info:show the state of the deployment"\
+  "check:check the state of the machines in the network"\
+  "set-args:persistently set arguments to the deployment specification"\
+  "deploy:deploy the network configuration"\
+  "send-keys:send encryption keys"\
+  "destroy:destroy all resources in the specified deployment"\
+  "stop:stop all virtual machines in the network"\
+  "start:start all virtual machines in the network"\
+  "reboot:reboot all virtual machines in the network"\
+  "show-physical:print the physical network expression"\
+  "ssh:login on the specified machine via SSH"\
+  "ssh-for-each:execute a command on each machine via SSH"\
+  "scp:copy files to or from the specified machine via scp"\
+  "rename:rename machine in network"\
+  "backup:make snapshots of persistent disks in network (EC2-only)"\
+  "backup-status:get status of backups"\
+  "remove-backup:remove a given backup"\
+  "clean-backups:remove old backups"\
+  "restore:restore machines based on snapshots of persistent disks in network (EC2-only)"\
+  "show-option:print the value of a configuration option"\
+  "list-generations:list previous configurations to which you can roll back"\
+  "rollback:roll back to a previous configuration"\
+  "delete-generation:remove a previous configuration"\
+  "show-console-output:print the machines console output on stdout"\
+  "dump-nix-paths:dump Nix paths referenced in deployments"\
+  "export:export the state of a deployment"\
+  "import:import deployments into the state file"\
+  "edit:open the deployment specification in \$EDITOR"\
+  )
+
+# Options valid for every command
+# This approach is slightly hackish, because the same option will be
+# completed before and after a command. TODO: Come up with a better approach
+local -a _nixops_common_arguments
+_nixops_common_arguments=(
+  '(--state -s)'{--state,-s}'[Path to state file that contains the deployments]:Statefile:_files -g \*.nixops'\
+  '(--deployment -d)'{--deployment,-d}'[UUID or symbolic name of deployment on which to operate]'\
+  '--confirm[Automatically confirm "dangerous" actions]'\
+  '--debug[Turn on debugging output]'\
+)
+
+_arguments \
+  '(- 1 *)'{--help,-h}'[Show help message and exit]'\
+  '(- 1 *)--version[Show version number and exit]'\
+  $_nixops_common_arguments\
+  '*:: :->subcmds' && return 0
+
+if (( CURRENT==1 )); then
+    _describe -t commands "nixos-container subcommands" _1st_arguments
+    return
+fi
+
+case "$words[1]" in
+  create)
+    _arguments \
+      $_nixops_common_arguments\
+      '-I[Add path to the Nix expression search path for all future evaluations]:Path:_files -/'\
+      '*:Nix Expressions:_files -g \*.nix'
+    ;;
+  modify)
+    _arguments \
+      $_nixops_common_arguments\
+      '-I[Add path to the Nix expression search path for all future evaluations]:Path:_files -/'\
+      '(--name -n)'{--name,-n}'[Change the symbolic name]:New Name:( )'\
+    ;;
+  clone)
+    _arguments \
+      $_nixops_common_arguments\
+      '(--name -n)'{--name,-n}'[Symbolic name for the new deployment]'\
+    ;;
+  delete)
+    _arguments \
+      $_nixops_common_arguments\
+      '--all[Delete all deployments in the state file]'\
+      '--force[]'
+    ;;
+  deploy)
+    _arguments \
+      $_nixops_common_arguments\
+      '(--kill-obsolete -k)'{--kill-obsolete,-k}'[Destroy machines no longer listed in the deployment specification]'\
+      '--dry-run[Show what would be done without doing it]'\
+      '--repair[Use --repair when calling nix-build]'\
+      '--create-only[Create missing machines only: build nothing and do not touch existing machines]'\
+      '--build-only[Build the configuration without creating or deploying machines]'\
+      '--copy-only[Do everything except activate the new configuration]'\
+      '--check[Check that deployed machines are correctly configured]'\
+      '--allow-reboot[Allow NixOps to reboot the instance if necessary]'\
+      '--force-reboot[Reboot the machine to activate the new configuration]'\
+      '--allow-recreate[Recreate resources that have disappeared]'\
+      '--include[Only operate on the specified machines]:Machine Names:( )'\
+      '--exclude[Do not operate on the specified machines]:Machine Names:( )'\
+      '*-I[Add path to the Nix expression search path]: :( )'\
+      '--max-concurrent-copy[Set the maximum concurrent nix-copy-closure processes (Default 5)]:Number:( )'
+    ;;
+  destroy)
+    _arguments \
+      $_nixops_common_arguments\
+      '--all[Destroy all deployments]'\
+      '--include[Only destroy the specified machines]:Machine Names:( )'\
+      '--exclude[Do not destroy the specified machines]:Machine Names:( )'
+    ;;
+  stop)
+    _arguments \
+      $_nixops_common_arguments\
+      '--include[Only stop the specified machines]:Machine Names:( )'\
+      '--exclude[Do not stop the specified machines]:Machine Names:( )'
+    ;;
+  start)
+    _arguments \
+      $_nixops_common_arguments\
+      '--include[Only start the specified machines]:Machine Names:( )'\
+      '--exclude[Do not start the specified machines]:Machine Names:( )'
+    ;;
+  list)
+    _arguments \
+      $_nixops_common_arguments\
+      '--all[Print information about all resources in all known deployments]'\
+      '--plain[Print in a more easily parsed format]'\
+      '--no-eval[Do not evaluate the deployment specification]'
+    ;;
+  check)
+    _arguments \
+      $_nixops_common_arguments\
+      '--all[Check all machines in all known deployments]'
+    ;;
+  ssh)
+    _arguments \
+      $_nixops_common_arguments\
+      '--include-keys[]'
+    ;;
+  ssh-for-each)
+    _arguments \
+      $_nixops_common_arguments\
+      '(--parallel -p)'{--parallel -p}'[Execute the command on each machine in parallel]'\
+      '--include[Only execute on the specified machines]:Machine Names:( )'\
+      '--exclude[Do not execute on the specified machines]:Machine Names:( )'
+    ;;
+  reboot)
+    _arguments \
+      $_nixops_common_arguments\
+      '--include[Only reboot the specified machines]:Machine Names:( )'\
+      '--exclude[Do not reboot the specified machines]:Machine Names:( )'\
+      '--no-wait[Do not wait until the machines have finished rebooting]'
+    ;;
+  backup)
+    _arguments \
+      $_nixops_common_arguments\
+      '--include[Only backup the specified machines]:Machine Names:( )'\
+      '--exclude[Do not backup the specified machines]:Machine Names:( )'\
+    ;;
+  restore)
+    _arguments \
+      $_nixops_common_arguments\
+      '--include[Only restore the specified machines]:Machine Names:( )'\
+      '--exclude[Do not restore the specified machines]:Machine Names:( )'\
+      '--devices[Restore only the persistent disks which are mapped to the specified device names]:Device names:( )'\
+      '--backup-id[Restore the persistent disks of all machines to a given backup except the ones listed here.]:Backup ids:( )'
+    ;;
+  show-option)
+    _arguments \
+      $_nixops_common_arguments\
+      '--xml[]'\
+      '1:machine:( )'\
+      '2:option:( )'
+    ;;
+  set-args)
+    _arguments \
+      $_nixops_common_arguments\
+      '--arg[Set the function argument]:Name:( ):Value:( )'\
+      '--argstr[Like --arg but the value is a string]:Name:( ):Value:( )'\
+      '--unset[Remove a previously set function argument]:Name:( )'
+    ;;
+  show-console-output)
+    _arguments \
+      $_nixops_common_arguments\
+      '1:machine:( )'
+    ;;
+  export)
+    _arguments \
+      $_nixops_common_arguments\
+      '--all[]'
+    ;;
+  import)
+    _arguments \
+      $_nixops_common_arguments\
+      '--include-keys[]'
+    ;;
+esac
