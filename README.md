@@ -1,8 +1,8 @@
 ZSH Completions for Nix and NixOS
 =================================
 
-This project aims to be a highly complete set of ZSH completions for [Nix](https://nixos.org/nix/),
-[NixOS](https://nixos.org/), and the surrounding ecosystem.
+This project aims to provide a highly complete set of ZSH completions for [Nix](https://nixos.org/nix/),
+[NixOS](https://nixos.org/), [NixOps](http://nixos.org/nixops/), and the surrounding ecosystem.
 
 Oh-My-ZSH Installation
 ----------------------
