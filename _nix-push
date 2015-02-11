@@ -1,3 +1,5 @@
+# vim: set ft=sh:
+
 #compdef nix-push
 #autoload
 
@@ -11,5 +13,3 @@ _arguments \
   '(--manifest)--manifest-path[Like --manifest, but specify the manifest filename]:Manifest filename:'\
   '--url-prefix[Specify the prefix URL used in the Manifest]:Prefix URL:( )'\
   '*:Derivation Paths:_files'
-
-# vim: set ft=zsh:

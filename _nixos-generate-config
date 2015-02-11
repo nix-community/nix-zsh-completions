@@ -1,3 +1,5 @@
+# vim: set ft=sh:
+
 #compdef nixos-generate-config
 #autoload
 
@@ -7,5 +9,3 @@ _arguments \
   '--dir[Directory to write configuration files to (Default /etc/nixos)]:Output directory:_files -/'\
   '--no-filesystems[Omit file system information from hardware configuration]'\
   '--show-hardware-config[Print hardware configuration to stdout without writing anything to disk]'
-
-# vim: set ft=zsh:

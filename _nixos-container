@@ -1,3 +1,5 @@
+# vim: set ft=sh:
+
 #compdef nixos-container
 #autoload
 
@@ -49,5 +51,3 @@ case "$words[1]" in
             '1:Container Name:_containers'
         ;;
 esac
-
-# vim: set ft=zsh:

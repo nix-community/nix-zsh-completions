@@ -1,3 +1,5 @@
+# vim: set ft=sh:
+
 #compdef nixops
 #autoload
 
@@ -201,5 +203,3 @@ case "$words[1]" in
       $_nixops_common_arguments\
     ;;
 esac
-
-# vim: set ft=zsh:

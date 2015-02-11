@@ -1,3 +1,5 @@
+# vim: set ft=sh:
+
 #compdef nixos-build-vms
 #autoload
 
@@ -5,5 +7,3 @@ _arguments \
   '--show-trace[Show a trace of the output]'\
   "--no-out-link[Do not create a 'result' symlink]"\
   '1:Network Nix Expression:_files -g \*.nix'
-
-# vim: set ft=zsh:
