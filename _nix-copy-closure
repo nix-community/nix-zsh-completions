@@ -1,0 +1,14 @@
+# vim: set ft=sh:
+
+#compdef nix-copy-closure
+#autoload
+
+_arguments \
+  '(--from)--to[Copy the closure to the remote machine (default)]'\
+  '(--to)--from[Copy the closure from the remote machine]'\
+  '--sign[Cryptographically sign]'\
+  '--gzip[Compress file transfer over SSH connection]'\
+  '--include-outputs[Also copy outputs of store derivations included in the closure]'\
+  '(--use-substitutes -s)'{--use-substitutes,-s}'[Download files from binary cache if possible]'\
+  '1:user@machine:( )'\
+  '2:paths:( )'
