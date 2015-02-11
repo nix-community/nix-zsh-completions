@@ -1,0 +1,51 @@
+#compdef nixos-container
+#autoload
+
+_containers () {
+    containers=($(nixos-container list))
+    _wanted containers expl 'containers' compadd -a containers
+}
+
+local -a _1st_arguments
+_1st_arguments=(
+    'list:Show list of containers'\
+    'create:Create a container'\
+    'destroy:Destroy a container'\
+    'start:Start a container'\
+    'stop:Stop a container'\
+    'status:Get status of a container'\
+    'login:Login to a container'\
+    'root-login:Login to a container as root (no password needed)'\
+    'run:Run a container'\
+    'show-ip:Display the IP of a container'\
+    'show-host-key:Display the host key of a container'
+    )
+
+_arguments \
+  '(- 1 *)--help[Display help]'\
+  '*:: :->subcmds' && return 0
+
+if (( CURRENT==1 )); then
+    _describe -t commands "nixos-container subcommands" _1st_arguments
+    return
+fi
+
+case "$words[1]" in
+    create)
+        _arguments\
+            '1:Container Name:_containers'\
+            '--system-path[System path]:Path:_files'\
+            '--config[Config]:Config:'\
+            '--ensure-unique-name[Avoid name conflicts with other containers]'\
+            '--auto-start[Start the container immediately]'
+        ;;
+    run)
+        # TODO: There are a few more arguments in this case
+        _arguments\
+            '1:Container Name:_containers'\
+        ;;
+    destroy|start|stop|login|root-login|show-ip|show-host-key)
+        _arguments\
+            '1:Container Name:_containers'
+        ;;
+esac
