@@ -1,0 +1,7 @@
+#compdef nix-prefetch-url
+#autoload
+
+_arguments \
+  '--type[Use the specified cryptographic hash algorithm]:Hash Algorithm:(md5 sha1 sha256)'\
+  '1:URL:( )'\
+  '2::Hash:( )'
