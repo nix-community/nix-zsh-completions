@@ -40,8 +40,6 @@ _1st_arguments=(
   )
 
 # Options valid for every command
-# This approach is slightly hackish, because the same option will be
-# completed before and after a command. TODO: Come up with a better approach
 local -a _nixops_common_arguments
 _nixops_common_arguments=(
   '(--state -s)'{--state,-s}'[Path to state file that contains the deployments]:Statefile:_files -g \*.nixops'\
@@ -51,9 +49,7 @@ _nixops_common_arguments=(
 )
 
 _arguments \
-  '(- 1 *)'{--help,-h}'[Show help message and exit]'\
-  '(- 1 *)--version[Show version number and exit]'\
-  $_nixops_common_arguments\
+  $_nix_boilerplate_opts \
   '*:: :->subcmds' && return 0
 
 if (( CURRENT==1 )); then
