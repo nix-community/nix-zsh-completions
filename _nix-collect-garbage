@@ -2,10 +2,7 @@
 #autoload
 
 _arguments \
+  $_nix_gc_common \
   '(--delete-old -d)'{--delete-old,-d}'[Delete everything in the nix store not used by the current generation of each profile]'\
   '--delete-older-than[Delete generations older than the given time]:Time such as 30d:( )'\
-  '(- --print* --delete)--print-roots[Print roots used by garbage collector]'\
-  '(- --print* --delete)--print-live[Print store paths reachable from roots]'\
-  '(- --print* --delete)--print-dead[Print store paths not reachable from roots]'\
-  '(- --print* --delete)--delete[Garbage collect all dead paths from the store]'\
   '--dry-run[Print what would have been done, without doing it]'
