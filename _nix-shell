@@ -1,0 +1,15 @@
+#compdef nix-shell
+#autoload
+
+_nix_shell_opts=(
+  '--command[Run a command instead of starting an interactive shell]:Command: ( )' \
+  '--exclude[Do not build any dependencies which match this regex]:Regex:( )' \
+  '--pure[Clear the environment before starting the interactive shell]' \
+  '(--packages -p)'{--packages,-p}'[Set up an environment where the given packages are present]:*:Packages:( )' \
+)
+
+_arguments \
+  $_nix_boilerplate_opts \
+  $_nix_common_opts \
+  $_nix_shell_opts \
+  '*:Paths:_files' \
