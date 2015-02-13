@@ -1,0 +1,29 @@
+#compdef nixos-rebuild
+#autoload
+
+local -a _1st_arguments
+_1st_arguments=(
+  'switch:Build, activate, and update boot default'\
+  'boot:Build and update boot default without activating'\
+  'test:Build and activate without updating boot default'\
+  'build:Build without activating or updating boot default'\
+  'dry-run:Show what store paths would be built or downloaded'\
+  'build-vm:Create a script which starts a VM with the built configuration'\
+  'build-vm-with-bootloader:Like build-vm, but boot using regular boot loader'
+  )
+
+_arguments \
+  $_nix_common_opts \
+  '--upgrade[Fetch the latest version of NixOS from the NixOS channel]'\
+  '--install-grub[(Re)install grub on the configured device]'\
+  "--no-build-nix[Don't build Nix package manager]"\
+  '--fast[Equivalent to --no-build-nix --show-trace]'\
+  '--rollback[Roll back to the previous configuration]'\
+  '(--profile-name -p)'{--profile-name,-p}'[Profile to use to track current and previous system configurations]: :( )'\
+  '1:: :->subcmds' && return 0
+
+case $state in
+  subcmds)
+    _describe -t commands "nixos-rebuild subcommands" _1st_arguments
+  ;;
+esac
