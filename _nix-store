@@ -1,0 +1,102 @@
+#compdef nix-store
+#autoload
+
+local -a _1st_arguments
+_1st_arguments=(
+  {--realise,-r}':Build the specified store paths' \
+  '--gc:Perform garbage collection on the Nix store' \
+  '--delete:Delete store paths from the Nix store if it is safe to do so' \
+  {--query,-q}':Display information about store paths' \
+  '--add:Add paths to the Nix store' \
+  '--verify:Verify the consistency of the Nix database and store' \
+  '--verify-path:Compare the contents of each store path to the hashes stored in the database' \
+  '--repair-path:Attempt to repair the specified paths by redownloading them' \
+  '--dump:Produce a NAR file containing the contents of the given path' \
+  '--restore:Unpack a NAR archive, read from stdin, to the given path' \
+  '--export:Serialize the specified store paths to stdout in a format which can be imported' \
+  '--import:Read searialized store paths from stdin and add them to the Nix store' \
+  '--optimise:Find identical files in the Nix store and hardlink them together to reduce disk usage'\
+  {--read-log,-l}':Print the build log of the specified store paths' \
+  '--dump-db:Dump Nix database to stdout' \
+  '--load-db:Read a dump of the Nix database' \
+  '--print-env:Print the environment of a derivation as shell code' \
+  '--query-failed-paths:Print out store paths which failed to build' \
+  '--clear-failed-paths:Clear the "failed" state of the given store path' \
+  )
+
+_arguments \
+  '*:: :->subcmds' && return 0
+
+if (( CURRENT==1 )); then
+  _describe -t commands "nix-store subcommands" _1st_arguments
+  return
+fi
+
+case "$words[1]" in
+  --realise)
+    _arguments \
+      $_nix_dry_run \
+      '--ignore-unknown[Silently ignore non-derivation paths with no substitute]' \
+      '*:Store Paths:_files'
+  ;;
+  --gc)
+    _arguments \
+      $_nix_gc_common \
+      '--max-freed[Stop garbage collection once this many bytes has been freed]:Bytes:( )'
+  ;;
+  --delete)
+    _arguments \
+      '--ignore-liveness[Ignore reachability from roots]'
+  ;;
+  --query)
+    _queries=(
+      '--outputs:Print the output paths of the given store derivations' \
+      {--requisites,-R}':Print the closure of the given store paths' \
+      '--references:Print immediate dependencies of the given store paths' \
+      '--referrers:Print store paths which refer to these paths' \
+      '--referrers-closure:Print the closure under the referrers relation' \
+      '--deriver:Print the deriver of the store paths' \
+      '--graph:Print the references graph of the store paths in Graphviz format' \
+      '--tree:Print the references graph of the store paths as an ASCII tree' \
+      '--binding:Print the value of an attribute of the store derivations' \
+      '--hash:Print the SHA-256 hash of the contents of the store paths' \
+      '--size:Print the size in bytes of the contents of the store paths' \
+      '--roots:Print the garbage collector roots that point to the store paths' \
+    )
+
+    _query_common=(
+      '(--use-output -u)'{--use-output,-u}'[Apply the query to the output path of any store derivations]' \
+      '(--force-realise -f)'{--force-realise,-f}'[Realise each argument to the query first]' \
+    )
+
+    if (( CURRENT == 2 )); then
+      _describe -t commands "Query subcommands" _queries
+      return
+    fi
+
+    case "$words[2]" in
+      --requisites|-R)
+        _arguments $_query_common \
+          '--include-outputs[Also include the output paths of store derivations]' \
+          '*: :_files'
+      ;;
+      *)
+        _arguments $_query_common \
+          '*: :_files'
+      ;;
+    esac
+
+  ;;
+  --verify)
+    _arguments \
+      '--check-contents[Compute and validate the SHA-256 hash of each store item]' \
+      '--repair[Attempt to repair invalid or missing paths by redownloading them]'
+  ;;
+  --dump-db|--load-db|--query-failed-paths)
+    # Nothing to complete
+  ;;
+  *)
+    _arguments \
+        '*: :_files'
+  ;;
+esac
