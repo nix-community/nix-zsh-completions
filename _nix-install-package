@@ -1,0 +1,9 @@
+#compdef nix-install-package
+#autoload
+
+_arguments \
+  '--non-interactive[Do not open a terminal window and do not ask for confirmation]' \
+  '(--profile -p)'{--profile,-p}'[Profile to install the package into]:Path:_files' \
+  '--set[Install the package as the profile so that the profile contains nothing else]' \
+  '(1)--url[URL to download the package file from]:URL:( )' \
+  '(--url)1:Package File:_files -g \*.nixpkg'
