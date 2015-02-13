@@ -44,7 +44,7 @@ case "$words[1]" in
         _arguments\
             '1:Container Name:_containers'\
         ;;
-    destroy|start|stop|login|root-login|show-ip|show-host-key)
+    destroy|start|stop|status|login|root-login|show-ip|show-host-key)
         _arguments\
             '1:Container Name:_containers'
         ;;
