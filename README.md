@@ -7,8 +7,22 @@ This project aims to provide a highly complete set of ZSH completions for [Nix](
 Oh-My-ZSH Installation
 ----------------------
 
-```bash
+```zsh
 git clone git@github.com:spwhitt/nix-zsh-completions.git ~/.oh-my-zsh/custom/plugins/nix
 ```
 
 Then add `nix` to the plugins list in `~/.zshrc`
+
+Antigen Installation
+--------------------
+
+Add the following to ~/.zshrc
+
+```zsh
+antigen bundle git@github.com:spwhitt/nix-zsh-completions.git
+```
+
+ZSH Completions Tutorial
+------------------------
+
+[zsh-completions-howto](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
