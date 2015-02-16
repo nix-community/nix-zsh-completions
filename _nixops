@@ -48,6 +48,11 @@ _nixops_common_arguments=(
   '--debug[Turn on debugging output]'\
 )
 
+_nixops_include_exclude=(
+  '--include[Only operate on the specified machines]:Machine Names:_hosts' \
+  '--exclude[Do not operate on the specified machines]:Machine Names:_hosts' \
+)
+
 _arguments \
   $_nix_boilerplate_opts \
   '*:: :->subcmds' && return 0
@@ -94,8 +99,7 @@ case "$words[1]" in
       '--allow-reboot[Allow NixOps to reboot the instance if necessary]'\
       '--force-reboot[Reboot the machine to activate the new configuration]'\
       '--allow-recreate[Recreate resources that have disappeared]'\
-      '--include[Only operate on the specified machines]:Machine Names:( )'\
-      '--exclude[Do not operate on the specified machines]:Machine Names:( )'\
+      $_nixops_include_exclude \
       '*-I[Add path to the Nix expression search path]: :( )'\
       '--max-concurrent-copy[Set the maximum concurrent nix-copy-closure processes (Default 5)]:Number:( )'
     ;;
@@ -103,20 +107,17 @@ case "$words[1]" in
     _arguments \
       $_nixops_common_arguments\
       '--all[Destroy all deployments]'\
-      '--include[Only destroy the specified machines]:Machine Names:( )'\
-      '--exclude[Do not destroy the specified machines]:Machine Names:( )'
+      $_nixops_include_exclude \
     ;;
   stop)
     _arguments \
       $_nixops_common_arguments\
-      '--include[Only stop the specified machines]:Machine Names:( )'\
-      '--exclude[Do not stop the specified machines]:Machine Names:( )'
+      $_nixops_include_exclude \
     ;;
   start)
     _arguments \
       $_nixops_common_arguments\
-      '--include[Only start the specified machines]:Machine Names:( )'\
-      '--exclude[Do not start the specified machines]:Machine Names:( )'
+      $_nixops_include_exclude \
     ;;
   info)
     _arguments \
@@ -139,27 +140,23 @@ case "$words[1]" in
     _arguments \
       $_nixops_common_arguments\
       '(--parallel -p)'{--parallel -p}'[Execute the command on each machine in parallel]'\
-      '--include[Only execute on the specified machines]:Machine Names:( )'\
-      '--exclude[Do not execute on the specified machines]:Machine Names:( )'
+      $_nixops_include_exclude \
     ;;
   reboot)
     _arguments \
       $_nixops_common_arguments\
-      '--include[Only reboot the specified machines]:Machine Names:( )'\
-      '--exclude[Do not reboot the specified machines]:Machine Names:( )'\
+      $_nixops_include_exclude \
       '--no-wait[Do not wait until the machines have finished rebooting]'
     ;;
   backup)
     _arguments \
       $_nixops_common_arguments\
-      '--include[Only backup the specified machines]:Machine Names:( )'\
-      '--exclude[Do not backup the specified machines]:Machine Names:( )'\
+      $_nixops_include_exclude \
     ;;
   restore)
     _arguments \
       $_nixops_common_arguments\
-      '--include[Only restore the specified machines]:Machine Names:( )'\
-      '--exclude[Do not restore the specified machines]:Machine Names:( )'\
+      $_nixops_include_exclude \
       '--devices[Restore only the persistent disks which are mapped to the specified device names]:Device names:( )'\
       '--backup-id[Restore the persistent disks of all machines to a given backup except the ones listed here.]:Backup ids:( )'
     ;;
@@ -167,7 +164,7 @@ case "$words[1]" in
     _arguments \
       $_nixops_common_arguments\
       '--xml[]'\
-      '1:machine:( )'\
+      '1:machine:_hosts'\
       '2:option:( )'
     ;;
   set-args)
@@ -180,7 +177,7 @@ case "$words[1]" in
   show-console-output)
     _arguments \
       $_nixops_common_arguments\
-      '1:machine:( )'
+      '1:machine:_hosts'
     ;;
   export)
     _arguments \
