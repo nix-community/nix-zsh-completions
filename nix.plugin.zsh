@@ -16,9 +16,11 @@ _nix_version_opt='(- *)--version[Print version number and exit]'
 _nix_verbose_opt='(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'
 
 _nix_boilerplate_opts=(
-  $_help_opt \
-  $_version_opt \
+  $_nix_help_opt \
+  $_nix_version_opt \
 )
+
+_nix_dry_run='--dry-run[Show what would be done without doing it]'
 
 # Output Types
 _nix_output_opts=(
@@ -33,9 +35,13 @@ _nix_gc_common=(
   '(- --print* --delete)--delete[Garbage collect all dead paths from the store]' \
 )
 
-_nix_args=(
+_nix_auto_args=(
   '*--arg[Argument to pass to the Nix function]:Name:( ):Value:( )'\
   '--argstr[Like --arg, but the value is a string]: :'\
+)
+
+_nix_search_path_args=(
+  '*-I+[Add path to Nix expression search path]:Include path:{_files -g \*.nix}'\
 )
 
 _nix_AE=(
@@ -45,7 +51,8 @@ _nix_AE=(
 
 _nix_common_opts=(
   $_verbose_opt \
-  $_nix_args \
+  $_nix_auto_args \
+  $_nix_search_path_args \
   $_nix_AE \
   '(--no-build-output -Q)'{--no-build-output,-Q}'[Silence output to stdout and stderr]'\
   '(--max-jobs -j)'{--max-jobs,-j}'[Set the maximum number of build jobs that Nix will perform in parallel]'\
@@ -58,7 +65,6 @@ _nix_common_opts=(
   '--readonly-mode[Do not open Nix database]'\
   '--log-type[Configure how output is formatted]:Output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'\
   '--show-trace[Print stack trace of evaluation errors]'\
-  '*-I+[Add path to Nix expression search path]:Include path:{_files -g \*.nix}'\
   '--option[Set Nix configuration option]: :'\
   '--repair[Fix corrupted or missing store paths by redownloading or rebuilding]'\
 )
