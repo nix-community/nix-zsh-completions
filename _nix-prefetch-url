@@ -3,5 +3,5 @@
 
 _arguments \
   '--type[Use the specified cryptographic hash algorithm]:Hash Algorithm:(md5 sha1 sha256)'\
-  '1:URL:( )'\
+  '1:URL:_urls'\
   '2::Hash:( )'
