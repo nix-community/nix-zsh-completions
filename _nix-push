@@ -8,6 +8,6 @@ _arguments \
   '--force[Overwrite .narinfo files if they already exist]'\
   '--link[Hard link files into the destination directory rather than copying]'\
   '(--manifest-path)--manifest[Force the generation of a manifest suitable for use by nix-pull]'\
-  '(--manifest)--manifest-path[Like --manifest, but specify the manifest filename]:Manifest filename:'\
-  '--url-prefix[Specify the prefix URL used in the Manifest]:Prefix URL:( )'\
+  '(--manifest)--manifest-path[Like --manifest, but specify the manifest filename]:Manifest filename:_files'\
+  '--url-prefix[Specify the prefix URL used in the Manifest]:Prefix URL:_urls'\
   '*:Derivation Paths:_files'
