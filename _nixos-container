@@ -35,7 +35,7 @@ case "$words[1]" in
     _arguments\
       '1:Container Name:_containers'\
       '--system-path[System path]:Path:_files'\
-      '--config[Config]:Config:'\
+      '--config[Config]:Config:( )'\
       '--ensure-unique-name[Avoid name conflicts with other containers]'\
       '--auto-start[Start the container immediately]'
     ;;
