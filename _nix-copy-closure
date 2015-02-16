@@ -8,5 +8,5 @@ _arguments \
   '--gzip[Compress file transfer over SSH connection]'\
   '--include-outputs[Also copy outputs of store derivations included in the closure]'\
   '(--use-substitutes -s)'{--use-substitutes,-s}'[Download files from binary cache if possible]'\
-  '1:user@machine:( )'\
-  '2:paths:( )'
+  '1:user@machine:_user_at_host'\
+  '2:paths:_files'
