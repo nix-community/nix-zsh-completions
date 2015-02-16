@@ -1,0 +1,5 @@
+#autoload
+
+# List of package names with version numbers stripped
+generations=($(nix-env --list-generations | awk '{print $1":"$2}'))
+_describe "Nix Generations" generations
