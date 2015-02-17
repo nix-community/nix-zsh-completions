@@ -6,8 +6,8 @@ _nix_channels() {
 }
 
 _arguments \
-  '(- *)--add[Subscribe to a channel]: :'\
-  '(- *)--remove[Unsubscribe from a channel]: :_nix_channels'\
-  '(- *)--list[List subscribed channels]: :'\
-  '(- *)--update[Update and activate channels]: :_nix_channels'\
-  '(- *)--rollback[Revert the previous nix-channel --update]: :'
+  '(- *)--add[Subscribe to a channel]:Channel URL:_urls::Channel Name:( )'\
+  '(- *)--remove[Unsubscribe from a channel]:Channel Name:_nix_channels'\
+  '(- *)--list[List subscribed channels]'\
+  '(- *)--update[Update and activate channels]:Channel Name:_nix_channels'\
+  '(- *)--rollback[Revert the previous nix-channel --update]'

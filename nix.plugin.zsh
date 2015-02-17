@@ -4,10 +4,14 @@ alias ni='nix-env -iA'
 # Nix Search
 alias ns='nix-env -qaP'
 
-_nix_store_path() {
+_nix_shortcuts () {
+    _values shortcuts "<nixpkgs>" "<nixos>"
+}
+
+_nix_path() {
   _alternative \
-    'nixpkgs:<nixpkgs>' \
-    'path:File Path:_files'
+    'nixpkgs:Nixpkgs:_nix_shortcuts' \
+    'path:File Path:_files -g \*.nix'
 }
 
 # Factor out common options
@@ -21,12 +25,6 @@ _nix_boilerplate_opts=(
 )
 
 _nix_dry_run='--dry-run[Show what would be done without doing it]'
-
-# Output Types
-_nix_output_opts=(
-  '--xml[Print expression from --eval as XML]'\
-  '--json[Print expression from --eval as JSON]'\
-)
 
 _nix_gc_common=(
   '(- --print* --delete)--print-roots[Print roots used by garbage collector]' \
@@ -65,6 +63,6 @@ _nix_common_opts=(
   '--readonly-mode[Do not open Nix database]'\
   '--log-type[Configure how output is formatted]:Output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'\
   '--show-trace[Print stack trace of evaluation errors]'\
-  '--option[Set Nix configuration option]: :'\
+  '--option[Set Nix configuration option]:Option Name:( ):Option Value:( )'\
   '--repair[Fix corrupted or missing store paths by redownloading or rebuilding]'\
 )

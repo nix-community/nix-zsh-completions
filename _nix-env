@@ -17,13 +17,13 @@ _1st_arguments=(
 
 _nix_env_common_opts=(
   $_nix_common_opts \
-  '(--file -f)'{--file,-f}'[Specify nix expression used to obtain derivations]:Path to file:_files'\
+  '(--file -f)'{--file,-f}'[Specify Nix expression used to obtain derivations]:Path to file:_files'\
   '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'\
   $_nix_dry_run \
   '--system-filter[Only show derivations matching the specified platform]:system:( )'\
 )
 _nix_env_b=('(--prebuilt-only -b)'{--prebuilt-only,-b}'[Fail if there is no pre-built binary available]')
-_nix_env_from_profile='--from-profile[]:Profile:_files'
+_nix_env_from_profile='--from-profile[Fetch store paths from another profile]:Profile:_nix_profiles'
 
 _arguments \
   '*:: :->subcmds' && return 0
@@ -59,7 +59,7 @@ case "$words[1]" in
     _set_flag_attrs=(
       'priority\:"Resolve package name conflicts"' \
       'keep\:"Prevent package from being upgraded"' \
-      'active\:"Symlinked to profile"' \
+      'active\:"Package is symlinked to profile"' \
     )
     _arguments \
       "1:Attribute:(($_set_flag_attrs))" \
@@ -79,6 +79,8 @@ case "$words[1]" in
       '--drv-path[Print store derivatino path]' \
       '--out-path[Print output path]' \
       '--description[Print description of derivation]' \
+      '--xml[Print output as XML]'\
+      '--json[Print output as JSON]'\
       '--meta[Print all meta attributes: only available with --xml]'
     ;;
   --switch-profile|-S)

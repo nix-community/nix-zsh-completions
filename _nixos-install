@@ -2,7 +2,7 @@
 #autoload
 
 _arguments \
-  '*-I[Add path to the Nix expression search path]:Path:_files -/'\
+  $_nix_search_path_args \
   '--root[Treat the given directory as the root of the NixOS installation]:Installation Root:_files -/'\
   '--show-trace[Print a stack trace in case of evaluation errors]'\
   '--chroot[Chroot into given installation]'

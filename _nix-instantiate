@@ -5,12 +5,13 @@
 # --repair: undocumented arg
 _arguments \
   $_nix_boilerplate_opts \
-  $_nix_output_opts \
   $_nix_common_opts \
-  '--add-root[Register result as a root of the garbage collector]::Path to store root, probably under /nix/var/nix/gcroots:_files -/'\
+  '--xml[Print output from --eval as XML]'\
+  '--json[Print output from --eval as JSON]'\
+  '--add-root[Register result as a root of the garbage collector]::Path (Hint /nix/var/nix/gcroots):_files -/'\
   '--indirect[Allow roots to be stored outside of the GC roots directory]'\
   '--parse[Just parse the input files and print their abstract syntax trees]'\
   '--eval[Just parse and evaluate the input files, and print the resulting values]'\
-  "(- *)--find-file[Look up the given files on Nix's search path]:*:Files:( )"\
+  "(- *)--find-file[Look up the given files on Nix's search path]:*:Files:_files"\
   '--strict[Cause --eval to recursively evaluate list elements and attributes]'\
   '--read-write-mode[Perform evaluation in read/write mode]'\

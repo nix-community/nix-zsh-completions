@@ -53,6 +53,10 @@ _nixops_include_exclude=(
   '--exclude[Do not operate on the specified machines]:Machine Names:_hosts' \
 )
 
+_nixops_search_path_args=(
+  '-I[Add path to the Nix expression search path for all future evaluations]:Path:_files -/' \
+)
+
 _arguments \
   $_nix_boilerplate_opts \
   '*:: :->subcmds' && return 0
@@ -66,13 +70,13 @@ case "$words[1]" in
   create)
     _arguments \
       $_nixops_common_arguments\
-      '-I[Add path to the Nix expression search path for all future evaluations]:Path:_files -/'\
+      $_nixops_search_path_args \
       '*:Nix Expressions:_files -g \*.nix'
     ;;
   modify)
     _arguments \
       $_nixops_common_arguments\
-      '-I[Add path to the Nix expression search path for all future evaluations]:Path:_files -/'\
+      $_nixops_search_path_args \
       '(--name -n)'{--name,-n}'[Change the symbolic name]:New Name:( )'\
     ;;
   clone)
@@ -90,7 +94,7 @@ case "$words[1]" in
     _arguments \
       $_nixops_common_arguments\
       '(--kill-obsolete -k)'{--kill-obsolete,-k}'[Destroy machines no longer listed in the deployment specification]'\
-      '--dry-run[Show what would be done without doing it]'\
+      $_nix_dry_run \
       '--repair[Use --repair when calling nix-build]'\
       '--create-only[Create missing machines only: build nothing and do not touch existing machines]'\
       '--build-only[Build the configuration without creating or deploying machines]'\
@@ -100,7 +104,7 @@ case "$words[1]" in
       '--force-reboot[Reboot the machine to activate the new configuration]'\
       '--allow-recreate[Recreate resources that have disappeared]'\
       $_nixops_include_exclude \
-      '*-I[Add path to the Nix expression search path]: :( )'\
+      $_nixops_search_path_args \
       '--max-concurrent-copy[Set the maximum concurrent nix-copy-closure processes (Default 5)]:Number:( )'
     ;;
   destroy)
@@ -163,7 +167,7 @@ case "$words[1]" in
   show-option)
     _arguments \
       $_nixops_common_arguments\
-      '--xml[]'\
+      '--xml[Format output as XML]'\
       '1:machine:_hosts'\
       '2:option:( )'
     ;;
@@ -182,7 +186,7 @@ case "$words[1]" in
   export)
     _arguments \
       $_nixops_common_arguments\
-      '--all[]'
+      '--all[Apply to all deployments]'
     ;;
   import)
     _arguments \
