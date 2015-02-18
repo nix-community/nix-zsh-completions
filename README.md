@@ -16,10 +16,21 @@ Then add `nix` to the plugins list in `~/.zshrc`
 Antigen Installation
 --------------------
 
-Add the following to ~/.zshrc
+Add the following to `~/.zshrc`
 
 ```zsh
 antigen bundle git@github.com:spwhitt/nix-zsh-completions.git
+```
+
+Plain ZSH Installation
+----------------------
+
+Clone this repository and add the following to `~/.zshrc` with the path to 
+`nix-zsh-completions` updated as necessary.
+
+```zsh
+fpath=($HOME/nix-zsh-completions $fpath)
+source $HOME/nix-zsh-completions/nix.plugin.zsh
 ```
 
 ZSH Completions Tutorial
