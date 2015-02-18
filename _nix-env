@@ -1,6 +1,16 @@
 #compdef nix-env
 #autoload
 
+_nix_systems () {
+    _values 'Systems' \
+        i686-linux x86_64-linux armv5tel-linux armv6l-linux armv7l-linux mips64el-linux \
+        x86_64-darwin \
+        i686-freebsd x86_64-freebsd \
+        i686-openbsd x86_64-openbsd \
+        i686-netbsd x86_64-netbsd \
+        i686-cygwin x86_64-cygwin \
+}
+
 local -a _1st_arguments
 _1st_arguments=(
   {--install,-i}":Install package"\
@@ -21,7 +31,7 @@ _nix_env_common_opts=(
   '(--file -f)'{--file,-f}'[Specify Nix expression used to obtain derivations]:Path to file:_files'\
   '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'\
   $_nix_dry_run \
-  '--system-filter[Only show derivations matching the specified platform]:system:( )'\
+  '--system-filter[Only show derivations matching the specified platform]:system:_nix_systems'\
 )
 
 local -a _nix_env_b
