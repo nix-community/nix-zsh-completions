@@ -33,7 +33,7 @@ if (( CURRENT==1 )); then
 fi
 
 case "$words[1]" in
-  --realise)
+  --realise|-r)
     _arguments \
       $_nix_dry_run \
       '--ignore-unknown[Silently ignore non-derivation paths with no substitute]' \
@@ -48,7 +48,7 @@ case "$words[1]" in
     _arguments \
       '--ignore-liveness[Ignore reachability from roots]'
   ;;
-  --query)
+  --query|-q)
     local -a _queries
     _queries=(
       '--outputs:Print the output paths of the given store derivations' \
