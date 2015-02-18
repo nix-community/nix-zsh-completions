@@ -49,6 +49,7 @@ case "$words[1]" in
       '--ignore-liveness[Ignore reachability from roots]'
   ;;
   --query)
+    local -a _queries
     _queries=(
       '--outputs:Print the output paths of the given store derivations' \
       {--requisites,-R}':Print the closure of the given store paths' \
@@ -64,6 +65,7 @@ case "$words[1]" in
       '--roots:Print the garbage collector roots that point to the store paths' \
     )
 
+    local -a _query_common
     _query_common=(
       '(--use-output -u)'{--use-output,-u}'[Apply the query to the output path of any store derivations]' \
       '(--force-realise -f)'{--force-realise,-f}'[Realise each argument to the query first]' \

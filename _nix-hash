@@ -1,6 +1,7 @@
 #compdef nix-hash
 #autoload
 
+local -a ig
 ig=( '--to-base16' '--to-base32' )
 
 _arguments \
@@ -11,5 +12,3 @@ _arguments \
   "($ig)--truncate[Truncate hashes to 160 bits]" \
   "($ig)--type[Hash algorithm to use]:hashAlgo:(md5 sha1 sha256)" \
   "($ig)*:Store Paths:_files" && return 0
-
-unset ig

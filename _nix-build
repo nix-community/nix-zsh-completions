@@ -1,6 +1,7 @@
 #compdef nix-build
 #autoload
 
+local -a _nix_build_opts
 _nix_build_opts=(
   '--drv-link[Add a symlink to the store derivation]:Symlink Name:( )' \
   '--add-drv-link[Shorthand for --drv-link ./derivation]' \

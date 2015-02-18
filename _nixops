@@ -48,11 +48,13 @@ _nixops_common_arguments=(
   '--debug[Turn on debugging output]'\
 )
 
+local -a _nixops_include_exclude
 _nixops_include_exclude=(
   '--include[Only operate on the specified machines]:Machine Names:_hosts' \
   '--exclude[Do not operate on the specified machines]:Machine Names:_hosts' \
 )
 
+local -a _nixops_search_path_args
 _nixops_search_path_args=(
   '-I[Add path to the Nix expression search path for all future evaluations]:Path:_files -/' \
 )
