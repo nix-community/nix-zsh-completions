@@ -17,7 +17,7 @@ _1st_arguments=(
   {--upgrade,-u}":Upgrade package"\
   {--uninstall,-e}":Uninstall package"\
   "--set-flag:Modify meta attribute of installed package"\
-  {--query,-q}":List derivations"\
+  {--query,-q}":List information about derivations"\
   {--switch-profile,-S}":Set the current profile path"\
   "--list-generations:Print a list of all generations in the active profile"\
   "--delete-generations:Delete specified generations"\
@@ -72,14 +72,30 @@ case "$words[1]" in
     ;;
   --set-flag)
     _set_flag_attrs=(
-      'priority\:"Resolve package name conflicts"' \
-      'keep\:"Prevent package from being upgraded"' \
-      'active\:"Package is symlinked to profile"' \
+      'priority:Resolve package name conflicts' \
+      'keep:Prevent package from being upgraded' \
+      'active:Package is symlinked to profile' \
     )
-    _arguments \
-      "1:Attribute:(($_set_flag_attrs))" \
-      '2:Value:( )' \
-      '*:drvnames:_nix_installed_packages'
+
+    if (( CURRENT==2 )); then
+        _describe -t commands "nix-env subcommands" _set_flag_attrs
+        return
+    fi
+
+    if (( CURRENT==3 )); then
+        case "$words[2]" in
+            priority)
+            ;;
+            keep)
+                _values "TF" true false
+            ;;
+            active)
+                _values "TF" true false
+            ;;
+        esac
+    else
+        _nix_installed_packages
+    fi
     ;;
   --query|-q)
     _arguments $_nix_env_common_opts \
@@ -91,9 +107,9 @@ case "$words[1]" in
       '--no-name[Suppress printing of name attribute]' \
       '(--compare-versions -c)'{--compare-versions,-c}'[Compare installed and available version]' \
       '--system[Print system attribute]' \
-      '--drv-path[Print store derivatino path]' \
+      '--drv-path[Print store derivation path]' \
       '--out-path[Print output path]' \
-      '--description[Print description of derivation]' \
+      '--description[Print description]' \
       '--xml[Print output as XML]'\
       '--json[Print output as JSON]'\
       '--meta[Print all meta attributes: only available with --xml]'
