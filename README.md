@@ -29,8 +29,9 @@ Clone this repository and add the following to `~/.zshrc` with the path to
 `nix-zsh-completions` updated as necessary.
 
 ```zsh
-fpath=($HOME/nix-zsh-completions $fpath)
 source $HOME/nix-zsh-completions/nix.plugin.zsh
+fpath=($HOME/nix-zsh-completions $fpath)
+autoload -U compinit && compinit
 ```
 
 ZSH Completions Tutorial
