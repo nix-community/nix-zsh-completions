@@ -15,13 +15,10 @@ _nix_path() {
 }
 
 # Factor out common options
-_nix_help_opt='(- *)--help[Print help message and exit]'
-_nix_version_opt='(- *)--version[Print version number and exit]'
-_nix_verbose_opt='(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'
 
 _nix_boilerplate_opts=(
-  $_nix_help_opt \
-  $_nix_version_opt \
+  '(- *)--help[Print help message and exit]' \
+  '(- *)--version[Print version number and exit]'
 )
 
 _nix_dry_run='--dry-run[Show what would be done without doing it]'
@@ -48,7 +45,7 @@ _nix_AE=(
 )
 
 _nix_common_opts=(
-  $_verbose_opt \
+  '(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'\
   $_nix_auto_args \
   $_nix_search_path_args \
   $_nix_AE \
