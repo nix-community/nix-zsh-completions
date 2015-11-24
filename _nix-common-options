@@ -99,25 +99,32 @@ _nix_options () {
         'pre-build-hook'
 }
 
-# Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixos-rebuild
-_nix_common_opts=(
+_nix_repair='--repair[Fix corrupted or missing store paths by redownloading or rebuilding]';
+
+# Misc Nix options accepted by nixos-rebuild
+_nix_common_nixos_rebuild=(
   '(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'\
-  '*--arg[Argument to pass to the Nix function]:Name:( ):Value:( )'\
-  '--argstr[Like --arg, but the value is a string]: :'\
-  $_nix_search_path_args \
-  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:attrPath:_files -/'\
-  '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]:*:Files:_files'\
   '(--no-build-output -Q)'{--no-build-output,-Q}'[Silence output to stdout and stderr]'\
   '(--max-jobs -j)'{--max-jobs,-j}'[Set the maximum number of build jobs that Nix will perform in parallel]'\
   '--cores[Set the parallelism of the individual builders (e.g. -j argument to make)]'\
-  '--max-silent-time[Builder times out after not producing stdout/stderr for x seconds]:Seconds:( )'\
-  '--timeout[Timeout builder after given number of seconds]:Seconds:( )'\
   '(--keep-going -k)'{--keep-going,-k}'[Keep going in case of failed builds, to the greatest extent possible]'\
   '(--keep-failed -K)'{--keep-failed,-K}'[Do not delete the build directory if build fails]'\
   '--fallback[If binary download fails, fall back on building from source]'\
-  '--readonly-mode[Do not open Nix database]'\
-  '--log-type[Configure how output is formatted]:Output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'\
   '--show-trace[Print stack trace of evaluation errors]'\
   '--option[Set Nix configuration option]:Options:_nix_options:Value:( )'\
-  '--repair[Fix corrupted or missing store paths by redownloading or rebuilding]'\
+  $_nix_repair
+  )
+
+# Used in: nix-build, nix-env, nix-instantiate, nix-shell
+_nix_common_opts=(
+  $_nix_common_nixos_rebuild \
+  $_nix_search_path_args \
+  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:attrPath:_files -/'\
+  '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]:*:Files:_files'\
+  '*--arg[Argument to pass to the Nix function]:Name:( ):Value:( )'\
+  '--argstr[Like --arg, but the value is a string]: :'\
+  '--max-silent-time[Builder times out after not producing stdout/stderr for x seconds]:Seconds:( )'\
+  '--timeout[Timeout builder after given number of seconds]:Seconds:( )'\
+  '--readonly-mode[Do not open Nix database]'\
+  '--log-type[Configure how output is formatted]:Output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'\
 )

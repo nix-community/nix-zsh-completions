@@ -99,7 +99,7 @@ case "$words[1]" in
       $_nixops_common_arguments\
       '(--kill-obsolete -k)'{--kill-obsolete,-k}'[Destroy machines no longer listed in the deployment specification]'\
       $_nix_dry_run \
-      '--repair[Use --repair when calling nix-build]'\
+	  $_nix_repair \
       '--create-only[Create missing machines only: build nothing and do not touch existing machines]'\
       '--build-only[Build the configuration without creating or deploying machines]'\
       '--copy-only[Do everything except activate the new configuration]'\
