@@ -1,6 +1,22 @@
 #autoload
 
+# Simple completion function to select a system
+# List gathered from: https://github.com/NixOS/nixpkgs/blob/master/lib/platforms.nix
+_nix_systems () {
+    _values 'Systems' \
+        i686-linux x86_64-linux \
+        armv5tel-linux armv6l-linux armv7l-linux mips64el-linux \
+        x86_64-darwin \
+        i686-freebsd x86_64-freebsd \
+        i686-openbsd x86_64-openbsd \
+        i686-netbsd x86_64-netbsd \
+        i686-cygwin x86_64-cygwin
+}
+
+# Completion function to select an angle-bracket expression from the nix path
 # TODO: Generate from NIX_PATH
+#           1. Fetch names before the = sign like in nixpkgs=/some/path/
+#           2. Complete files in /some/path for expressions like <nixpkgs/pkgs/...>
 _nix_shortcuts () {
     _values shortcuts "<nixpkgs>" "<nixos>"
 }
@@ -8,18 +24,23 @@ _nix_shortcuts () {
 _nix_path() {
   _alternative \
     'nixpkgs:Nixpkgs:_nix_shortcuts' \
-    'path:File Path:_files -g \*.nix'
+    'path:File Path:_nix_complete_dotnix_files'
 }
 
-# Factor out common options
+_nix_complete_dotnix_files () {
+    _files '-g' '*.nix'
+}
 
+# Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixops
 _nix_boilerplate_opts=(
   '(- *)--help[Print help message and exit]' \
   '(- *)--version[Print version number and exit]'
 )
 
+# Used in: nix-collect-garbage, nix-env, nix-store, nixops
 _nix_dry_run='--dry-run[Show what would be done without doing it]'
 
+# Used in: nix-collect-garbage, nix-store
 _nix_gc_common=(
   '(- --print* --delete)--print-roots[Print roots used by garbage collector]' \
   '(- --print* --delete)--print-live[Print store paths reachable from roots]' \
@@ -27,25 +48,65 @@ _nix_gc_common=(
   '(- --print* --delete)--delete[Garbage collect all dead paths from the store]' \
 )
 
-_nix_auto_args=(
-  '*--arg[Argument to pass to the Nix function]:Name:( ):Value:( )'\
-  '--argstr[Like --arg, but the value is a string]: :'\
-)
-
+# Used in: nixos-install, nix_common_opts
 _nix_search_path_args=(
-  '*-I+[Add path to Nix expression search path]:Include path:{_files -g \*.nix}'\
+  '*-I+[Add path to Nix expression search path]:Include path:_nix_complete_dotnix_files'\
 )
 
-_nix_AE=(
-  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:attrPath:_files -/'\
-  '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]:*:Files:_files'\
-)
+# Either true or false: useful for completing many Nix options
+_nix_options_bool () {
+    _values true false
+}
+# List gathered from: https://nixos.org/nix/manual/#sec-conf-file
+# TODO: Complete the value as well, not just the key
+_nix_options () {
+    _values \
+        'gc-keep-outputs' \
+        'gc-keep-derivations' \
+        'env-keep-derivations' \
+        'build-max-jobs' \
+        'build-cores' \
+        'build-max-silent-time' \
+        'build-timeout' \
+        'build-max-log-size' \
+        'build-users-group' \
+        'build-use-chroot' \
+        'build-chroot-dirs' \
+        'build-extra-chroot-dirs' \
+        'build-use-substitutes' \
+        'build-fallback' \
+        'build-cache-failure' \
+        'build-keep-log' \
+        'build-compress-log' \
+        'use-binary-caches' \
+        'binary-caches' \
+        'binary-caches-files' \
+        'trusted-binary-caches' \
+        'extra-binary-caches' \
+        'signed-binary-caches' \
+        'binary-cache-public-keys' \
+        'binary-caches-parallel-connections' \
+        'verify-https-binary-caches' \
+        'force-manifest' \
+        'system' \
+        'fsync-metadata' \
+        'auto-optimise-store' \
+        'connect-timeout' \
+        'log-servers' \
+        'trusted-users' \
+        'allowed-users' \
+        'restrict-eval' \
+        'pre-build-hook'
+}
 
+# Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixos-rebuild
 _nix_common_opts=(
   '(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'\
-  $_nix_auto_args \
+  '*--arg[Argument to pass to the Nix function]:Name:( ):Value:( )'\
+  '--argstr[Like --arg, but the value is a string]: :'\
   $_nix_search_path_args \
-  $_nix_AE \
+  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:attrPath:_files -/'\
+  '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]:*:Files:_files'\
   '(--no-build-output -Q)'{--no-build-output,-Q}'[Silence output to stdout and stderr]'\
   '(--max-jobs -j)'{--max-jobs,-j}'[Set the maximum number of build jobs that Nix will perform in parallel]'\
   '--cores[Set the parallelism of the individual builders (e.g. -j argument to make)]'\
@@ -57,6 +118,6 @@ _nix_common_opts=(
   '--readonly-mode[Do not open Nix database]'\
   '--log-type[Configure how output is formatted]:Output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'\
   '--show-trace[Print stack trace of evaluation errors]'\
-  '--option[Set Nix configuration option]:Option Name:( ):Option Value:( )'\
+  '--option[Set Nix configuration option]:Options:_nix_options:Value:( )'\
   '--repair[Fix corrupted or missing store paths by redownloading or rebuilding]'\
 )

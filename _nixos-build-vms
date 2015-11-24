@@ -6,4 +6,4 @@ _nix-common-options
 _arguments \
   '--show-trace[Show a trace of the output]'\
   "--no-out-link[Do not create a 'result' symlink]"\
-  '1:Network Nix Expression:_files -g \*.nix'
+  '1:Network Nix Expression:_nix_complete_dotnix_files'

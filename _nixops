@@ -75,7 +75,7 @@ case "$words[1]" in
     _arguments \
       $_nixops_common_arguments\
       $_nixops_search_path_args \
-      '*:Nix Expressions:_files -g \*.nix'
+      '*:Nix Expressions:_nix_complete_dotnix_files'
     ;;
   modify)
     _arguments \

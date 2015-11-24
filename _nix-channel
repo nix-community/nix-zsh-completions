@@ -3,6 +3,7 @@
 
 _nix-common-options
 
+# TODO: Handle case where nix-channel --list is empty
 _nix_channels() {
   _values 'Nix Channels' $(nix-channel --list | awk '{ print $1 }' ORS=' ')
 }
