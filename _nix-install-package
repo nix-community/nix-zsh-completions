@@ -1,6 +1,8 @@
 #compdef nix-install-package
 #autoload
 
+_nix-common-options
+
 _arguments \
   '--non-interactive[Do not open a terminal window and do not ask for confirmation]' \
   '(--profile -p)'{--profile,-p}'[Profile to install the package into]:Profile:_nix_profiles' \

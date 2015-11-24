@@ -1,6 +1,8 @@
 #compdef nix-hash
 #autoload
 
+_nix-common-options
+
 local -a ig
 ig=( '--to-base16' '--to-base32' )
 

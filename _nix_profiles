@@ -1,5 +1,7 @@
 #autoload
 
+_nix-common-options
+
 local -a profiles
 profiles=($(find /nix/var/nix/profiles))
 _values "Nix Profiles" $profiles

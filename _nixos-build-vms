@@ -1,6 +1,8 @@
 #compdef nixos-build-vms
 #autoload
 
+_nix-common-options
+
 _arguments \
   '--show-trace[Show a trace of the output]'\
   "--no-out-link[Do not create a 'result' symlink]"\

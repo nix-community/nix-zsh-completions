@@ -1,6 +1,8 @@
 #compdef nix-instantiate
 #autoload
 
+_nix-common-options
+
 # --no-location: undocumented arg
 # --repair: undocumented arg
 _arguments \

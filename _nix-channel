@@ -1,6 +1,8 @@
 #compdef nix-channel
 #autoload
 
+_nix-common-options
+
 _nix_channels() {
   _values 'Nix Channels' $(nix-channel --list | awk '{ print $1 }' ORS=' ')
 }

@@ -1,6 +1,8 @@
 #compdef nix-shell
 #autoload
 
+_nix-common-options
+
 local -a _nix_shell_opts
 _nix_shell_opts=(
   '--command[Run a command instead of starting an interactive shell]:Command:_command_names' \

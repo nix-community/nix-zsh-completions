@@ -1,6 +1,8 @@
 #compdef nix-env
 #autoload
 
+_nix-common-options
+
 _nix_systems () {
     _values 'Systems' \
         i686-linux x86_64-linux armv5tel-linux armv6l-linux armv7l-linux mips64el-linux \

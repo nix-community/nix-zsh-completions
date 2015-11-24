@@ -1,6 +1,8 @@
 #compdef nix-copy-closure
 #autoload
 
+_nix-common-options
+
 _arguments \
   '(--from)--to[Copy the closure to the remote machine (default)]'\
   '(--to)--from[Copy the closure from the remote machine]'\

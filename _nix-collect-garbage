@@ -1,6 +1,8 @@
 #compdef nix-collect-garbage
 #autoload
 
+_nix-common-options
+
 _arguments \
   $_nix_gc_common \
   '(--delete-old -d)'{--delete-old,-d}'[Delete all old generations of all profiles]'\

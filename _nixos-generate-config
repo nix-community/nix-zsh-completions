@@ -1,6 +1,8 @@
 #compdef nixos-generate-config
 #autoload
 
+_nix-common-options
+
 _arguments \
   '--force[Overwrite /etc/nixos/configuration.nix if it exists]:'\
   '--root[Directory to treat as root of filesystem]:Root directory:_files -/'\

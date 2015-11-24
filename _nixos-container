@@ -1,6 +1,8 @@
 #compdef nixos-container
 #autoload
 
+_nix-common-options
+
 _containers () {
   containers=($(nixos-container list))
   _wanted containers expl 'containers' compadd -a containers

@@ -1,6 +1,8 @@
 #compdef nix-push
 #autoload
 
+_nix-common-options
+
 _arguments \
   '--dest[Set the destination directory]:Destination directory:_files -/'\
   '(--none)--bzip2[Compress NARs using bzip2 instead of xz -9]'\
