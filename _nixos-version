@@ -1,0 +1,7 @@
+#compdef nixos-version
+#autoload
+
+_nix-common-options
+
+_arguments \
+  '(- *)'{--hash,--revision}'[Print only the git hash of the channel]'\
