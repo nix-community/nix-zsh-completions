@@ -16,6 +16,7 @@ _1st_arguments=(
   'start:Start a container'\
   'stop:Stop a container'\
   'status:Get status of a container'\
+  'update:Update container'\
   'login:Login to a container'\
   'root-login:Login to a container as root (no password needed)'\
   'run:Run a container'\
@@ -32,22 +33,30 @@ if (( CURRENT==1 )); then
   return
 fi
 
+local _container_name='1:Container Name:_containers';
+local _container_config='--config[Config]:Config:( )';
+
 case "$words[1]" in
   create)
     _arguments\
-      '1:Container Name:_containers'\
+      $_container_name\
+      $_container_config\
       '--system-path[System path]:Path:_files'\
-      '--config[Config]:Config:( )'\
       '--ensure-unique-name[Avoid name conflicts with other containers]'\
       '--auto-start[Start the container immediately]'
     ;;
   run)
     # TODO: There are a few more arguments in this case
     _arguments\
-      '1:Container Name:_containers'\
+      $_container_name\
+    ;;
+  update)
+    _arguments\
+      $_container_name\
+      $_container_config
     ;;
   destroy|start|stop|status|login|root-login|show-ip|show-host-key)
     _arguments\
-      '1:Container Name:_containers'
+      $_container_name
     ;;
 esac
