@@ -31,6 +31,25 @@ _nix_complete_dotnix_files () {
     _files '-g' '*.nix'
 }
 
+_nix_generations () {
+    # List of package names with version numbers stripped
+    local generations=($(nix-env --list-generations | awk '{print $1":"$2}'))
+    _describe "Nix Generations" generations
+}
+
+_nix_installed_packages () {
+    # List of package names with version numbers stripped
+    local -a packages
+    packages=($(nix-env -q | perl -pe 's/-[0-9.]*$//'))
+    _values "Nix Packages" $packages
+}
+
+_nix_profiles () {
+    local -a profiles
+    profiles=($(find /nix/var/nix/profiles))
+    _values "Nix Profiles" $profiles
+}
+
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixops
 _nix_boilerplate_opts=(
   '(- *)--help[Print help message and exit]' \

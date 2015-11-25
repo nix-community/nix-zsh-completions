@@ -1,8 +1,0 @@
-#autoload
-
-_nix-common-options
-
-# List of package names with version numbers stripped
-local -a packages
-packages=($(nix-env -q | perl -pe 's/-[0-9.]*$//'))
-_values "Nix Packages" $packages
