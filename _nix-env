@@ -33,10 +33,16 @@ _nix_env_b=('(--prebuilt-only -b)'{--prebuilt-only,-b}'[Fail if there is no pre-
 local _nix_env_from_profile
 _nix_env_from_profile='--from-profile[Fetch store paths from another profile]:Profile:_nix_profiles'
 
-_actions () {
-    _describe -t commands "nix-env subcommands" _1st_arguments
-}
-
 _arguments \
-    '1:Action:_actions' \
-    $_nix_env_common_opts
+    $_nix_env_common_opts \
+    - '(actions)' \
+    {--install,-i}"[Install package]"\
+    {--upgrade,-u}"[Upgrade package]"\
+    {--uninstall,-e}"[Uninstall package]"\
+    "--set-flag:Modify meta attribute of installed package"\
+    {--query,-q}":List information about derivations"\
+    {--switch-profile,-S}":Set the current profile path:_nix_profiles"\
+    "--list-generations:Print a list of all generations in the active profile"\
+    "--delete-generations:Delete specified generations"\
+    {--switch-generation,-G}":Activate specified generation:_nix_generations"\
+    "--rollback:Switch to the previous generation of active profile" \
