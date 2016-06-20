@@ -24,7 +24,7 @@ _nix_env_common_opts=(
   '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'\
   $_nix_dry_run \
   '--system-filter[Only show derivations matching the specified platform]:system:_nix_systems'\
-  '*:::Package:_nix_attr_paths'\
+  '*:Package:_nix_attr_paths'\
 )
 
 local -a _nix_env_b
