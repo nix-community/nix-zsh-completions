@@ -167,7 +167,7 @@ _nix_common_nixos_rebuild=(
 _nix_common_opts=(
   $_nix_common_nixos_rebuild \
   $_nix_search_path_args \
-  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:attrPath:_nix_attr_paths'\
+  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]'\
   '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]:*:Files:_files'\
   '*--arg[Argument to pass to the Nix function]:Name:( ):Value:( )'\
   '--argstr[Like --arg, but the value is a string]: :'\
