@@ -33,7 +33,7 @@ _nix_env_b=('(--prebuilt-only -b)'{--prebuilt-only,-b}'[Fail if there is no pre-
 local _nix_env_from_profile
 _nix_env_from_profile='--from-profile[Fetch store paths from another profile]:Profile:_nix_profiles'
 
-_arguments \
+_arguments -sw \
     $_nix_env_common_opts \
     - '(actions)' \
     {--install,-i}"[Install package]"\
