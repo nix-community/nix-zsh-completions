@@ -3,19 +3,6 @@
 
 _nix-common-options
 
-local -a _1st_arguments
-_1st_arguments=(
-  {--install,-i}":Install package"\
-  {--upgrade,-u}":Upgrade package"\
-  {--uninstall,-e}":Uninstall package"\
-  "--set-flag:Modify meta attribute of installed package"\
-  {--query,-q}":List information about derivations"\
-  {--switch-profile,-S}":Set the current profile path"\
-  "--list-generations:Print a list of all generations in the active profile"\
-  "--delete-generations:Delete specified generations"\
-  {--switch-generation,-G}":Activate specified generation"\
-  "--rollback:Switch to the previous generation of active profile"
-  )
 
 local -a _nix_env_common_opts
 _nix_env_common_opts=(
