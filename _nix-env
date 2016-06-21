@@ -1,21 +1,10 @@
 #compdef nix-env
 #autoload
 
-_nix-common-options
+emulate -L zsh
+setopt extendedglob
 
-local -a _1st_arguments
-_1st_arguments=(
-  {--install,-i}":Install package"\
-  {--upgrade,-u}":Upgrade package"\
-  {--uninstall,-e}":Uninstall package"\
-  "--set-flag:Modify meta attribute of installed package"\
-  {--query,-q}":List information about derivations"\
-  {--switch-profile,-S}":Set the current profile path"\
-  "--list-generations:Print a list of all generations in the active profile"\
-  "--delete-generations:Delete specified generations"\
-  {--switch-generation,-G}":Activate specified generation"\
-  "--rollback:Switch to the previous generation of active profile"
-  )
+_nix-common-options
 
 local -a _nix_env_common_opts
 _nix_env_common_opts=(
@@ -24,6 +13,7 @@ _nix_env_common_opts=(
   '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'\
   $_nix_dry_run \
   '--system-filter[Only show derivations matching the specified platform]:system:_nix_systems'\
+  '*:Package:_nix_attr_paths'\
 )
 
 local -a _nix_env_b
@@ -32,89 +22,16 @@ _nix_env_b=('(--prebuilt-only -b)'{--prebuilt-only,-b}'[Fail if there is no pre-
 local _nix_env_from_profile
 _nix_env_from_profile='--from-profile[Fetch store paths from another profile]:Profile:_nix_profiles'
 
-_arguments \
-  '*:: :->subcmds' && return 0
-  # TODO: For some reason boilerplate opts hide all other opts
-  #$_nix_boilerplate_opts \
-
-if (( CURRENT==1 )); then
-    _describe -t commands "nix-env subcommands" _1st_arguments
-    return
-fi
-
-case "$words[1]" in
-  --install|-i)
-    _arguments $_nix_env_common_opts \
-      $_nix_env_b \
-      $_nix_env_from_profile \
-      '(--preserve-installed -P)'{--preserve-installed,-P}'[Do not remove derivations with the same name]' \
-      '(--remove-all -r)'{--remove-all,-r}'[Remove all previously installed packages prior to installing]' \
-    ;;
-  --upgrade|-u)
-    _arguments $_nix_env_common_opts \
-      $_nix_env_b \
-      $_nix_env_from_profile \
-      '(-lt -leq -eq --always)--lt[Upgrade derivations with newer versions (default)]' \
-      '(-lt -leq -eq --always)--leq[Upgrade derivations with the same or newer version]' \
-      '(-lt -leq -eq --always)--eq[Upgrade derivations with equivalent versions]' \
-      '(-lt -leq -eq --always)--always[Upgrade even if version number decreases]' \
-      '*:Packages:_nix_installed_packages'
-    ;;
-  --uninstall|-e)
-    _arguments '*::Packages:_nix_installed_packages'
-    ;;
-  --set-flag)
-    _set_flag_attrs=(
-      'priority:Resolve package name conflicts' \
-      'keep:Prevent package from being upgraded' \
-      'active:Package is symlinked to profile' \
-    )
-
-    if (( CURRENT==2 )); then
-        _describe -t commands "nix-env subcommands" _set_flag_attrs
-        return
-    fi
-
-    if (( CURRENT==3 )); then
-        case "$words[2]" in
-            priority)
-            ;;
-            keep)
-                _values "TF" true false
-            ;;
-            active)
-                _values "TF" true false
-            ;;
-        esac
-    else
-        _nix_installed_packages
-    fi
-    ;;
-  --query|-q)
-    _arguments $_nix_env_common_opts \
-      '(--available -a)'{--available,-a}'[Display all installable derivations]' \
-      $_nix_output_opts \
-      $_nix_env_b \
-      '(--status -s)'{--status,-s}'[Print status of derivation]' \
-      '(--attr-path -P)'{--attr-path,-P}'[Print attribute path of derivations]' \
-      '--no-name[Suppress printing of name attribute]' \
-      '(--compare-versions -c)'{--compare-versions,-c}'[Compare installed and available version]' \
-      '--system[Print system attribute]' \
-      '--drv-path[Print store derivation path]' \
-      '--out-path[Print output path]' \
-      '--description[Print description]' \
-      '--xml[Print output as XML]'\
-      '--json[Print output as JSON]'\
-      '--meta[Print all meta attributes: only available with --xml]'
-    ;;
-  --switch-profile|-S)
-    _arguments '*:Profile:_nix_profiles'
-    ;;
-  --delete-generations)
-    _arguments \
-      '*::Generations:_nix_generations'
-    ;;
-  --switch-generation|-G)
-    _arguments '*::Generations:_nix_generations'
-    ;;
-esac
+_arguments -sw \
+    $_nix_env_common_opts \
+    - '(actions)' \
+    {--install,-i}"[Install package]"\
+    {--upgrade,-u}"[Upgrade package]"\
+    {--uninstall,-e}"[Uninstall package]"\
+    "--set-flag:Modify meta attribute of installed package"\
+    {--query,-q}":List information about derivations"\
+    {--switch-profile,-S}":Set the current profile path:_nix_profiles"\
+    "--list-generations:Print a list of all generations in the active profile"\
+    "--delete-generations:Delete specified generations"\
+    {--switch-generation,-G}":Activate specified generation:_nix_generations"\
+    "--rollback:Switch to the previous generation of active profile" \
