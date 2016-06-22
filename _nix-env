@@ -1,6 +1,9 @@
 #compdef nix-env
 #autoload
 
+emulate -L zsh
+setopt extendedglob
+
 _nix-common-options
 
 local -a _1st_arguments
