@@ -48,23 +48,23 @@ fi
 typeset -Ua options
 for opt in $words; do
     case $opt in
-        --attr|-A)
+        --attr|-[^-]#A[^-]#)
             options+=(attr_path)
             ;;
     esac
 done
 
 case "$words[1]" in
-  --install|-i)
-    _arguments -O options $_nix_env_common_opts \
+  --install|-[^-]#i[^-]#)
+    _arguments -s -O options $_nix_env_common_opts \
       $_nix_env_b \
       $_nix_env_from_profile \
       '(--preserve-installed -P)'{--preserve-installed,-P}'[Do not remove derivations with the same name]' \
       '(--remove-all -r)'{--remove-all,-r}'[Remove all previously installed packages prior to installing]' \
       '*:Package:_nix_attr_paths'\
     ;;
-  --upgrade|-u)
-    _arguments $_nix_env_common_opts \
+  --upgrade|-[^-]#u[^-]#)
+    _arguments -s $_nix_env_common_opts \
       $_nix_env_b \
       $_nix_env_from_profile \
       '(-lt -leq -eq --always)--lt[Upgrade derivations with newer versions (default)]' \
@@ -73,8 +73,8 @@ case "$words[1]" in
       '(-lt -leq -eq --always)--always[Upgrade even if version number decreases]' \
       '*:Packages:_nix_installed_packages'
     ;;
-  --uninstall|-e)
-    _arguments '*::Packages:_nix_installed_packages'
+  --uninstall|-[^-]#e[^-]#)
+    _arguments -s '*::Packages:_nix_installed_packages'
     ;;
   --set-flag)
     _set_flag_attrs=(
@@ -103,8 +103,8 @@ case "$words[1]" in
         _nix_installed_packages
     fi
     ;;
-  --query|-q)
-    _arguments -O options $_nix_env_common_opts \
+  --query|-[^-]#q[^-]#)
+    _arguments -s -O options $_nix_env_common_opts \
       '(--available -a)'{--available,-a}'[Display all installable derivations]' \
       $_nix_output_opts \
       $_nix_env_b \
@@ -121,14 +121,14 @@ case "$words[1]" in
       '--meta[Print all meta attributes: only available with --xml]'\
       '*:Packages:_nix_attr_paths'\
     ;;
-  --switch-profile|-S)
-    _arguments '*:Profile:_nix_profiles'
+  --switch-profile|-[^-]#S[^-]#)
+    _arguments ':Profile:_nix_profiles'
     ;;
   --delete-generations)
     _arguments \
       '*::Generations:_nix_generations'
     ;;
-  --switch-generation|-G)
-    _arguments '*::Generations:_nix_generations'
+  --switch-generation|-[^-]#G[^-]#)
+    _arguments '::Generations:_nix_generations'
     ;;
 esac
