@@ -47,6 +47,16 @@ _nix_installed_packages () {
 _nix_attr_paths () {
     # Add a 'X' last to make sure "nixos." results in two array entries below
     local attr_opt=1
+    while [[ -n $1 ]]; do
+        if [[ $attr_opt -le 0 || "$1" == "attr_path" ]]; then
+            attr_opt=0
+        fi
+        # attr_opt=$(test ( $attr_opt -le 0 ) -o ( "$1" = "attr_path" ))
+        shift
+    done
+    if [[ $attr_opt -gt 0 ]]; then
+        return
+    fi
     local attr_path=${words[CURRENT]}X
     local attr_list=($(echo $attr_path | tr . ' '))
     local quoted_attr_list=($(echo $attr_list | sed -r 's/([^ ]*)/\"\1\"/g'))

@@ -24,7 +24,6 @@ _nix_env_common_opts=(
   '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'\
   $_nix_dry_run \
   '--system-filter[Only show derivations matching the specified platform]:system:_nix_systems'\
-  '*:Package:_nix_attr_paths'\
 )
 
 local -a _nix_env_b
@@ -43,13 +42,23 @@ if (( CURRENT==1 )); then
     return
 fi
 
+typeset -Ua options
+for opt in $words; do
+    case $opt in
+        --attr|-A)
+            options+=(attr_path)
+            ;;
+    esac
+done
+
 case "$words[1]" in
   --install|-i)
-    _arguments $_nix_env_common_opts \
+    _arguments -O options $_nix_env_common_opts \
       $_nix_env_b \
       $_nix_env_from_profile \
       '(--preserve-installed -P)'{--preserve-installed,-P}'[Do not remove derivations with the same name]' \
       '(--remove-all -r)'{--remove-all,-r}'[Remove all previously installed packages prior to installing]' \
+      '*:Package:_nix_attr_paths'\
     ;;
   --upgrade|-u)
     _arguments $_nix_env_common_opts \
@@ -92,7 +101,7 @@ case "$words[1]" in
     fi
     ;;
   --query|-q)
-    _arguments $_nix_env_common_opts \
+    _arguments -O options $_nix_env_common_opts \
       '(--available -a)'{--available,-a}'[Display all installable derivations]' \
       $_nix_output_opts \
       $_nix_env_b \
@@ -106,7 +115,8 @@ case "$words[1]" in
       '--description[Print description]' \
       '--xml[Print output as XML]'\
       '--json[Print output as JSON]'\
-      '--meta[Print all meta attributes: only available with --xml]'
+      '--meta[Print all meta attributes: only available with --xml]'\
+      '*:Packages:_nix_attr_paths'\
     ;;
   --switch-profile|-S)
     _arguments '*:Profile:_nix_profiles'
