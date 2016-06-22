@@ -45,23 +45,24 @@ _nix_installed_packages () {
 }
 
 _nix_attr_paths () {
-  # Add a 'X' last to make sure "nixos." results in two array entries below
-  local attr_path=${words[CURRENT]}X
-  local attr_list=($(echo $attr_path | tr . ' '))
-  local quoted_attr_list=($(echo $attr_list | sed -r 's/([^ ]*)/\"\1\"/g'))
+    # Add a 'X' last to make sure "nixos." results in two array entries below
+    local attr_opt=1
+    local attr_path=${words[CURRENT]}X
+    local attr_list=($(echo $attr_path | tr . ' '))
+    local quoted_attr_list=($(echo $attr_list | sed -r 's/([^ ]*)/\"\1\"/g'))
 
-  local -a result=(
-    $(nix-instantiate --eval --arg attrs "[ $quoted_attr_list[1,-2] ]" \
-        =(<<NIX_FILE
-            { attrs ? null}:
+    local -a result=(
+        $(nix-instantiate --eval --arg attrs "[ $quoted_attr_list[1,-2] ]" \
+            =(<<NIX_FILE
+                { attrs ? null}:
 
-            let
-              top = {};
-              top.nixos = import <nixpkgs> {};
-              foldAttr = set: s: builtins.getAttr s set;
-              attr = builtins.foldl' foldAttr top attrs;
-            in
-            builtins.attrNames attr
+                let
+                  top = {};
+                  top.nixos = import <nixpkgs> {};
+                  foldAttr = set: s: builtins.getAttr s set;
+                  attr_opt = builtins.foldl' foldAttr top attrs;
+                in
+                builtins.attrNames attr_opt
 NIX_FILE
 ) \
         | tr '[]"' ' '))
