@@ -45,6 +45,7 @@ if (( CURRENT==1 )); then
     return
 fi
 
+# Workaround:
 # opt_args doesn't contain the first option
 # so can't detect stacked options like '-iA'
 typeset -Ua options
@@ -122,7 +123,6 @@ case "$words[1]" in
       '--xml[Print output as XML]'\
       '--json[Print output as JSON]'\
       '--meta[Print all meta attributes: only available with --xml]'\
-      '*:Packages:_nix_attr_paths'\
     ;;
   --switch-profile|-[^-]#S[^-]#)
     _arguments ':Profile:_nix_profiles'
