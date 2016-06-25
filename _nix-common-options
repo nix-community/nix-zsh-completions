@@ -45,31 +45,47 @@ _nix_installed_packages () {
 }
 
 
-# Prints the attribute names of the given path
-# eg.
-# Input: nixos python2Packages
-# Output: whitespace separated attributes of nixos.python2Packages
+# Generate nix code creating the default expression used by nix-env -iA
+_nix_gen_defexpr () {
+    setopt local_options null_glob
+    local -a result
+    local -a queue=($1)
+    while [[ ${#queue} > 0 ]]; do
+        local current=$queue[1]
+        shift queue
+        if [[ -e $current/default.nix ]]; then
+            result+=($current)
+        else
+            queue+=($current/*)
+        fi
+    done
+
+    local nix_expr="{\n"
+    for p in $result; do
+        nix_expr+="$(basename $p) = import $p {};"
+        nix_expr+="\n"
+    done
+    nix_expr+="}"
+
+    echo $nix_expr
+}
+
+
+# Prints the attribute names (whitespace separated) of the given path
+# Eg. input: nixos.python2Packages
 _nix_attr_names () {
     setopt local_options pipefail
 
-    # Could simplify by splicing the attr path into the heredoc
-    # ie. builtins.attrName $path where path=nixos.python2Packages
+    local attr_path=top${1:+.$1}
 
-    local attr_list="$@"
-    local quoted_attr_list=($(echo $attr_list | sed 's/\([^ ]\+\)/\"\1\"/g'))
-
-    nix-instantiate --eval --arg attrs "[ $quoted_attr_list ]" - \
+    nix-instantiate --eval - \
           <<NIX_FILE | tr '[]"' ' '
-                { attrs ? null}:
-
                 let
-                  top = {};
-                  top.nixos = import <nixpkgs> {};
-                  foldAttr = set: s: builtins.getAttr s set;
-                  attr_opt = builtins.foldl' foldAttr top attrs;
+                  top = $(_nix_gen_defexpr ~/.nix-defexpr);
                 in
-                  builtins.attrNames attr_opt
+                  builtins.attrNames $attr_path
 NIX_FILE
+
     return $?
 }
 
@@ -81,28 +97,28 @@ _nix_attr_paths () {
         if [[ $attr_opt -le 0 || "$1" == "attr_path" ]]; then
             attr_opt=0
         fi
-        # attr_opt=$(test ( $attr_opt -le 0 ) -o ( "$1" = "attr_path" ))
         shift
     done
     if [[ $attr_opt -gt 0 ]]; then
         return
     fi
 
-    # Add a 'X' last to make sure "nixos." results in two array entries below
-    local attr_path=${words[CURRENT]}X
-    local attr_list=( ${=${attr_path//./ }} )
+    local attr_path=""
+    if [[ $words[CURRENT] == *.* ]]; then
+        attr_path=${words[CURRENT]%.*}
+    fi
 
     local -a result # must be on separate line to capture error code..
-    result=( $(_nix_attr_names $attr_list[1,-2]) ) 2>/dev/null
+    result=( $(_nix_attr_names $attr_path) ) 2>/dev/null
 
     if [[ $? > 0 ]]; then
         # Probably because of invalid attribute path
         return
     fi
 
-    local prefix=${(j:.:)attr_list[1,-2]}
-    if [[ -n $prefix ]]; then
-        prefix=${prefix}.
+    local prefix
+    if [[ -n $attr_path ]]; then
+        prefix=${attr_path}.
     fi
 
     _values -s . "Packages" $(echo $result | sed "s/\([^ ]\+\)/$prefix\1/g")
