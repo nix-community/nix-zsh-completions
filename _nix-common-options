@@ -121,7 +121,7 @@ _nix_attr_paths () {
         prefix=${attr_path}.
     fi
 
-    _values -s . "Packages" $(echo $result | sed "s/\([^ ]\+\)/$prefix\1/g")
+    _values -s . "Packages" ${prefix}${^result}
 }
 
 _nix_profiles () {
