@@ -45,6 +45,8 @@ if (( CURRENT==1 )); then
     return
 fi
 
+# opt_args doesn't contain the first option
+# so can't detect stacked options like '-iA'
 typeset -Ua options
 for opt in $words; do
     case $opt in
@@ -56,7 +58,8 @@ done
 
 case "$words[1]" in
   --install|-[^-]#i[^-]#)
-    _arguments -s -O options $_nix_env_common_opts \
+    _arguments -s -O options \
+      $_nix_env_common_opts \
       $_nix_env_b \
       $_nix_env_from_profile \
       '(--preserve-installed -P)'{--preserve-installed,-P}'[Do not remove derivations with the same name]' \
