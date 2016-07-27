@@ -1,6 +1,8 @@
 #compdef nix-build
 #autoload
 
+local command_name=nix-build
+
 _nix-common-options
 
 local -a _nix_build_opts
@@ -26,4 +28,4 @@ _arguments \
   $_nix_boilerplate_opts \
   $_nix_common_opts \
   $_nix_build_opts \
-  '*::Paths:_files'
+  '*:Paths:_files'

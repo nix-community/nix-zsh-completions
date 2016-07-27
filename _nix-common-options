@@ -84,7 +84,7 @@ _nix_attr_names () {
     local defexpr
     if [[ -n $defexpr_path ]]; then
         defexpr="import ${defexpr_path:a}"
-    else
+    elif [[ $command_name == nix-env ]]; then
         defexpr=$(_nix_gen_defexpr ~/.nix-defexpr)
     fi
 
@@ -101,28 +101,28 @@ NIX_FILE
     return $?
 }
 
+
 # Complete attribute paths
 _nix_attr_paths () {
-    # Check if we're suppose to complete attr paths
-    local attr_opt=1
-    while [[ -n $1 ]]; do
-        if [[ $attr_opt -le 0 || "$1" == "attr_path" ]]; then
-            attr_opt=0
-        fi
-        shift
-    done
-    if [[ $attr_opt -gt 0 ]]; then
-        return
-    fi
-
     local attr_path=""
     if [[ $words[CURRENT] == *.* ]]; then
         attr_path=${words[CURRENT]%.*}
     fi
 
-    local defexpr_path=$opt_args[-f]
-    if [[ -z $defexpr_path ]]; then
-        defexpr_path=$opt_args[--file]
+    local defexpr_path
+    if [[ $command_name == nix-env ]]; then
+        defexpr_path=$opt_args[-f]
+        if [[ -z $defexpr_path ]]; then
+            defexpr_path=$opt_args[--file]
+        fi
+    else
+        if [[ $line ]]; then
+            defexpr_path=$line[1]
+        elif [[ -e shell.nix && $command_name == nix-shell ]]; then
+            defexpr_path=shell.nix
+        elif [[ -e default.nix ]]; then
+            defexpr_path=default.nix
+        fi
     fi
 
     local -a result # must be on separate line to capture error code..

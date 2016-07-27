@@ -4,6 +4,8 @@
 emulate -L zsh
 setopt extendedglob
 
+local command_name=nix-env
+
 _nix-common-options
 
 local -a _1st_arguments
@@ -48,24 +50,24 @@ fi
 # Workaround:
 # opt_args doesn't contain the first option
 # so can't detect stacked options like '-iA'
-typeset -Ua options
+local expect_attr_paths=false
 for opt in $words; do
     case $opt in
         --attr|-[^-]#A[^-]#)
-            options+=(attr_path)
+            expect_attr_paths=true
             ;;
     esac
 done
 
 case "$words[1]" in
   --install|-[^-]#i[^-]#)
-    _arguments -s -O options \
+    _arguments -s \
       $_nix_env_common_opts \
       $_nix_env_b \
       $_nix_env_from_profile \
       '(--preserve-installed -P)'{--preserve-installed,-P}'[Do not remove derivations with the same name]' \
       '(--remove-all -r)'{--remove-all,-r}'[Remove all previously installed packages prior to installing]' \
-      '*:Package:_nix_attr_paths'\
+      '*:Package:{if $expect_attr_paths; then _nix_attr_paths ; fi}'\
     ;;
   --upgrade|-[^-]#u[^-]#)
     _arguments -s $_nix_env_common_opts \
