@@ -10,7 +10,7 @@ _nix_shell_opts=(
   '--command[Run a command instead of starting an interactive shell]:Command:_command_names' \
   '--exclude[Do not build any dependencies which match this regex]:Regex:( )' \
   '--pure[Clear the environment before starting the interactive shell]' \
-  '(--packages -p)'{--packages,-p}'[Set up an environment where the given packages are present]:*:Packages:_nix_installed_packages' \
+  '(--packages -p)'{--packages,-p}'[Set up an environment where the given packages are present]:*:Packages: _nix_attr_paths "<nixpkgs>"' \
 )
 
 _arguments \
