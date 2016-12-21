@@ -44,6 +44,125 @@ _nix_installed_packages () {
     _values "Nix Packages" $packages
 }
 
+
+# Generate nix code creating the default expression used by 'nix-env -iA'
+_nix_gen_defexpr () {
+    setopt local_options null_glob
+    local -a result
+    local -a queue=($1)
+    while [[ ${#queue} > 0 ]]; do
+        local current=$queue[1]
+        shift queue
+        if [[ -e $current/default.nix ]]; then
+            result+=($current)
+        else
+            queue+=($current/*)
+        fi
+    done
+
+    local nix_expr="{\n"
+    for p in $result; do
+        nix_expr+="$(basename $p) = import $p {};"
+        nix_expr+="\n"
+    done
+    nix_expr+="}"
+
+    echo $nix_expr
+}
+
+
+# Prints the attribute names (whitespace separated) of the given path
+# Arguments: attribute_path [top_level_expr_path]
+#   top_level_expr is interpreted as 'nix-env --file'
+#   if top_level_expr is omitted it defaults to what 'nix-env -iA' uses
+# Eg. _nix_attr_names nixos.python2Packages mypkgs.nix
+_nix_attr_names () {
+    setopt local_options pipefail
+
+    local attr_path=top${1:+.$1}
+    local defexpr_path=$2
+
+    local defexpr
+    if [[ -n $defexpr_path ]]; then
+        if [[ -e $defexpr_path ]]; then
+            # If the path exist use the absolute path to make sure import will
+            # accept it.
+            # (Otherwise the path is likely a <nixpkgs> notation)
+            defexpr_path=${defexpr_path:a}
+        fi
+        defexpr="import $defexpr_path"
+    elif [[ $command_name == nix-env ]]; then
+        defexpr=$(_nix_gen_defexpr ~/.nix-defexpr)
+    fi
+
+    nix-instantiate --eval - \
+          <<NIX_FILE | tr '[]"' ' '
+                let
+                  top_gen = $defexpr;
+                  # --file arguments can be a lambda producing a record too
+                  top = if builtins.typeOf top_gen == "lambda" then top_gen {} else top_gen ;
+                in
+                  builtins.attrNames $attr_path
+NIX_FILE
+
+    return $?
+}
+
+
+# Complete attribute paths
+# NB: this function expects an optional argument so the user must make sure
+#     zsh completion functions doesn't supply arguments. eg. when used in a
+#     action spec to _arguments the function should be prefixed with a space:
+#     `: _nix_attr_paths`
+#     Without the space prefix _arguments will inject lots of arguments. These
+#     are available(?) in the `expl` array anyway
+_nix_attr_paths () {
+    local attr_path=""
+    if [[ $words[CURRENT] == *.* ]]; then
+        attr_path=${words[CURRENT]%.*}
+    fi
+
+    local defexpr_path=$1
+    if [[ -z $defexpr_path ]]; then
+        if [[ $command_name == nix-env ]]; then
+            defexpr_path=$opt_args[-f]
+            if [[ -z $defexpr_path ]]; then
+                defexpr_path=$opt_args[--file]
+            fi
+        else
+            if [[ $line ]]; then
+                defexpr_path=$line[1]
+            elif [[ -e shell.nix && $command_name == nix-shell ]]; then
+                defexpr_path=shell.nix
+            elif [[ -e default.nix ]]; then
+                defexpr_path=default.nix
+            fi
+        fi
+    fi
+
+    # Remove one level of shell quoting to make sure we see the same value as
+    # the nix-* program will see.
+    # ($opt_args and $line contain the verbatim string:
+    #  eg. given `nix-shell '<nixpkgs>' -A ` $line[1] will be `'<nixpkgs>'` while
+    #  nix-shell will see `<nixpkgs>`)
+    defexpr_path=${(Q)defexpr_path}
+
+    local -a result # must be on separate line to capture error code..
+    result=( $(_nix_attr_names "$attr_path" $defexpr_path) ) 2>/dev/null
+
+    if [[ $? > 0 ]]; then
+        # Probably because of invalid attribute path or error in top-level expr
+        return 1
+    fi
+
+    local prefix
+    if [[ -n $attr_path ]]; then
+        prefix=${attr_path}.
+    fi
+
+    _values -s . "Packages" ${prefix}${^result}
+}
+
 _nix_profiles () {
     local -a profiles
     profiles=($(find /nix/var/nix/profiles))
@@ -138,7 +257,7 @@ _nix_common_nixos_rebuild=(
 _nix_common_opts=(
   $_nix_common_nixos_rebuild \
   $_nix_search_path_args \
-  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:attrPath:_files -/'\
+  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:Packages: _nix_attr_paths'\
   '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]:*:Files:_files'\
   '*--arg[Argument to pass to the Nix function]:Name:( ):Value:( )'\
   '--argstr[Like --arg, but the value is a string]: :'\

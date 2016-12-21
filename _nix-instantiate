@@ -1,6 +1,8 @@
 #compdef nix-instantiate
 #autoload
 
+local command_name=nix-instantiate
+
 _nix-common-options
 
 # --no-location: undocumented arg
