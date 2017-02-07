@@ -17,4 +17,4 @@ _arguments \
   $_nix_boilerplate_opts \
   $_nix_common_opts \
   $_nix_shell_opts \
-  '*:Paths:_files' \
+  '*:Paths:_nix_path' \

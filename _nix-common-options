@@ -1,5 +1,10 @@
 #autoload
 
+if [[ $_NIX_SHELL_COMPLETION_LOADED ]]; then
+    # No point in re-defining these functions each time we do a completion
+    return 0
+fi
+
 # Simple completion function to select a system
 # List gathered from: https://github.com/NixOS/nixpkgs/blob/master/lib/platforms.nix
 _nix_systems () {
@@ -14,11 +19,17 @@ _nix_systems () {
 }
 
 # Completion function to select an angle-bracket expression from the nix path
-# TODO: Generate from NIX_PATH
-#           1. Fetch names before the = sign like in nixpkgs=/some/path/
-#           2. Complete files in /some/path for expressions like <nixpkgs/pkgs/...>
+# Assumptions: No '=' in the actual path components in NIX_PATH
+# TODO: Complete files in /some/path for expressions like <nixpkgs/pkgs/...>
+# IMPROVEMENT: Remove '<nixos-config>' since that seems rather useless(?)
 _nix_shortcuts () {
-    _values shortcuts "<nixpkgs>" "<nixos>"
+    local nix_path=(${(s.:.)NIX_PATH})
+    local named=(${(M)nix_path:#*=*})
+    local dirs=(${nix_path:#*=*})
+    local valid_dir_globs=($^dirs"/*/default.nix(N:h:t)")
+    local valid_dirs=(${~valid_dir_globs})
+    local names=(${named%%=*})
+    _values shortcuts "<"${^valid_dirs}">" "<"${^names}">"
 }
 
 _nix_path() {
@@ -28,7 +39,7 @@ _nix_path() {
 }
 
 _nix_complete_dotnix_files () {
-    _files '-g' '*.nix'
+    _path_files '-g' '*.nix(N) *(N-/)'
 }
 
 _nix_generations () {
@@ -266,3 +277,5 @@ _nix_common_opts=(
   '--readonly-mode[Do not open Nix database]'\
   '--log-type[Configure how output is formatted]:Output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'\
 )
+
+_NIX_SHELL_COMPLETION_LOADED=1
