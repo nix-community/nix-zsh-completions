@@ -1,0 +1,163 @@
+#compdef nix
+#autoload
+
+# Most information is extractable from `nix --help` and `nix command --help`
+
+# There's four different types of options and arguments which is passed to _arguments:
+#
+# 1. The main commands which we get from nix --help
+#
+# 2. The common options which are hardcoded for the moment
+#
+# 3. The regular arguments for the active command. The number and types of these
+# arguments are taken from the "Usage:" line of `nix command --help`, the
+# actions and descriptions are then looked up in `$completors[type]`
+#
+# 4. The options for the active command. These are taken from the "Flags:"
+# section of `nix command --help`, and the option arguments are handled in the
+# same way as in 3.
+
+# Set command_name and ensure access to eg. _nix_attr_paths
+local command_name=nix
+_nix-common-options
+
+local -a common_options
+common_options=("(--debug)"--debug"[enable debug output]"
+                "(-h --help)"{-h,--help}"[show usage information]"
+                "(--help-config)"--help-config"[show configuration options]"
+                "(--option)"--option"[set a Nix configuration option (overriding nix.conf)]:Option:_extract_nix_options:Value:_extract_nix_value_description"
+                "(--quiet)"--quiet"[decrease verbosity level]"
+                "(-v --verbose)"{-v,--verbose}"[increase verbosity level]"
+                "(--version)"--version"[show version information]")
+
+local -a main_commands
+() {
+    local IFS=$'\n'
+    # Extract the commands with descriptions
+    # like ('command:some description' 'run:run some stuff')
+    main_commands=($(nix --help | sed -E \
+                                      -e '/^Available commands/,/^$/!d' \
+                                      -e '/^Available commands/d' \
+                                      -e '/^$/d' \
+                                      -e 's=^ +([0-9a-z-]*) +(.*)$=\1:\2='))
+}
+
+function _describe_nix_commands {
+    _describe -t main_commands "Command" main_commands
+}
+
+function _extract_nix_options {
+    local IFS=$'\n'
+    local -a nix_options
+    nix_options=($(nix --help-config | sed -E \
+                                 -e '/^$/,/^$/!d' \
+                                 -e '/^$/d' \
+                                 -e 's=^ +([0-9a-z-]*) +(.*)$=\1:\2='))
+    _describe -t nix_options "Option" nix_options
+}
+
+function _extract_nix_value_description {
+    local OPTION=$words[$(($CURRENT - 1))]
+    local description=$(nix --help-config | sed -E \
+                                                -e /\^\ \ ${OPTION}\ /\!d \
+                                                -e "s=^  ${OPTION} +==")
+    _message $description
+}
+
+local -A completors
+# The different argument completors that can be used
+completors[INSTALLABLES]="*:Installables: _nix_attr_paths"
+completors[INSTALLABLE]=":Installable: _nix_attr_paths"
+completors[PACKAGE]=":The package we're checking depencies of: _nix_attr_paths"
+completors[DEPENDENCY]=":The dependency: _nix_attr_paths"
+completors[PATH]=":Path:_files"
+completors[PATHS]="*:Path:_files"
+completors[NAR]=":Nar:_files"
+completors[REGEX]="::Regex to search for: "
+# Completors that are used for options
+completors[NAME]=":Environment Variable:_vars"
+completors[STORE-URI]=":Store uri:_files"
+completors[FILE]=":Path:_files"
+completors[FILES]="*:Path:_files"
+completors[COMMAND]=":Path:_command_names"
+completors[ARGS]="*:Arguments to command: "
+completors[TYPE]=":Hash type:(md5 sha1 sha256 sha512)"
+completors[STRINGS]="*:Hash: "
+
+# Add commands to an associative array for easy lookup
+local -A command_lookup
+local command_description
+for command_description in $main_commands; {
+    local command=${command_description%%\:*}
+    command_lookup[$command]=1
+}
+
+local -a command_options=()
+local -a command_arguments=()
+# Setup the correct command_arguments and command_options depending on which
+# command we've typed
+local word
+for word in $words; do
+
+    # Check if we're in a valid command
+    if [[ $command_lookup[$word] == 1 ]]; then
+        # Extract an array describing the possible arguments to the command eg.
+        # (NAR PATH) for cat-nar or (INSTALLABLES) for run
+        local -a args=($(nix $word --help | sed -E \
+                                          -e '2,$d' \
+                                          -e 's=^Usage.*<FLAGS>==' \
+                                          -e 's=\.|\?|<|>==g'))
+        # And add the corresponding completors
+        local arg
+        for arg in $args; do
+            command_arguments+=($completors[$arg])
+        done
+
+        # Extract the lines containing the option descriptions
+        local -a option_descriptions
+        (){
+            local IFS=$'\n'
+            option_descriptions=($(nix $word --help | sed -E \
+                                                        -e '/^Flags:/,/^$/!d' \
+                                                        -e "/^Flags:/d" \
+                                                        -e '/^$/d'))
+        }
+
+        local option_description
+        local option
+        for option_description in $option_descriptions; do
+            # Extract the options from the description
+            local -a option_group=($(print -- $option_description \
+                                       | sed -E \
+                                             -e 's=  (-[a-zA-Z-]+)(, (--[a-zA-Z0-9-]+))?.*$=\1 \3='))
+
+            # Extract any option arguments from the description
+            local -a option_args=($(print -- $option_description | sed -E \
+                                                                   -e 's=^[^<]+<=<=' \
+                                                                   -e 's=>[^>]+$=>=' \
+                                                                   -e 's=<|>==g'))
+
+            local description=$(print -- $option_description | sed -E \
+                                                           -e 's=.*  ([a-zA-Z].*)$=\1=')
+
+            local ACTIONS=""
+            for arg in $option_args; do
+                ACTIONS+=$completors[$arg]
+            done
+
+            for option in $option_group; do
+                # Some options can be provided multiple times, but there's no way
+                # to automatically check, so we exclude them by default
+                command_options+=("($option_group)"$option"[$description]"$ACTIONS)
+            done
+        done
+
+        break
+    fi
+done
+
+_arguments -s \
+           :Command:_describe_nix_commands \
+           $command_arguments \
+           $common_options \
+           $command_options

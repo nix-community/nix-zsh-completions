@@ -104,6 +104,18 @@ _nix_attr_names () {
         defexpr="import $defexpr_path"
     elif [[ $command_name == nix-env ]]; then
         defexpr=$(_nix_gen_defexpr ~/.nix-defexpr)
+    elif [[ $command_name == nix ]]; then
+        # Extract the channels from NIX_PATH
+        local -a channels
+        () {
+            local IFS=:
+            channels=(${=NIX_PATH})
+        }
+        # nixos-config isn't very useful as it's just a function
+        defexpr=$'{\n'$(print -l -- $channels | sed -E \
+                                        -e '/=/!d' \
+                                        -e '/^nixos-config/d' \
+                                        -e 's_=(.*)_ = import \1 {};_')$'\n}'
     fi
 
     nix-instantiate --eval - \
@@ -136,6 +148,11 @@ _nix_attr_paths () {
     local defexpr_path=$1
     if [[ -z $defexpr_path ]]; then
         if [[ $command_name == nix-env ]]; then
+            defexpr_path=$opt_args[-f]
+            if [[ -z $defexpr_path ]]; then
+                defexpr_path=$opt_args[--file]
+            fi
+        elif [[ $command_name == nix ]]; then
             defexpr_path=$opt_args[-f]
             if [[ -z $defexpr_path ]]; then
                 defexpr_path=$opt_args[--file]
