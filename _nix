@@ -25,9 +25,9 @@ local -a common_options
 common_options=("(--debug)"--debug"[enable debug output]"
                 "(-h --help)"{-h,--help}"[show usage information]"
                 "(--help-config)"--help-config"[show configuration options]"
-                "(--option)"--option"[set a Nix configuration option (overriding nix.conf)]:Option:_extract_nix_options:Value:_extract_nix_value_description"
+                "*--option[set a Nix configuration option (overriding nix.conf)]:Option:_extract_nix_options:Value:_extract_nix_value_description"
                 "(--quiet)"--quiet"[decrease verbosity level]"
-                "(-v --verbose)"{-v,--verbose}"[increase verbosity level]"
+                "*"{-v,--verbose}"[increase verbosity level]"
                 "(--version)"--version"[show version information]")
 
 local -a main_commands
