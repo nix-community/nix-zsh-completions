@@ -75,7 +75,7 @@ completors[PATHS]="*:Path:_files"
 completors[NAR]=":Nar:_files"
 completors[REGEX]="::Regex to search for: "
 # Completors that are used for options
-completors[NAME]=":Environment Variable:_vars"
+completors[NAME]=":Argument name: "
 completors[STORE-URI]=":Store uri:_files"
 completors[FILE]=":Path:_files"
 completors[FILES]="*:Path:_files"
@@ -148,9 +148,14 @@ for word in $words; do
             done
 
             for option in $option_group; do
-                # Some options can be provided multiple times, but there's no way
-                # to automatically check, so we exclude them by default
-                command_options+=("($option_group)"$option"[$description]"$ACTIONS)
+                # Handle `run --keep/--unset` manually as they can be repeated
+                if [[ $word == run && -z ${option:#(-k|--keep|-u|--unset)} ]]; then
+                    command_options+=("*${option}[$description]:Environment Variable:_vars")
+                else
+                    # Some options can be provided multiple times, but there's no way
+                    # to automatically check, so we exclude them by default
+                    command_options+=("($option_group)"$option"[$description]"$ACTIONS)
+                fi
             done
         done
 
