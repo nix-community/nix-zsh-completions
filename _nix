@@ -83,6 +83,8 @@ completors[COMMAND]=":Path:_command_names"
 completors[ARGS]="*:Arguments to command: "
 completors[TYPE]=":Hash type:(md5 sha1 sha256 sha512)"
 completors[STRINGS]="*:Hash: "
+completors[EXPR]=":Expression argument: "
+completors[STRING]=":String argument: "
 
 # Add commands to an associative array for easy lookup
 local -A command_lookup
