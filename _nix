@@ -25,6 +25,7 @@ local -a common_options
 common_options=("(--debug)"--debug"[enable debug output]"
                 "(-h --help)"{-h,--help}"[show usage information]"
                 "(--help-config)"--help-config"[show configuration options]"
+                "*--builders[The machine to build on]:Machine eg. 'root@mac x86_64-darwin': "
                 "*--option[set a Nix configuration option (overriding nix.conf)]:Option:_extract_nix_options:Value:_extract_nix_value_description"
                 "(--quiet)"--quiet"[decrease verbosity level]"
                 "*"{-v,--verbose}"[increase verbosity level]"
