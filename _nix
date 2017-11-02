@@ -26,6 +26,7 @@ common_options=("(--debug)"--debug"[enable debug output]"
                 "(-h --help)"{-h,--help}"[show usage information]"
                 "(--help-config)"--help-config"[show configuration options]"
                 "*--builders[The machine to build on]:Machine eg. 'root@mac x86_64-darwin': "
+                "--store[Select a nix store]:Store:_nix_store"
                 "*--option[set a Nix configuration option (overriding nix.conf)]:Option:_extract_nix_options:Value:_extract_nix_value_description"
                 "(--quiet)"--quiet"[decrease verbosity level]"
                 "*"{-v,--verbose}"[increase verbosity level]"
@@ -65,6 +66,17 @@ function _extract_nix_value_description {
     _message $description
 }
 
+function _nix_store {
+    _alternative \
+        'file:Use a chroot store:_directories' \
+        'local:Use /nix/store:(local)' \
+        'remote:Go via the Nix daemon:(remote)' \
+        'https:HTTPS:(https://)' \
+        'cache:Local binary cache:(file://)' \
+        's3:S3 binary cache:(s3://)' \
+        'ssh:Nix store over ssh:(ssh://)' \
+}
+
 local -A completors
 # The different argument completors that can be used
 completors[INSTALLABLES]="*:Installables: _nix_attr_paths"
@@ -80,8 +92,7 @@ completors[STRINGS]="*:Hash: "
 local -A option_completors
 # Completors that are used for options
 option_completors[NAME]=":Argument name: "
-option_completors[STORE-URI]=":Store uri:_files"
-option_completors[FILE]=":Path:_files"
+option_completors[STORE-URI]=":Store uri:_nix_store"
 option_completors[FILES]="*:Path:_files"
 option_completors[COMMAND]=":Path:_command_names"
 option_completors[ARGS]="*:Arguments to command: "
