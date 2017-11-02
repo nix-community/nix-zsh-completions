@@ -77,6 +77,23 @@ function _nix_store {
         'ssh:Nix store over ssh:(ssh://)' \
 }
 
+function _nix_installables_file {
+    _alternative \
+        file:'Local file':_files \
+        'channel:Channel:(channel:
+                       channel:nixos-13.10           channel:nixos-16.09
+                       channel:nixos-14.04           channel:nixos-16.09-small
+                       channel:nixos-14.04-small     channel:nixos-17.03
+                       channel:nixos-14.12           channel:nixos-17.03-small
+                       channel:nixos-14.12-small     channel:nixos-17.09
+                       channel:nixos-15.09           channel:nixos-17.09-small
+                       channel:nixos-15.09-small     channel:nixos-unstable
+                       channel:nixos-16.03           channel:nixos-unstable-small
+                       channel:nixos-16.03-small     channel:nixpkgs-17.09-darwin
+                       channel:nixos-16.03-testing   channel:nixpkgs-unstable)' \
+        'url:URL:(https:// http://)'
+}
+
 local -A completors
 # The different argument completors that can be used
 completors[INSTALLABLES]="*:Installables: _nix_attr_paths"
@@ -93,6 +110,7 @@ local -A option_completors
 # Completors that are used for options
 option_completors[NAME]=":Argument name: "
 option_completors[STORE-URI]=":Store uri:_nix_store"
+option_completors[FILE]=":Path:_nix_installables_file"
 option_completors[FILES]="*:Path:_files"
 option_completors[COMMAND]=":Path:_command_names"
 option_completors[ARGS]="*:Arguments to command: "
