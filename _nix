@@ -75,17 +75,20 @@ completors[PATH]=":Path:_files"
 completors[PATHS]="*:Path:_files"
 completors[NAR]=":Nar:_files"
 completors[REGEX]="::Regex to search for: "
-# Completors that are used for options
-completors[NAME]=":Argument name: "
-completors[STORE-URI]=":Store uri:_files"
-completors[FILE]=":Path:_files"
-completors[FILES]="*:Path:_files"
-completors[COMMAND]=":Path:_command_names"
-completors[ARGS]="*:Arguments to command: "
-completors[TYPE]=":Hash type:(md5 sha1 sha256 sha512)"
 completors[STRINGS]="*:Hash: "
-completors[EXPR]=":Expression argument: "
-completors[STRING]=":String argument: "
+
+local -A option_completors
+# Completors that are used for options
+option_completors[NAME]=":Argument name: "
+option_completors[STORE-URI]=":Store uri:_files"
+option_completors[FILE]=":Path:_files"
+option_completors[FILES]="*:Path:_files"
+option_completors[COMMAND]=":Path:_command_names"
+option_completors[ARGS]="*:Arguments to command: "
+option_completors[TYPE]=":Hash type:(md5 sha1 sha256 sha512)"
+option_completors[EXPR]=":Expression argument: "
+option_completors[STRING]=":String argument: "
+option_completors[PATH]=":Shadow NIX_PATH, eg. nixpkgs=git\://github.com/NixOS/nixpkgs: "
 
 # Add commands to an associative array for easy lookup
 local -A command_lookup
@@ -145,7 +148,7 @@ for word in $words; do
 
             local ACTIONS=""
             for arg in $option_args; do
-                ACTIONS+=$completors[$arg]
+                ACTIONS+=$option_completors[$arg]
             done
 
             for option in $option_group; do
