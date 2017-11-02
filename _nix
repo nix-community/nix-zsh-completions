@@ -94,12 +94,26 @@ function _nix_installables_file {
         'url:URL:(https:// http://)'
 }
 
+# Complete attribute paths and files starting with either "/" or "./"
+function _nix_installable {
+    # We need to prefix relative paths with ./ so nix will evaluate it as a path
+    local prefix='-P ./'
+    local current_word=$words[$CURRENT]
+    # When referencing an absolute path we can't prefix with ./
+    if [[ -z ${current_word:##(/*|\~/*)} && -n $current_word ]]; then
+        prefix=""
+    fi
+    _alternative \
+        'path:Attribute path: _nix_attr_paths' \
+        "file:File path to package:_files ${prefix}"
+}
+
 local -A completors
 # The different argument completors that can be used
-completors[INSTALLABLES]="*:Installables: _nix_attr_paths"
-completors[INSTALLABLE]=":Installable: _nix_attr_paths"
-completors[PACKAGE]=":The package we're checking depencies of: _nix_attr_paths"
-completors[DEPENDENCY]=":The dependency: _nix_attr_paths"
+completors[INSTALLABLES]="*:Installables: _nix_installable"
+completors[INSTALLABLE]=":Installable: _nix_installable"
+completors[PACKAGE]=":The package we're checking depencies of:_nix_installable"
+completors[DEPENDENCY]=":The dependency: _nix_installable"
 completors[PATH]=":Path:_files"
 completors[PATHS]="*:Path:_files"
 completors[NAR]=":Nar:_files"
