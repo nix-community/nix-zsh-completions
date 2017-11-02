@@ -132,22 +132,17 @@ for word in $words; do
         local option_description
         local option
         for option_description in $option_descriptions; do
-            # Extract the options from the description
 
-            local description=$(print -- $option_description | sed -E \
-                                                                   -e 's=^  .*  ([a-zA-Z].*)$=\1=')
+            # Extract the description by stripping everything up to the the last
+            # two consecutive spaces
+            local description=${option_description/(*  )/}
             # Remove the description from the help line
-            local option_spec=${option_description:0:${#option_description} - ${#description}}
+            local option_spec=${option_description%$description}
 
-            local -a option_group=($(print -- $option_spec \
-                                       | sed -E \
-                                             -e 's=  (-[a-zA-Z-]+)(, (--[a-zA-Z0-9-]+))?.*$=\1 \3='))
-
-            # Extract any option arguments from the description
-            local -a option_args=($(print -- $option_spec | sed -E \
-                                                                   -e 's=^[^<]+<=<=' \
-                                                                   -e 's=>[^>]+$=>=' \
-                                                                   -e 's=<|>==g'))
+            # Extract the options by stripping everything starting at '<' (and ',')
+            local -a option_group=(${=option_spec//(<*|,)/})
+            # Extract any arguments, by stripping the options (and <|>)
+            local -a option_args=(${=option_spec//(*$option_group[${#option_group}]|<|>)/})
 
             local ACTIONS=""
             for arg in $option_args; do
