@@ -133,22 +133,30 @@ for word in $words; do
         local option
         for option_description in $option_descriptions; do
             # Extract the options from the description
-            local -a option_group=($(print -- $option_description \
+
+            local description=$(print -- $option_description | sed -E \
+                                                                   -e 's=^  .*  ([a-zA-Z].*)$=\1=')
+            # Remove the description from the help line
+            local option_spec=${option_description:0:${#option_description} - ${#description}}
+
+            local -a option_group=($(print -- $option_spec \
                                        | sed -E \
                                              -e 's=  (-[a-zA-Z-]+)(, (--[a-zA-Z0-9-]+))?.*$=\1 \3='))
 
             # Extract any option arguments from the description
-            local -a option_args=($(print -- $option_description | sed -E \
+            local -a option_args=($(print -- $option_spec | sed -E \
                                                                    -e 's=^[^<]+<=<=' \
                                                                    -e 's=>[^>]+$=>=' \
                                                                    -e 's=<|>==g'))
 
-            local description=$(print -- $option_description | sed -E \
-                                                           -e 's=.*  ([a-zA-Z].*)$=\1=')
-
             local ACTIONS=""
             for arg in $option_args; do
-                ACTIONS+=$option_completors[$arg]
+                local action=$option_completors[$arg]
+                if [[ -z $action ]]; then
+                    # Fall back on description and arg if there's no known completor
+                    action=":$description\: $arg: "
+                fi
+                ACTIONS+=$action
             done
 
             for option in $option_group; do
