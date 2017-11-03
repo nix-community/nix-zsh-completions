@@ -33,28 +33,24 @@ common_options=("(--debug)"--debug"[enable debug output]"
                 "(--version)"--version"[show version information]")
 
 local -a main_commands
-() {
-    local IFS=$'\n'
-    # Extract the commands with descriptions
-    # like ('command:some description' 'run:run some stuff')
-    main_commands=($(nix --help | sed -E \
+# Extract the commands with descriptions
+# like ('command:some description' 'run:run some stuff')
+main_commands=(${(f)"$(nix --help | sed -E \
                                       -e '/^Available commands/,/^$/!d' \
                                       -e '/^Available commands/d' \
                                       -e '/^$/d' \
-                                      -e 's=^ +([0-9a-z-]*) +(.*)$=\1:\2='))
-}
+                                      -e 's=^ +([0-9a-z-]*) +(.*)$=\1:\2=')"})
 
 function _describe_nix_commands {
     _describe -t main_commands "Command" main_commands
 }
 
 function _extract_nix_options {
-    local IFS=$'\n'
     local -a nix_options
-    nix_options=($(nix --help-config | sed -E \
+    nix_options=(${(f)"$(nix --help-config | sed -E \
                                  -e '/^$/,/^$/!d' \
                                  -e '/^$/d' \
-                                 -e 's=^ +([0-9a-z-]*) +(.*)$=\1:\2='))
+                                 -e 's=^ +([0-9a-z-]*) +(.*)$=\1:\2=')"})
     _describe -t nix_options "Option" nix_options
 }
 
@@ -164,13 +160,10 @@ for word in $words; do
 
         # Extract the lines containing the option descriptions
         local -a option_descriptions
-        (){
-            local IFS=$'\n'
-            option_descriptions=($(nix $word --help | sed -E \
-                                                        -e '/^Flags:/,/^$/!d' \
-                                                        -e "/^Flags:/d" \
-                                                        -e '/^$/d'))
-        }
+        option_descriptions=(${(f)"$(nix $word --help | sed -E \
+                                                      -e '/^Flags:/,/^$/!d' \
+                                                      -e '/^Flags:/d' \
+                                                      -e '/^$/d')"})
 
         local option_description
         local option
