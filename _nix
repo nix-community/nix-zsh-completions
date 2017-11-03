@@ -198,12 +198,14 @@ for word in $words; do
             done
 
             for option in $option_group; do
-                # Handle `run --keep/--unset` manually as they can be repeated
+                # Handle `run --keep/--unset` manually as there's ambiguity the NAME argument
                 if [[ $word == run && -z ${option:#(-k|--keep|-u|--unset)} ]]; then
                     command_options+=("*${option}[$description]:Environment Variable:_vars")
+                elif [[ -z ${option:#(-I|--include)} ]]; then
+                    # Repeatable options
+                    command_options+=("*${option}[$description]"$ACTIONS)
                 else
-                    # Some options can be provided multiple times, but there's no way
-                    # to automatically check, so we exclude them by default
+                    # Default to mutually exclusive non-repeatable options
                     command_options+=("($option_group)"$option"[$description]"$ACTIONS)
                 fi
             done
