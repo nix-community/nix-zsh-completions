@@ -75,7 +75,7 @@ function _nix_store {
 
 function _nix_installables_file {
     _alternative \
-        file:'Local file':_files \
+        'file:Local file:_nix_complete_dotnix_files' \
         'channel:Channel:(channel:
                        channel:nixos-13.10           channel:nixos-16.09
                        channel:nixos-14.04           channel:nixos-16.09-small
