@@ -21,6 +21,8 @@
 local command_name=nix
 _nix-common-options
 
+setopt extendedglob
+
 local -a common_options
 common_options=("(--debug)"--debug"[enable debug output]"
                 "(-h --help)"{-h,--help}"[show usage information]"
@@ -34,12 +36,15 @@ common_options=("(--debug)"--debug"[enable debug output]"
 
 local -a main_commands
 # Extract the commands with descriptions
-# like ('command:some description' 'run:run some stuff')
-main_commands=(${(f)"$(nix --help | sed -E \
-                                      -e '/^Available commands/,/^$/!d' \
-                                      -e '/^Available commands/d' \
-                                      -e '/^$/d' \
-                                      -e 's=^ +([0-9a-z-]*) +(.*)$=\1:\2=')"})
+# like ('command:some description' 'run:run some stuff'):
+#
+# Split the help output on newlines, and remove all lines which doesn't start
+# with two spaces and a lower case character,
+main_commands=(${${(f)"$(nix --help)"}:#^(  [a-z]*)})
+# Strip the leading spaces
+main_commands=(${main_commands/#  /})
+# And replace the whitespace separating the command and description with ':'
+main_commands=(${main_commands/  ##/:})
 
 function _describe_nix_commands {
     _describe -t main_commands "Command" main_commands
@@ -47,18 +52,17 @@ function _describe_nix_commands {
 
 function _extract_nix_options {
     local -a nix_options
-    nix_options=(${(f)"$(nix --help-config | sed -E \
-                                 -e '/^$/,/^$/!d' \
-                                 -e '/^$/d' \
-                                 -e 's=^ +([0-9a-z-]*) +(.*)$=\1:\2=')"})
+    # Strip the header line, remove leading spaces and replace separating
+    # whitespace with ':'
+    nix_options=(${${${${(f)"$(nix --help-config)"}:1:-1}/#  /}/  ##/:})
     _describe -t nix_options "Option" nix_options
 }
 
 function _extract_nix_value_description {
     local OPTION=$words[$(($CURRENT - 1))]
-    local description=$(nix --help-config | sed -E \
-                                                -e /\^\ \ ${OPTION}\ /\!d \
-                                                -e "s=^  ${OPTION} +==")
+    # Remove lines not starting with " $OPTION " and strip eveything up to the
+    # last two consecutive spaces
+    local description=${${${(f)"$(nix --help-config)"}:#^(  $OPTION *)}/*  /}
     _message $description
 }
 
@@ -146,12 +150,10 @@ for word in $words; do
 
     # Check if we're in a valid command
     if [[ $command_lookup[$word] == 1 ]]; then
+        local -a help=(${(f)"$(nix $word --help)"})
         # Extract an array describing the possible arguments to the command eg.
         # (NAR PATH) for cat-nar or (INSTALLABLES) for run
-        local -a args=($(nix $word --help | sed -E \
-                                          -e '2,$d' \
-                                          -e 's=^Usage.*<FLAGS>==' \
-                                          -e 's=\.|\?|<|>==g'))
+        local -a args=(${=help[1]//(*<FLAGS>|.|<|>)/})
         # And add the corresponding completors
         local arg
         for arg in $args; do
@@ -160,10 +162,7 @@ for word in $words; do
 
         # Extract the lines containing the option descriptions
         local -a option_descriptions
-        option_descriptions=(${(f)"$(nix $word --help | sed -E \
-                                                      -e '/^Flags:/,/^$/!d' \
-                                                      -e '/^Flags:/d' \
-                                                      -e '/^$/d')"})
+        option_descriptions=(${help:#^(  -*|  ??? -*)})
 
         local option_description
         local option
