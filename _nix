@@ -46,10 +46,6 @@ main_commands=(${main_commands/#  /})
 # And replace the whitespace separating the command and description with ':'
 main_commands=(${main_commands/  ##/:})
 
-function _describe_nix_commands {
-    _describe -t main_commands "Command" main_commands
-}
-
 function _extract_nix_options {
     local -a nix_options
     # Strip the header line, remove leading spaces and replace separating
@@ -208,7 +204,7 @@ for word in $words; do
 done
 
 _arguments -s \
-           :Command:_describe_nix_commands \
+           ":Command: _describe -t main_commands Command main_commands"\
            $command_arguments \
            $common_options \
            $command_options
