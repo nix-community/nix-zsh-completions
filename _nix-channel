@@ -1,16 +1,20 @@
 #compdef nix-channel
 #autoload
 
-_nix-common-options
+local context state state_descr line
+typeset -A opt_args
 
-# TODO: Handle case where nix-channel --list is empty
-_nix_channels() {
-  _values 'Nix Channels' $(nix-channel --list | awk '{ print $1 }' ORS=' ')
-}
+_nix-common-options
 
 _arguments \
   '(- *)--add[Subscribe to a channel]:Channel URL:_urls::Channel Name:( )'\
-  '(- *)--remove[Unsubscribe from a channel]:Channel Name:_nix_channels'\
+  '(- *)--remove[Unsubscribe from a channel]:Channel Name:->nix_channels'\
   '(- *)--list[List subscribed channels]'\
-  '(- *)--update[Update and activate channels]:Channel Name:_nix_channels'\
+  '(- *)--update[Update and activate channels]:Channel Name:->nix_channels'\
   '(- *)--rollback[Revert the previous nix-channel --update]'
+
+case $state in
+    nix-channels)
+        local -a channels=(${${(f)"$(nix-channel --list)"}%% *})
+        _values 'Nix Channels' ${channels}
+esac
