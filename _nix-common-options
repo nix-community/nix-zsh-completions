@@ -44,8 +44,9 @@ _nix_complete_dotnix_files () {
 
 _nix_generations () {
     # List of package names with version numbers stripped
-    local generations=($(nix-env --list-generations | awk '{print $1":"$2}'))
-    _describe "Nix Generations" generations
+    setopt extendedglob
+    local -a generations=(${${${(f)"$(nix-env --list-generations)"}##  #}/  /:})
+    _describe -V "Nix Generations" generations
 }
 
 _nix_installed_packages () {
