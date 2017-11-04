@@ -4,6 +4,9 @@
 emulate -L zsh
 setopt extendedglob
 
+local context state state_descr line
+typeset -A opt_args
+
 local command_name=nix-env
 
 _nix-common-options
@@ -13,7 +16,7 @@ _1st_arguments=(
     '(main_options)'{--install,-i}"[Install package]"
     '(main_options)'{--upgrade,-u}"[Upgrade package]"
     '(main_options)'{--uninstall,-e}"[Uninstall package]"
-    "(main_options)--set-flag[Modify meta attribute of installed package]"
+    '(main_options)'--set-flag'[Modify meta attribute of installed package]:Name:->flag_name:Value:->flag_value:*:Packages: _nix_installed_packages'
     '(main_options)'{--query,-q}"[List information about derivations]"
     '(main_options)'{--switch-profile,-S}"[Set the current profile path]"
     "(main_options)--list-generations[Print a list of all generations in the active profile]"
@@ -79,35 +82,7 @@ case "$opt" in
         break
         ;;
     --set-flag)
-        _set_flag_attrs=(
-            'priority:Resolve package name conflicts' \
-                'keep:Prevent package from being upgraded' \
-                'active:Package is symlinked to profile' \
-                )
-
-        if (( CURRENT==2 )); then
-            _describe -t commands "nix-env subcommands" _set_flag_attrs
-            return
-        fi
-
-        if (( CURRENT==3 )); then
-            case "$words[2]" in
-                priority)
-                    break
-                    ;;
-                keep)
-                    _values "TF" true false
-                    break
-                    ;;
-                active)
-                    _values "TF" true false
-                    break
-                    ;;
-            esac
-        else
-            _nix_installed_packages
-        fi
-        return
+        break
         ;;
     --query|-[^-]#q[^-]#)
         command_options=(
@@ -148,3 +123,33 @@ _arguments -s -O options $command_options \
            $_nix_boilerplate_opts \
            + main_options \
            $_1st_arguments
+
+# Handle the --set-flag option
+case $state in
+    flag_name)
+        local -a _set_flag_attrs=(
+            'priority:Resolve package name conflicts'
+            'keep:Prevent package from being upgraded'
+            'active:Package is symlinked to profile'
+        )
+        _describe -t commands "Package flag" _set_flag_attrs
+        break
+        ;;
+    flag_value)
+        local flag_name=$words[$(($CURRENT - 1))]
+        case $flag_name in
+            priority)
+                __message "Number, lower priority values denote a higher priority"
+                break
+                ;;
+            keep)
+                _values "TF" true false
+                break
+                ;;
+            active)
+                _values "TF" true false
+                break
+                ;;
+        esac
+        ;;
+esac
