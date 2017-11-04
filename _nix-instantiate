@@ -19,3 +19,4 @@ _arguments \
   "(- *)--find-file[Look up the given files on Nix's search path]:*:Files:_files"\
   '--strict[Cause --eval to recursively evaluate list elements and attributes]'\
   '--read-write-mode[Perform evaluation in read/write mode]'\
+  '*:File to instantiate (default\: ./default.nix):_nix_path' \
