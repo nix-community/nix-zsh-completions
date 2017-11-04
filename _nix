@@ -198,6 +198,7 @@ case "${context%%-*} $state" in
     'option FILE')
         _alternative \
             'file:Local file:_nix_complete_dotnix_files' \
+            'shortcuts:Shortcuts:_nix_shortcuts' \
             'channel:Channel:(channel:
                        channel:nixos-13.10           channel:nixos-16.09
                        channel:nixos-14.04           channel:nixos-16.09-small
