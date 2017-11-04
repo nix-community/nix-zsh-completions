@@ -10,8 +10,9 @@
 # 2. The common options which are hardcoded for the moment
 #
 # 3. The regular arguments for the active command. The number and types of these
-# arguments are taken from the "Usage:" line of `nix command --help`, the
-# actions and descriptions are then looked up in `$completors[type]`
+# arguments are taken from the "Usage:" line of `nix command --help`, $state
+# is set to the name of the argument via a `->$arg` action, which are further
+# handled in the case statement at the end of the file.
 #
 # 4. The options for the active command. These are taken from the "Flags:"
 # section of `nix command --help`, and the option arguments are handled in the
@@ -23,13 +24,16 @@ _nix-common-options
 
 setopt extendedglob
 
+local context state state_descr line
+typeset -A opt_args
+
 local -a common_options
 common_options=("(--debug)"--debug"[enable debug output]"
                 "(-h --help)"{-h,--help}"[show usage information]"
                 "(--help-config)"--help-config"[show configuration options]"
                 "*--builders[The machine to build on]:Machine eg. 'root@mac x86_64-darwin': "
-                "--store[Select a nix store]:Store:_nix_store"
-                "*--option[set a Nix configuration option (overriding nix.conf)]:Option:_extract_nix_options:Value:_extract_nix_value_description"
+                "--store[Select a nix store]:Store:->option STORE-URI"
+                "*--option[set a Nix configuration option (overriding nix.conf)]:Option:->nixoption:Value:->nixoptionvalue"
                 "(--quiet)"--quiet"[decrease verbosity level]"
                 "*"{-v,--verbose}"[increase verbosity level]"
                 "(--version)"--version"[show version information]")
@@ -45,89 +49,6 @@ main_commands=(${${(f)"$(nix --help)"}:#^(  [a-z]*)})
 main_commands=(${main_commands/#  /})
 # And replace the whitespace separating the command and description with ':'
 main_commands=(${main_commands/  ##/:})
-
-function _extract_nix_options {
-    local -a nix_options
-    # Strip the header line, remove leading spaces and replace separating
-    # whitespace with ':'
-    nix_options=(${${${${(f)"$(nix --help-config)"}:1:-1}/#  /}/  ##/:})
-    _describe -t nix_options "Option" nix_options
-}
-
-function _extract_nix_value_description {
-    local OPTION=$words[$(($CURRENT - 1))]
-    # Remove lines not starting with " $OPTION " and strip eveything up to the
-    # last two consecutive spaces
-    local description=${${${(f)"$(nix --help-config)"}:#^(  $OPTION *)}/*  /}
-    _message $description
-}
-
-function _nix_store {
-    _alternative \
-        'file:Use a chroot store:_directories' \
-        'local:Use /nix/store:(local)' \
-        'remote:Go via the Nix daemon:(remote)' \
-        'https:HTTPS:(https://)' \
-        'cache:Local binary cache:(file://)' \
-        's3:S3 binary cache:(s3://)' \
-        'ssh:Nix store over ssh:(ssh://)' \
-}
-
-function _nix_installables_file {
-    _alternative \
-        'file:Local file:_nix_complete_dotnix_files' \
-        'channel:Channel:(channel:
-                       channel:nixos-13.10           channel:nixos-16.09
-                       channel:nixos-14.04           channel:nixos-16.09-small
-                       channel:nixos-14.04-small     channel:nixos-17.03
-                       channel:nixos-14.12           channel:nixos-17.03-small
-                       channel:nixos-14.12-small     channel:nixos-17.09
-                       channel:nixos-15.09           channel:nixos-17.09-small
-                       channel:nixos-15.09-small     channel:nixos-unstable
-                       channel:nixos-16.03           channel:nixos-unstable-small
-                       channel:nixos-16.03-small     channel:nixpkgs-17.09-darwin
-                       channel:nixos-16.03-testing   channel:nixpkgs-unstable)' \
-        'url:URL:(https:// http://)'
-}
-
-# Complete attribute paths and files starting with either "/" or "./"
-function _nix_installable {
-    # We need to prefix relative paths with ./ so nix will evaluate it as a path
-    local prefix='-P ./'
-    local current_word=$words[$CURRENT]
-    # When referencing an absolute path we can't prefix with ./
-    if [[ -z ${current_word:##(/*|\~/*)} && -n $current_word ]]; then
-        prefix=""
-    fi
-    _alternative \
-        'path:Attribute path: _nix_attr_paths' \
-        "file:File path to package:_files ${prefix}"
-}
-
-local -A completors
-# The different argument completors that can be used
-completors[INSTALLABLES]="*:Installables: _nix_installable"
-completors[INSTALLABLE]=":Installable: _nix_installable"
-completors[PACKAGE]=":The package we're checking depencies of:_nix_installable"
-completors[DEPENDENCY]=":The dependency: _nix_installable"
-completors[PATH]=":Path:_files"
-completors[PATHS]="*:Path:_files"
-completors[NAR]=":Nar:_files"
-completors[REGEX]="::Regex to search for: "
-completors[STRINGS]="*:Hash: "
-
-local -A option_completors
-# Completors that are used for options
-option_completors[NAME]=":Argument name: "
-option_completors[STORE-URI]=":Store uri:_nix_store"
-option_completors[FILE]=":Path:_nix_installables_file"
-option_completors[FILES]="*:Path:_files"
-option_completors[COMMAND]=":Path:_command_names"
-option_completors[ARGS]="*:Arguments to command: "
-option_completors[TYPE]=":Hash type:(md5 sha1 sha256 sha512)"
-option_completors[EXPR]=":Expression argument: "
-option_completors[STRING]=":String argument: "
-option_completors[PATH]=":Shadow NIX_PATH, eg. nixpkgs=git\://github.com/NixOS/nixpkgs: "
 
 # Add commands to an associative array for easy lookup
 local -A command_lookup
@@ -150,10 +71,11 @@ for word in $words; do
         # Extract an array describing the possible arguments to the command eg.
         # (NAR PATH) for cat-nar or (INSTALLABLES) for run
         local -a args=(${=help[1]//(*<FLAGS>|.|<|>)/})
-        # And add the corresponding completors
+        # And add the appropriate _argument spec
         local arg
         for arg in $args; do
-            command_arguments+=($completors[$arg])
+            # Prefix * if $arg ends in 'S', ie. is plural
+            command_arguments+=("${${(M)arg:#*S}:+*}:$arg:->$arg")
         done
 
         # Extract the lines containing the option descriptions
@@ -177,12 +99,8 @@ for word in $words; do
 
             local ACTIONS=""
             for arg in $option_args; do
-                local action=$option_completors[$arg]
-                if [[ -z $action ]]; then
-                    # Fall back on description and arg if there's no known completor
-                    action=":$description\: $arg: "
-                fi
-                ACTIONS+=$action
+                # Prefix with ':*' if $arg ends in 'S', ie. is plural
+                ACTIONS+="${${(M)arg:#*S}:+:*}:$arg:->$arg"
             done
 
             for option in $option_group; do
@@ -208,3 +126,129 @@ _arguments -s \
            $command_arguments \
            $common_options \
            $command_options
+
+# Guard against running any argument handling when entering options, as it can
+# screw things up for _arguments
+if [[ -n $words[$CURRENT]
+   && -z ${words[$CURRENT]:#-*}
+   && -n $context
+   && -z ${context:#argument-*} ]]; then
+    return
+fi
+
+# Handle arguments to commands and options
+case "${context%%-*} $state" in
+    'argument '(INSTALLABLES|INSTALLABLE|PACKAGE|DEPENDENCY))
+        # Complete attribute paths and files starting with either "/" or "./"
+
+        # We need to prefix relative paths with ./ so nix will evaluate it as a
+        # path
+        local prefix='-P ./'
+        local current_word=$words[$CURRENT]
+        # When referencing an absolute path we can't prefix with ./
+        if [[ -z ${current_word:##(/*|\~/*)} && -n $current_word ]]; then
+            prefix=""
+        fi
+        _alternative \
+            'path:Attribute path: _nix_attr_paths' \
+            "file:File path to package:_files ${prefix}"
+        return
+        ;;
+    'argument '(PATH|PATHS|FILES))
+        _files
+        return
+        ;;
+    'argument NAR')
+        _files -X "NAR"
+        return
+        ;;
+    'argument REGEX')
+        _message 'Regex to search for'
+        return
+        ;;
+    'argument STRINGS')
+        _message 'HASH to convert to a different base'
+        return
+        ;;
+    'option NAME')
+        _message 'Argument name'
+        return
+        ;;
+    'option STORE-URI')
+        _alternative \
+            'file:Use a chroot store:_directories' \
+            'local:Use /nix/store:(local)' \
+            'remote:Go via the Nix daemon:(remote)' \
+            'https:HTTPS:(https://)' \
+            'cache:Local binary cache:(file://)' \
+            's3:S3 binary cache:(s3://)' \
+            'ssh:Nix store over ssh:(ssh://)' \
+        return
+        ;;
+    'option FILE')
+        _alternative \
+            'file:Local file:_nix_complete_dotnix_files' \
+            'channel:Channel:(channel:
+                       channel:nixos-13.10           channel:nixos-16.09
+                       channel:nixos-14.04           channel:nixos-16.09-small
+                       channel:nixos-14.04-small     channel:nixos-17.03
+                       channel:nixos-14.12           channel:nixos-17.03-small
+                       channel:nixos-14.12-small     channel:nixos-17.09
+                       channel:nixos-15.09           channel:nixos-17.09-small
+                       channel:nixos-15.09-small     channel:nixos-unstable
+                       channel:nixos-16.03           channel:nixos-unstable-small
+                       channel:nixos-16.03-small     channel:nixpkgs-17.09-darwin
+                       channel:nixos-16.03-testing   channel:nixpkgs-unstable)' \
+                           'url:URL:(https:// http://)'
+        return
+        ;;
+    'option FILES')
+        _files
+        return
+        ;;
+    'option COMMAND')
+        _command_names
+        return
+        ;;
+    'option ARGS')
+        _message 'Arguments to command'
+        return
+        ;;
+    'option TYPE')
+        _values 'Hash type' md5 sha1 sha256 sha512
+        return
+        ;;
+    'option EXPR')
+        _message 'Expression argument'
+        return
+        ;;
+    'option STRING')
+        _message 'String argument'
+        return
+        ;;
+    'option PATH')
+        _message 'Shadow NIX_PATH, eg. nixpkgs=git\://github.com/NixOS/nixpkgs'
+        return
+        ;;
+    'option nixoption')
+        # Complete nix options with descriptions
+        local -a nix_options
+        # Strip the header line, remove leading spaces and replace separating
+        # whitespace with ':'
+        nix_options=(${${${${(f)"$(nix --help-config)"}:1:-1}/#  /}/  ##/:})
+        _describe -t nix_options "Option" nix_options
+        return
+        ;;
+    'option nixoptionvalue')
+        # Print the description of the option we're setting
+        local OPTION=$words[$(($CURRENT - 1))]
+        # Remove lines not starting with " $OPTION " and strip eveything up to the
+        # last two consecutive spaces
+        local description=${${${(f)"$(nix --help-config)"}:#^(  $OPTION *)}/*  /}
+        _message $description
+        return
+        ;;
+    *)
+        # Fallback to argument name description
+        _message $state_descr
+esac
