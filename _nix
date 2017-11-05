@@ -109,7 +109,7 @@ for word in $words; do
                 # Handle `run --keep/--unset` manually as there's ambiguity the NAME argument
                 if [[ $word == run && -z ${option:#(-k|--keep|-u|--unset)} ]]; then
                     command_options+=("*${option}[$description]:Environment Variable:_vars")
-                elif [[ -z ${option:#(-I|--include)} ]]; then
+                elif [[ -z ${option:#(-I|--include|--arg|--argstr)} ]]; then
                     # Repeatable options
                     command_options+=("*${option}[$description]"$ACTIONS)
                 else
