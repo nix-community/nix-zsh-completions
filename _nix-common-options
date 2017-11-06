@@ -198,7 +198,7 @@ _nix_attr_paths () {
 
     local -a prefix=()
     if [[ -n $attr_path ]]; then
-        for i in ${=attr_path/./ }; do
+        for i in ${=attr_path//./ }; do
             prefix+=("($i)" .)
         done
     fi
