@@ -196,12 +196,14 @@ _nix_attr_paths () {
         return 1
     fi
 
-    local prefix
+    local -a prefix=()
     if [[ -n $attr_path ]]; then
-        prefix=${attr_path}.
+        for i in ${=attr_path/./ }; do
+            prefix+=("($i)" .)
+        done
     fi
 
-    _values -s . "Packages" ${prefix}${^result}
+    _wanted package package "Attribute path to package" _sep_parts $prefix result \.
 }
 
 _nix_profiles () {
