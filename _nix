@@ -185,14 +185,16 @@ case "${context%%-*} $state" in
         return
         ;;
     'option STORE-URI')
+        local -a others=(
+            'local:Use /nix/store'
+            'remote:Go via the Nix daemon'
+            'https\://:HTTPS'
+            's3\://:S3 binary cache'
+            'ssh\://:Nix store over ssh')
         _alternative \
             'file:Use a chroot store:_directories' \
-            'local:Use /nix/store:(local)' \
-            'remote:Go via the Nix daemon:(remote)' \
-            'https:HTTPS:(https://)' \
-            'cache:Local binary cache:(file://)' \
-            's3:S3 binary cache:(s3://)' \
-            'ssh:Nix store over ssh:(ssh://)' \
+            'url:Other: _describe "URLS and special options" others' \
+            'cache:Local binary cache (adds file url prefix):_files -P "file://" -/'
         return
         ;;
     'option FILE')
