@@ -147,7 +147,7 @@ case "$words[1]" in
   ssh-for-each)
     _arguments \
       $_nixops_common_arguments\
-      '(--parallel -p)'{--parallel -p}'[Execute the command on each machine in parallel]'\
+      '(--parallel -p)'{--parallel,-p}'[Execute the command on each machine in parallel]'\
       $_nixops_include_exclude \
     ;;
   reboot)
