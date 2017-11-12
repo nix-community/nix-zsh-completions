@@ -127,16 +127,7 @@ _arguments -s \
            ":Command: _describe -t main_commands Command main_commands"\
            $command_arguments \
            $common_options \
-           $command_options
-
-# Guard against running any argument handling when entering options, as it can
-# screw things up for _arguments
-if [[ -n $words[$CURRENT]
-   && -z ${words[$CURRENT]:#-*}
-   && -n $context
-   && -z ${context:#argument-*} ]]; then
-    return
-fi
+           $command_options && return 0
 
 # Handle arguments to commands and options
 case "${context%%-*} $state" in
