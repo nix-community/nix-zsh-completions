@@ -63,7 +63,11 @@ case "$opt" in
             $_nix_env_from_profile
             '(--preserve-installed -P)'{--preserve-installed,-P}'[Do not remove derivations with the same name]'
             '(--remove-all -r)'{--remove-all,-r}'[Remove all previously installed packages prior to installing]'
-            '*:Package:{if $expect_attr_paths; then _nix_attr_paths ; fi}')
+            '*:Package:{if $expect_attr_paths; then
+                           _nix_attr_paths;
+                        else
+                            _message "Use -A or --attr to get useful completion";
+                        fi}')
         break
         ;;
     --upgrade|-[^-]#u[^-]#)
