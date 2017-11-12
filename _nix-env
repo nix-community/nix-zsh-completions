@@ -118,7 +118,7 @@ done
 
 # Let _arguments handle the rest, with _1st_arguments being mutually exclusive
 # under the main_options group
-_arguments -s -O options $command_options \
+_arguments -s $command_options \
            $_nix_env_common_opts \
            $_nix_boilerplate_opts \
            + main_options \
