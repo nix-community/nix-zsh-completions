@@ -27,6 +27,8 @@ setopt extendedglob
 local context state state_descr line
 typeset -A opt_args
 
+type nix &> /dev/null || return
+
 local -a common_options
 common_options=("(--debug)"--debug"[enable debug output]"
                 "(-h --help)"{-h,--help}"[show usage information]"
