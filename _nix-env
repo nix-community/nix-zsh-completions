@@ -59,6 +59,7 @@ for opt in $words; do
 case "$opt" in
     --install|-[^-]#i[^-]#)
         command_options=(
+            $_nix_env_common_opts
             $_nix_env_b
             $_nix_env_from_profile
             '(--preserve-installed -P)'{--preserve-installed,-P}'[Do not remove derivations with the same name]'
@@ -72,6 +73,7 @@ case "$opt" in
         ;;
     --upgrade|-[^-]#u[^-]#)
         command_options=(
+            $_nix_env_common_opts
             $_nix_env_b
             $_nix_env_from_profile
             '(-lt -leq -eq --always)--lt[Upgrade derivations with newer versions (default)]'
@@ -82,7 +84,7 @@ case "$opt" in
         break
         ;;
     --uninstall|-[^-]#e[^-]#)
-        command_options=('*::Packages:_nix_installed_packages')
+        command_options=($_nix_env_common_opts '*::Packages:_nix_installed_packages')
         break
         ;;
     --set-flag)
@@ -90,6 +92,7 @@ case "$opt" in
         ;;
     --query|-[^-]#q[^-]#)
         command_options=(
+            $_nix_env_common_opts
             '(--available -a)'{--available,-a}'[display all installable derivations]'
             $_nix_env_b
             '(--status -s)'{--status,-s}'[print status of derivation]'
@@ -106,15 +109,15 @@ case "$opt" in
         break
         ;;
     --switch-profile|-[^-]#S[^-]#)
-        command_options=(':Profile:_nix_profiles')
+        command_options=($_nix_env_common_opts ':Profile:_nix_profiles')
         break
         ;;
     --delete-generations)
-        command_options=('*::Generations:_nix_generations')
+        command_options=($_nix_env_common_opts '*::Generations:_nix_generations')
         break
         ;;
     --switch-generation|-[^-]#G[^-]#)
-        command_options=('::Generations:_nix_generations')
+        command_options=($_nix_env_common_opts '::Generations:_nix_generations')
         break
         ;;
 esac
@@ -123,7 +126,6 @@ done
 # Let _arguments handle the rest, with _1st_arguments being mutually exclusive
 # under the main_options group
 _arguments -s $command_options \
-           $_nix_env_common_opts \
            $_nix_boilerplate_opts \
            + main_options \
            $_1st_arguments
