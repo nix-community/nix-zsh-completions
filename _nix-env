@@ -59,7 +59,8 @@ for opt in $words; do
 case "$opt" in
     --install|-[^-]#i[^-]#)
         command_options=(
-            $_nix_env_common_opts
+            ${_nix_env_common_opts:#(*--attr|*-A*)}
+            '(--attr -A)'{--attr,-A}'[Specify packages by attribute path instead of name]'
             $_nix_env_b
             $_nix_env_from_profile
             '(--preserve-installed -P)'{--preserve-installed,-P}'[Do not remove derivations with the same name]'
