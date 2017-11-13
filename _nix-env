@@ -146,7 +146,7 @@ case $state in
         local flag_name=$words[$(($CURRENT - 1))]
         case $flag_name in
             priority)
-                __message "Number, lower priority values denote a higher priority"
+                _message "Number, lower priority values denote a higher priority"
                 break
                 ;;
             keep)
