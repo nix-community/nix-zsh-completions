@@ -48,7 +48,8 @@ case "$words[1]" in
   ;;
   --delete)
     _arguments \
-      '--ignore-liveness[Ignore reachability from roots]'
+        '--ignore-liveness[Ignore reachability from roots]' \
+        '*::Store path to garbage collect:_files'
   ;;
   --query|-q)
     local -a _queries
