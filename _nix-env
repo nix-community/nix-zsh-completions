@@ -59,7 +59,7 @@ for opt in $words; do
 case "$opt" in
     --install|-[^-]#i[^-]#)
         command_options=(
-            ${_nix_env_common_opts:#(*--attr|*-A*)}
+            ${_nix_env_common_opts:#'(--attr -A)'*}
             '(--attr -A)'{--attr,-A}'[Specify packages by attribute path instead of name]'
             $_nix_env_b
             $_nix_env_from_profile
@@ -68,7 +68,7 @@ case "$opt" in
             '*:Package:{if $expect_attr_paths; then
                            _nix_attr_paths;
                         else
-                            _message "Use -A or --attr to get useful completion";
+                           _nix_installed_packages "(use -A/--attr to access all packages)"
                         fi}')
         break
         ;;
@@ -81,11 +81,13 @@ case "$opt" in
             '(-lt -leq -eq --always)--leq[Upgrade derivations with the same or newer version]'
             '(-lt -leq -eq --always)--eq[Upgrade derivations with equivalent versions]'
             '(-lt -leq -eq --always)--always[Upgrade even if version number decreases]'
-            '*:Packages:_nix_installed_packages')
+            '*:Packages: _nix_installed_packages')
         break
         ;;
     --uninstall|-[^-]#e[^-]#)
-        command_options=($_nix_env_common_opts '*::Packages:_nix_installed_packages')
+        command_options=(
+            ${_nix_env_common_opts:#'(--attr -A)'*}
+            '*::Packages: _nix_installed_packages')
         break
         ;;
     --set-flag)

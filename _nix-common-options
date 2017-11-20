@@ -66,8 +66,19 @@ _nix_generations () {
 
 _nix_installed_packages () {
     # List of package names with version numbers stripped
+    # with the alternative to specify store paths
+    local extra_help=$1
+    local prefix='-P ./'
+    local current_word=$words[$CURRENT]
+    # When referencing an absolute path we can't prefix with ./
+    if [[ -z ${current_word:##(/*|\~/*)} && -n $current_word ]]; then
+        prefix=""
+    fi
     local -a packages=(${${(f)"$(nix-env -q)"}%%-[0-9]*})
-    _values "Nix Packages" $packages
+
+    _alternative \
+        "package:packages:_values 'Installed package $extra_help' $packages" \
+        "file:Store path to package:_files ${prefix}"
 }
 
 
