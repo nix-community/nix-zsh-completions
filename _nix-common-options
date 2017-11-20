@@ -100,6 +100,15 @@ _nix_attr_names () {
             # accept it.
             # (Otherwise the path is likely a <nixpkgs> notation)
             defexpr_path=${defexpr_path:a}
+        elif [[ "$defexpr_path" == https://* ]]; then
+            # works for nix 1.11
+            local -a sha=($(printf "$defexpr_path" | sha256sum -))
+            local base=$(nix-hash --to-base32 --type sha256 ${sha[*]:0:1})
+            local cache=${XDG_CACHE_HOME:-~/.cache}/nix/tarballs
+            local link="$cache"/"$base"-file
+            if [[ -e "$link" ]]; then
+                defexpr_path="$cache"/"$(basename $(readlink $link))"-unpacked
+            fi
         fi
         defexpr="import $defexpr_path"
     elif [[ $command_name == nix-env ]]; then
