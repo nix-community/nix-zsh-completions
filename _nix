@@ -225,7 +225,8 @@ case "${context%%-*} $state" in
         return
         ;;
     'option PATH')
-        _message 'Shadow NIX_PATH, eg. nixpkgs=git\://github.com/NixOS/nixpkgs'
+        # --include <PATH> completion
+        _nix_complete_includes
         return
         ;;
     'option nixoption')

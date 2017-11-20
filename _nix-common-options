@@ -42,6 +42,18 @@ _nix_complete_dotnix_files () {
     _path_files '-g' '*.nix(N) *(N-/)'
 }
 
+_nix_complete_includes () {
+    local cur=${words[$CURRENT]}
+    local -a nixpath=(${(s.:.)NIX_PATH})
+    local -a path_names
+    local p
+    for p in ${nixpath[*]}; do
+        [[ "$p" == *=* ]] && path_names+=(${p%=*}:Path:_files)
+    done
+    _values -s = 'Nix path name' $path_names
+    return
+}
+
 _nix_generations () {
     # List of package names with version numbers stripped
     setopt extendedglob
@@ -253,7 +265,7 @@ _nix_gc_common=(
 
 # Used in: nixos-install, nix_common_opts
 _nix_search_path_args=(
-  '*-I+[Add path to Nix expression search path]:Include path:_nix_complete_dotnix_files'\
+    '*-I+[Add path to Nix expression search path]:Include path:_nix_complete_includes'\
 )
 
 # Either true or false: useful for completing many Nix options
@@ -306,6 +318,7 @@ _nix_repair='--repair[Fix corrupted or missing store paths by redownloading or r
 
 # Misc Nix options accepted by nixos-rebuild
 _nix_common_nixos_rebuild=(
+    $_nix_search_path_args \
   '(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'\
   '(--no-build-output -Q)'{--no-build-output,-Q}'[Silence output to stdout and stderr]'\
   '(--max-jobs -j)'{--max-jobs,-j}'[Set the maximum number of build jobs that Nix will perform in parallel]'\
@@ -321,7 +334,6 @@ _nix_common_nixos_rebuild=(
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell
 _nix_common_opts=(
   $_nix_common_nixos_rebuild \
-  $_nix_search_path_args \
   '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:Packages: _nix_attr_paths'\
   '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]:*:Files:_files'\
   '*--arg[Argument to pass to the Nix function]:Name: :Value: '\
