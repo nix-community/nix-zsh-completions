@@ -100,9 +100,22 @@ _nix_attr_names () {
             # accept it.
             # (Otherwise the path is likely a <nixpkgs> notation)
             defexpr_path=${defexpr_path:a}
-        elif [[ "$defexpr_path" == https://* ]]; then
-            # works for nix 1.11
-            local -a sha=($(printf "$defexpr_path" | sha256sum -))
+        elif [[ "$defexpr_path" == (https://*|channel:*) ]]; then
+            local -a sha
+            local version="$($service --version)"
+            if [[ ${version##* } == 1.11.* ]]; then
+                # works for nix 1.11
+                sha=($(printf "$defexpr_path" | sha256sum -))
+            else
+                # works for nix 1.12
+                # Resolve channel: syntax
+                if [[ "$defexpr_path" == channel:* ]]; then
+                    defexpr_path="https://nixos.org/channels/"${defexpr_path:8}"/nixexprs.tar.xz"
+
+                fi
+                local name="${defexpr_path##*/}"
+                sha=($(printf "$name\0$defexpr_path" | sha256sum -))
+            fi
             local base=$(nix-hash --to-base32 --type sha256 ${sha[*]:0:1})
             local cache=${XDG_CACHE_HOME:-~/.cache}/nix/tarballs
             local link="$cache"/"$base"-file
