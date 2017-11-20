@@ -50,6 +50,9 @@ _nix_complete_includes () {
     for p in ${nixpath[*]}; do
         [[ "$p" == *=* ]] && path_names+=(${p%=*}:Path:_files)
     done
+    if [[ $cur == *=* ]]; then
+        path_names+=(${cur%=*}:Path:_files)
+    fi
     _values -s = 'Nix path name' $path_names
     return
 }
