@@ -91,39 +91,39 @@ _nix_attr_names () {
     setopt local_options pipefail
 
     local attr_path=top${1:+.$1}
-    local defexpr_path=$2
+    local file=$2
 
     local defexpr
-    if [[ -n $defexpr_path ]]; then
-        if [[ -e $defexpr_path ]]; then
+    if [[ -n $file ]]; then
+        if [[ -e $file ]]; then
             # If the path exist use the absolute path to make sure import will
             # accept it.
             # (Otherwise the path is likely a <nixpkgs> notation)
-            defexpr_path=${defexpr_path:a}
-        elif [[ "$defexpr_path" == (https://*|channel:*) ]]; then
+            file=${defexpr_path:a}
+        elif [[ "$file" == (https://*|channel:*) ]]; then
             local -a sha
             local version="$($service --version)"
             if [[ ${version##* } == 1.11.* ]]; then
                 # works for nix 1.11
-                sha=($(printf "$defexpr_path" | sha256sum -))
+                sha=($(printf "$file" | sha256sum -))
             else
                 # works for nix 1.12
                 # Resolve channel: syntax
-                if [[ "$defexpr_path" == channel:* ]]; then
-                    defexpr_path="https://nixos.org/channels/"${defexpr_path:8}"/nixexprs.tar.xz"
+                if [[ "$file" == channel:* ]]; then
+                    file="https://nixos.org/channels/"${defexpr_path:8}"/nixexprs.tar.xz"
 
                 fi
                 local name="${defexpr_path##*/}"
-                sha=($(printf "$name\0$defexpr_path" | sha256sum -))
+                sha=($(printf "$name\0$file" | sha256sum -))
             fi
             local base=$(nix-hash --to-base32 --type sha256 ${sha[*]:0:1})
             local cache=${XDG_CACHE_HOME:-~/.cache}/nix/tarballs
             local link="$cache"/"$base"-file
             if [[ -e "$link" ]]; then
-                defexpr_path="$cache"/"$(basename $(readlink $link))"-unpacked
+                file="$cache"/"$(basename $(readlink $link))"-unpacked
             fi
         fi
-        defexpr="import $defexpr_path"
+        defexpr="import $file"
     elif [[ $command_name == nix-env ]]; then
         defexpr=$(_nix_gen_defexpr ~/.nix-defexpr)
     elif [[ $command_name == nix ]]; then
@@ -180,25 +180,25 @@ _nix_attr_paths () {
         attr_path=${words[CURRENT]%.*}
     fi
 
-    local defexpr_path=$1
-    if [[ -z $defexpr_path ]]; then
+    local file=$1
+    if [[ -z $file ]]; then
         if [[ $command_name == nix-env ]]; then
-            defexpr_path=$opt_args[-f]
-            if [[ -z $defexpr_path ]]; then
-                defexpr_path=$opt_args[--file]
+            file=$opt_args[-f]
+            if [[ -z $file ]]; then
+                file=$opt_args[--file]
             fi
         elif [[ $command_name == nix ]]; then
-            defexpr_path=$opt_args[-f]
-            if [[ -z $defexpr_path ]]; then
-                defexpr_path=$opt_args[--file]
+            file=$opt_args[-f]
+            if [[ -z $file ]]; then
+                file=$opt_args[--file]
             fi
         else
             if [[ $line ]]; then
-                defexpr_path=$line[1]
+                file=$line[1]
             elif [[ -e shell.nix && $command_name == nix-shell ]]; then
-                defexpr_path=shell.nix
+                file=shell.nix
             elif [[ -e default.nix ]]; then
-                defexpr_path=default.nix
+                file=default.nix
             fi
         fi
     fi
@@ -208,10 +208,10 @@ _nix_attr_paths () {
     # ($opt_args and $line contain the verbatim string:
     #  eg. given `nix-shell '<nixpkgs>' -A ` $line[1] will be `'<nixpkgs>'` while
     #  nix-shell will see `<nixpkgs>`)
-    defexpr_path=${(Q)defexpr_path}
+    file=${(Q)file}
 
     local -a result # must be on separate line to capture error code..
-    result=( $(_nix_attr_names "$attr_path" $defexpr_path) ) 2>/dev/null
+    result=( $(_nix_attr_names "$attr_path" $file) ) 2>/dev/null
 
     if [[ $? > 0 ]]; then
         # Probably because of invalid attribute path or error in top-level expr
