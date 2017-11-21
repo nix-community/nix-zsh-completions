@@ -218,12 +218,7 @@ _nix_attr_paths () {
 
     local file=$1
     if [[ -z $file ]]; then
-        if [[ $command_name == nix-env ]]; then
-            file=$opt_args[-f]
-            if [[ -z $file ]]; then
-                file=$opt_args[--file]
-            fi
-        elif [[ $command_name == nix ]]; then
+        if [[ $service == (nix-env|nix) ]]; then
             file=$opt_args[-f]
             if [[ -z $file ]]; then
                 file=$opt_args[--file]
