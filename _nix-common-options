@@ -125,7 +125,7 @@ _nix_attr_names () {
             # If the path exist use the absolute path to make sure import will
             # accept it.
             # (Otherwise the path is likely a <nixpkgs> notation)
-            file=${defexpr_path:a}
+            file=${file:a}
         elif [[ "$file" == (https://*|channel:*) ]]; then
             local -a sha
             local version="$($service --version)"
@@ -136,10 +136,10 @@ _nix_attr_names () {
                 # works for nix 1.12
                 # Resolve channel: syntax
                 if [[ "$file" == channel:* ]]; then
-                    file="https://nixos.org/channels/"${defexpr_path:8}"/nixexprs.tar.xz"
+                    file="https://nixos.org/channels/"${file:8}"/nixexprs.tar.xz"
 
                 fi
-                local name="${defexpr_path##*/}"
+                local name="${file##*/}"
                 sha=($(printf "$name\0$file" | sha256sum -))
             fi
             local base=$(nix-hash --to-base32 --type sha256 ${sha[*]:0:1})
