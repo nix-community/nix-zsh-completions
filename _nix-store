@@ -38,6 +38,7 @@ case "$words[1]" in
   --realise|-r)
     _arguments \
       $_nix_dry_run \
+      '--add-root[Register result as a root of the garbage collector]:Path (Hint /nix/var/nix/gcroots):_files -/'\
       '--ignore-unknown[Silently ignore non-derivation paths with no substitute]' \
       '*:Store Paths:_files'
   ;;

@@ -12,7 +12,7 @@ _arguments \
   $_nix_common_opts \
   '--xml[Print output from --eval as XML]'\
   '--json[Print output from --eval as JSON]'\
-  '--add-root[Register result as a root of the garbage collector]::Path (Hint /nix/var/nix/gcroots):_files -/'\
+  '--add-root[Register result as a root of the garbage collector]:Path (Hint /nix/var/nix/gcroots):_files -/'\
   '--indirect[Allow roots to be stored outside of the GC roots directory]'\
   '--parse[Just parse the input files and print their abstract syntax trees]'\
   '--eval[Just parse and evaluate the input files, and print the resulting values]'\
