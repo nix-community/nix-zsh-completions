@@ -223,6 +223,10 @@ _nix_attr_paths () {
             if [[ -z $file ]]; then
                 file=$opt_args[--file]
             fi
+            # opt_args escapes all backslashes in the argument
+            # so we have to remove a layer of backslashes
+            # same with `:`
+            file=${${file//\\\\/\\}//\\:/:}
         else
             if [[ $line ]]; then
                 file=$line[1]
