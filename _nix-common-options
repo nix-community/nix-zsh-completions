@@ -159,22 +159,23 @@ _nix_attr_names () {
         channels+=(${(s.:.)opt_args[-I]})
         channels+=(${(s.:.)opt_args[--include]})
 
-        local -A path_map
-        local channel name nix_path
+        # Add the names in an associative array to avoid duplicates
+        local -A names
+        local channel name
         for channel in $channels; do
             name=${channel%%=*}
             nix_path=${channel#*=}
             if [[ $name != $channel ]]; then
                 # Only add paths with a name, not sure how they work
-                path_map[$name]=$nix_path
+                names[$name]=1
             fi
         done
 
         defexpr=$'{ '
-        for name in ${(@k)path_map}; do
+        for name in ${(@k)names}; do
             # nixos-config isn't useful or possible to complete
             [[ $name == nixos-config ]] && continue
-            defexpr+="$name = import $path_map[$name] {}; "
+            defexpr+="$name = import <${name}> {}; "
         done
         defexpr+=' }'
     fi
