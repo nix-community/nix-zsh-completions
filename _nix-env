@@ -7,8 +7,6 @@ setopt extendedglob
 local context state state_descr line
 typeset -A opt_args
 
-local command_name=nix-env
-
 _nix-common-options
 
 local -a _1st_arguments

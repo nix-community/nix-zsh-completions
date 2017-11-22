@@ -1,8 +1,6 @@
 #compdef nix-shell
 #autoload
 
-local command_name=nix-shell
-
 _nix-common-options
 
 local -a _nix_shell_opts

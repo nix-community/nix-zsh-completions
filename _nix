@@ -18,8 +18,7 @@
 # section of `nix command --help`, and the option arguments are handled in the
 # same way as in 3.
 
-# Set command_name and ensure access to eg. _nix_attr_paths
-local command_name=nix
+# Ensure access to eg. _nix_attr_paths
 _nix-common-options
 
 setopt extendedglob
