@@ -4,6 +4,6 @@
 _nix-common-options
 
 _arguments \
-  '--type[Use the specified cryptographic hash algorithm]:Hash Algorithm:(md5 sha1 sha256)'\
+  '--type[Use the specified cryptographic hash algorithm]:Hash Algorithm:(md5 sha1 sha256 sha512)'\
   '1:URL:_urls'\
   '2::Hash:( )'
