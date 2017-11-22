@@ -183,10 +183,8 @@ _nix_attr_names () {
     # Build the modified nix path based on --include and -I options
     # The ordering here is somewhat random, and might not be fully correct.
     local includes=${opt_args[-I]:+${opt_args[-I]}:}${opt_args[--include]}
-    # If passing several path definitions in a single -I option opt_args will
-    # escape the ':' with a backslash. It does seem to work without dequoting,
-    # but this is more proper.
-    includes=${includes//\\:/:}
+    # Remove any backslashes that opt_args have added in
+    includes=${${includes//\\:/:}//\\\\/\\}
     local override=${includes:+${includes}:}$NIX_PATH
 
     NIX_PATH=$override nix-instantiate --eval - \
