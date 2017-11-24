@@ -26,7 +26,7 @@ _1st_arguments=(
 local -a _nix_env_common_opts
 _nix_env_common_opts=(
   $_nix_common_opts \
-  '(--file -f)'{--file,-f}'[Specify Nix expression used to obtain derivations]:Path to file:_nix_path'\
+  '*'{--file,-f}'[Specify Nix expression used to obtain derivations]:Path to file:_nix_path'\
   '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'\
   $_nix_dry_run \
   '--system-filter[Only show derivations matching the specified platform]:system:_nix_systems'\

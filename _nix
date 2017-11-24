@@ -113,7 +113,7 @@ for word in $words; do
                 elif [[ $option == (-I|--include) ]]; then
                     # Special handling of --include due to type ambiguity
                     command_options+=("*${option}[$description]:Includes:->INCLUDE")
-                elif [[ -z ${option:#(--arg|--argstr)} ]]; then
+                elif [[ -z ${option:#(--arg|--argstr|-f|--file)} ]]; then
                     # Repeatable options
                     command_options+=("*${option}[$description]"$ACTIONS)
                 else

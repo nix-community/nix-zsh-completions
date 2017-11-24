@@ -220,10 +220,14 @@ _nix_attr_paths () {
     local file=$1
     if [[ -z $file ]]; then
         if [[ $service == (nix-env|nix) ]]; then
-            file=$opt_args[-f]
-            if [[ -z $file ]]; then
-                file=$opt_args[--file]
-            fi
+            # Add up the opt_args, unfortunately it's only possible to get the
+            # true order of -f and --file separately, not together, so here we
+            # make --file take precedent
+            local seperator=""
+            [[ "${opt_args[-f]}" && "${opt_args[--file]}" ]] && seperator=:
+            file=${opt_args[-f]}$seperator${opt_args[--file]}
+            # Take the last file input we see
+            file=${file##*[^\\]:}
             # opt_args escapes all backslashes in the argument
             # so we have to remove a layer of backslashes
             # same with `:`
