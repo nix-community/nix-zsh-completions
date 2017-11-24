@@ -232,14 +232,12 @@ _nix_attr_paths () {
             # so we have to remove a layer of backslashes
             # same with `:`
             file=${${file//\\\\/\\}//\\:/:}
-        else
-            if [[ $line ]]; then
+        elif [[ $line ]]; then
                 file=$line[1]
-            elif [[ -e shell.nix && $service == nix-shell ]]; then
+        elif [[ -e shell.nix && $service == nix-shell ]]; then
                 file=shell.nix
-            elif [[ -e default.nix ]]; then
+        elif [[ -e default.nix ]]; then
                 file=default.nix
-            fi
         fi
     fi
 
