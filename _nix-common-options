@@ -48,12 +48,15 @@ _nix_complete_includes () {
     local -a path_names
     local p
     for p in ${nixpath[*]}; do
-        [[ "$p" == *=* ]] && path_names+=(${p%=*}:Path:_files)
+        [[ "$p" == *=* ]] && \
+            path_names+=(${p%=*}:Path:_nix_complete_dotnix_files)
     done
     if [[ $cur == *=* ]]; then
-        path_names+=(${cur%=*}:Path:_files)
+        path_names+=(${cur%=*}:Path:_nix_complete_dotnix_files)
     fi
-    _values -s = 'Nix path name' $path_names
+    _alternative \
+        "nixpath:nixpath:_values -s = 'Nix path name' $path_names" \
+        'file:Path:_files -/'
     return
 }
 
