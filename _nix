@@ -18,7 +18,7 @@
 # section of `nix command --help`, and the option arguments are handled in the
 # same way as in 3.
 
-# Ensure access to eg. _nix_attr_paths
+# Ensure access to eg. _nix_complete_attr_paths
 _nix-common-options
 
 setopt extendedglob
@@ -147,7 +147,7 @@ case "${context%%-*} $state" in
             prefix=""
         fi
         _alternative \
-            'path:Attribute path: _nix_attr_paths' \
+            'path:Attribute path: _nix_complete_attr_paths' \
             "file:File path to package:_files ${prefix}"
         return
         ;;

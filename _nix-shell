@@ -16,7 +16,7 @@ local word
 for word in $words; do
     case "$word" in
         --packages|-[^-]#p[^-]#)
-            norm_arguments='*:Packages: _nix_attr_paths "<nixpkgs>"'
+            norm_arguments='*:Packages: _nix_attr_paths "import <nixpkgs>"'
             break
     esac
 done

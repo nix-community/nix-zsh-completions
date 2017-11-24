@@ -111,19 +111,123 @@ _nix_gen_defexpr () {
 }
 
 
-# Prints the attribute names (whitespace separated) of the given path
-# Arguments: attribute_path [top_level_expr_path]
-#   top_level_expr is interpreted as 'nix-env --file'
-#   if top_level_expr is omitted it defaults to what 'nix-env -iA' uses
-# Eg. _nix_attr_names nixos.python2Packages mypkgs.nix
-_nix_attr_names () {
+# Complete attribute names using $1 as the toplevel expression NB: If calling
+# this function from an action spec you need to prefix it with a space so that
+# eg. _arguments won't pass it options which it doesn't expect, ie:
+#     `: _nix_attr_paths`
+_nix_attr_paths () {
     setopt local_options pipefail
 
-    local attr_path=top${1:+.$1}
-    local file=$2
+    local defexpr=$1
+    local attr_path=""
+    if [[ $words[CURRENT] == *.* ]]; then
+        attr_path=${words[CURRENT]%.*}
+    fi
+    local prefixed_path=top${attr_path:+.$attr_path}
 
-    local defexpr
-    if [[ -n $file ]]; then
+    # Build the modified nix path based on --include and -I options
+    # The ordering here is somewhat random, and might not be fully correct.
+    local includes=${opt_args[-I]:+${opt_args[-I]}:}${opt_args[--include]}
+    # Remove any backslashes that opt_args have added in
+    includes=${${includes//\\:/:}//\\\\/\\}
+    local override=${includes:+${includes}:}$NIX_PATH
+
+    local -a result=($(
+        NIX_PATH=$override nix-instantiate --eval - \
+                <<NIX_FILE | tr '[]"' ' '
+        let
+        top_gen = $defexpr;
+        # --file arguments can be a lambda producing a record too
+        top = if builtins.typeOf top_gen == "lambda" then top_gen {} else top_gen ;
+        in
+            builtins.attrNames $prefixed_path
+NIX_FILE
+    ))
+
+    if [[ $? > 0 ]]; then
+        # Probably because of invalid attribute path or error in top-level expr
+        return 1
+    fi
+
+    local -a prefix=()
+    if [[ -n $attr_path ]]; then
+        for i in ${=attr_path//./ }; do
+            prefix+=("($i)" .)
+        done
+    fi
+
+    _wanted package package "Attribute path to package" _sep_parts $prefix result \.
+    return $?
+}
+
+
+# Generate the top level expression in all the various ways the different
+# commands expects it to be built. Then generate completions by calling
+# _nix_attr_paths $defexpr
+_nix_complete_attr_paths () {
+
+    local defexpr="" file=""
+    if [[ "$opt_args[-f]"  || "$opt_args[--file]" ]]; then
+        # Add up the opt_args, unfortunately it's only possible to get the
+        # true order of -f and --file separately, not together, so here we
+        # make --file take precedent
+        local seperator=""
+        [[ "${opt_args[-f]}" && "${opt_args[--file]}" ]] && seperator=:
+        file=${opt_args[-f]}$seperator${opt_args[--file]}
+        # Take the last file input we see
+        file=${file##*[^\\]:}
+        # opt_args escapes all backslashes in the argument
+        # so we have to remove a layer of backslashes
+        # same with `:`
+        file=${${file//\\\\/\\}//\\:/:}
+
+    elif [[ $service == nix-env ]]; then
+        defexpr=$(_nix_gen_defexpr ~/.nix-defexpr)
+
+    elif [[ $service == nix ]]; then
+        # Extract the channels from NIX_PATH and -I/--include
+        local -a channels=(${(s.:.)NIX_PATH})
+        # Add -I/--include afterwards, so they will shadow the NIX_PATH
+        channels+=(${(s.:.)opt_args[-I]})
+        channels+=(${(s.:.)opt_args[--include]})
+
+        # Add the names in an associative array to avoid duplicates
+        local -A names
+        local channel name
+        for channel in $channels; do
+            name=${channel%%=*}
+            nix_path=${channel#*=}
+            if [[ $name != $channel ]]; then
+                # Only add paths with a name, not sure how they work
+                names[$name]=1
+            fi
+        done
+
+        defexpr=$'{ '
+        for name in ${(@k)names}; do
+            # nixos-config isn't useful or possible to complete
+            [[ $name == nixos-config ]] && continue
+            defexpr+="$name = import <${name}> {}; "
+        done
+        defexpr+=' }'
+
+    elif [[ $line ]]; then
+        file=$line[1]
+    elif [[ -e shell.nix && $service == nix-shell ]]; then
+        file=shell.nix
+    elif [[ -e default.nix ]]; then
+        file=default.nix
+    fi
+
+    # Remove one level of shell quoting to make sure we see the same value as
+    # the nix-* program will see.
+    # ($opt_args and $line contain the verbatim string:
+    #  eg. given `nix-shell '<nixpkgs>' -A ` $line[1] will be `'<nixpkgs>'` while
+    #  nix-shell will see `<nixpkgs>`)
+    file=${(Q)file}
+
+    if [[ "$file" && -z "$defexpr" ]]; then
+
         if [[ -e $file ]]; then
             # If the path exist use the absolute path to make sure import will
             # accept it.
@@ -153,117 +257,9 @@ _nix_attr_names () {
             fi
         fi
         defexpr="import $file"
-    elif [[ $service == nix-env ]]; then
-        defexpr=$(_nix_gen_defexpr ~/.nix-defexpr)
-    elif [[ $service == nix ]]; then
-        # Extract the channels from NIX_PATH and -I/--include
-        local -a channels=(${(s.:.)NIX_PATH})
-        # Add -I/--include afterwards, so they will shadow the NIX_PATH
-        channels+=(${(s.:.)opt_args[-I]})
-        channels+=(${(s.:.)opt_args[--include]})
-
-        # Add the names in an associative array to avoid duplicates
-        local -A names
-        local channel name
-        for channel in $channels; do
-            name=${channel%%=*}
-            nix_path=${channel#*=}
-            if [[ $name != $channel ]]; then
-                # Only add paths with a name, not sure how they work
-                names[$name]=1
-            fi
-        done
-
-        defexpr=$'{ '
-        for name in ${(@k)names}; do
-            # nixos-config isn't useful or possible to complete
-            [[ $name == nixos-config ]] && continue
-            defexpr+="$name = import <${name}> {}; "
-        done
-        defexpr+=' }'
     fi
 
-    # Build the modified nix path based on --include and -I options
-    # The ordering here is somewhat random, and might not be fully correct.
-    local includes=${opt_args[-I]:+${opt_args[-I]}:}${opt_args[--include]}
-    # Remove any backslashes that opt_args have added in
-    includes=${${includes//\\:/:}//\\\\/\\}
-    local override=${includes:+${includes}:}$NIX_PATH
-
-    NIX_PATH=$override nix-instantiate --eval - \
-          <<NIX_FILE | tr '[]"' ' '
-                let
-                  top_gen = $defexpr;
-                  # --file arguments can be a lambda producing a record too
-                  top = if builtins.typeOf top_gen == "lambda" then top_gen {} else top_gen ;
-                in
-                  builtins.attrNames $attr_path
-NIX_FILE
-
-    return $?
-}
-
-
-# Complete attribute paths
-# NB: this function expects an optional argument so the user must make sure
-#     zsh completion functions doesn't supply arguments. eg. when used in a
-#     action spec to _arguments the function should be prefixed with a space:
-#     `: _nix_attr_paths`
-#     Without the space prefix _arguments will inject lots of arguments. These
-#     are available(?) in the `expl` array anyway
-_nix_attr_paths () {
-    local attr_path=""
-    if [[ $words[CURRENT] == *.* ]]; then
-        attr_path=${words[CURRENT]%.*}
-    fi
-
-    local file=$1
-    if [[ -z $file ]]; then
-        if [[ $service == (nix-env|nix) ]]; then
-            # Add up the opt_args, unfortunately it's only possible to get the
-            # true order of -f and --file separately, not together, so here we
-            # make --file take precedent
-            local seperator=""
-            [[ "${opt_args[-f]}" && "${opt_args[--file]}" ]] && seperator=:
-            file=${opt_args[-f]}$seperator${opt_args[--file]}
-            # Take the last file input we see
-            file=${file##*[^\\]:}
-            # opt_args escapes all backslashes in the argument
-            # so we have to remove a layer of backslashes
-            # same with `:`
-            file=${${file//\\\\/\\}//\\:/:}
-        elif [[ $line ]]; then
-                file=$line[1]
-        elif [[ -e shell.nix && $service == nix-shell ]]; then
-                file=shell.nix
-        elif [[ -e default.nix ]]; then
-                file=default.nix
-        fi
-    fi
-
-    # Remove one level of shell quoting to make sure we see the same value as
-    # the nix-* program will see.
-    # ($opt_args and $line contain the verbatim string:
-    #  eg. given `nix-shell '<nixpkgs>' -A ` $line[1] will be `'<nixpkgs>'` while
-    #  nix-shell will see `<nixpkgs>`)
-    file=${(Q)file}
-
-    local -a result # must be on separate line to capture error code..
-    result=( $(_nix_attr_names "$attr_path" $file) ) 2>/dev/null
-
-    if [[ $? > 0 ]]; then
-        # Probably because of invalid attribute path or error in top-level expr
-        return 1
-    fi
-
-    local -a prefix=()
-    if [[ -n $attr_path ]]; then
-        for i in ${=attr_path//./ }; do
-            prefix+=("($i)" .)
-        done
-    fi
-
-    _wanted package package "Attribute path to package" _sep_parts $prefix result \.
+    _nix_attr_paths $defexpr 2>/dev/null
 }
 
 _nix_profiles () {
@@ -360,7 +356,7 @@ _nix_common_nixos_rebuild=(
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell
 _nix_common_opts=(
   $_nix_common_nixos_rebuild \
-  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:Packages: _nix_attr_paths'\
+  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:Packages: _nix_complete_attr_paths'\
   '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]:*:Files:_files'\
   '*--arg[Argument to pass to the Nix function]:Name: :Value: '\
   '*--argstr[Like --arg, but the value is a string]:Name: :String: '\
