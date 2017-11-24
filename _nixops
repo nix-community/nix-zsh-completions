@@ -58,7 +58,7 @@ _nixops_include_exclude=(
 
 local -a _nixops_search_path_args
 _nixops_search_path_args=(
-  '-I[Add path to the Nix expression search path for all future evaluations]:Path:_files -/' \
+  '-I[Add path to the Nix expression search path for all future evaluations]:Path:_nix_complete_includes' \
 )
 
 _arguments \
