@@ -130,12 +130,16 @@ _nix_attr_paths () {
     fi
     local prefixed_path=top${attr_path:+.$attr_path}
 
-    # Add paths to include, first occurrence having priority
-    local override=${opt_args[--include]}
-    override+=${includes:+:}${opt_args[-I]}
-    # Descape any escaped colons from opt_args
-    override=${${override//\\:/:}//\\\\/\\}
-    override+=${opt_args[-I]:+:}${NIX_PATH}
+    # Build up a modified NIX_PATH using -I and --include
+    local i override=""
+    for ((i=1; i < ${#words[*]}; i++)); do
+        case "${words[i]}" in
+            -I|--include)
+                override+=${override:+:}${words[$((i+1))]}
+                ;;
+        esac
+    done
+    override+=${override:+:}${NIX_PATH}
 
     local cache_help=""
     # Resolve any url to a cache, else we might trigger a blocking download
