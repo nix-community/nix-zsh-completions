@@ -119,6 +119,11 @@ _nix_attr_paths () {
     setopt local_options pipefail
 
     local defexpr=$1
+    if [[ "$2" == false ]]; then
+       _message "The URL isn't cached, download to get completion"
+       return
+    fi
+
     local attr_path=""
     if [[ $words[CURRENT] == *.* ]]; then
         attr_path=${words[CURRENT]%.*}
@@ -132,6 +137,7 @@ _nix_attr_paths () {
     override=${${override//\\:/:}//\\\\/\\}
     override+=${opt_args[-I]:+:}${NIX_PATH}
 
+    local cache_help=""
     # Resolve any url to a cache, else we might trigger a blocking download
     while [[ "$override" == *https://* ]]; do
         # Find the first url
@@ -139,6 +145,8 @@ _nix_attr_paths () {
         # Strip everything starting with the first colon
         url="https://"${url%%:*}
         local cache=$(_nix_resolve_url "$url")
+        [[ -z "$cache" ]] \
+            && cache_help=" (an URL in the NIX_PATH isn't cached, completion might not work)"
         # Replace the url with the cache
         override=${override/"$url"/"$cache"}
     done
@@ -167,7 +175,8 @@ NIX_FILE
         done
     fi
 
-    _wanted package package "Attribute path to package" _sep_parts $prefix result \.
+    _wanted package package "Attribute path$cache_help" \
+            _sep_parts $prefix result \.
     return $?
 }
 
@@ -237,6 +246,7 @@ _nix_complete_attr_paths () {
     #  nix-shell will see `<nixpkgs>`)
     file=${(Q)file}
 
+    local cached=true
     if [[ "$file" && -z "$defexpr" ]]; then
 
         # Expand channel: syntax
@@ -251,11 +261,13 @@ _nix_complete_attr_paths () {
             file=${file:a}
         elif [[ "$file" == https://* ]]; then
             file=$(_nix_resolve_url $file)
+            [[ -z "$file" ]] \
+                && cached=false
         fi
         defexpr="import $file"
     fi
 
-    _nix_attr_paths $defexpr 2>/dev/null
+    _nix_attr_paths $defexpr $cached 2>/dev/null
 }
 
 function _nix_resolve_url () {
