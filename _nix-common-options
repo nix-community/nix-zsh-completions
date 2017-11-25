@@ -125,15 +125,26 @@ _nix_attr_paths () {
     fi
     local prefixed_path=top${attr_path:+.$attr_path}
 
-    # Build the modified nix path based on --include and -I options
-    # The ordering here is somewhat random, and might not be fully correct.
-    local includes=${opt_args[-I]:+${opt_args[-I]}:}${opt_args[--include]}
-    # Remove any backslashes that opt_args have added in
-    includes=${${includes//\\:/:}//\\\\/\\}
-    local override=${includes:+${includes}:}$NIX_PATH
+    # Add paths to include, first occurrence having priority
+    local override=${opt_args[--include]}
+    override+=${includes:+:}${opt_args[-I]}
+    # Descape any escaped colons from opt_args
+    override=${${override//\\:/:}//\\\\/\\}
+    override+=${opt_args[-I]:+:}${NIX_PATH}
+
+    # Resolve any url to a cache, else we might trigger a blocking download
+    while [[ "$override" == *https://* ]]; do
+        # Find the first url
+        local url=${override#*https://}
+        # Strip everything starting with the first colon
+        url="https://"${url%%:*}
+        local cache=$(_nix_resolve_url "$url")
+        # Replace the url with the cache
+        override=${override/"$url"/"$cache"}
+    done
 
     local -a result=($(
-        NIX_PATH=$override nix-instantiate --eval - \
+        NIX_PATH=$override nix-instantiate --eval -  2> /dev/null \
                 <<NIX_FILE | tr '[]"' ' '
         let
         top_gen = $defexpr;
@@ -239,27 +250,33 @@ _nix_complete_attr_paths () {
             # (Otherwise the path is likely a <nixpkgs> notation)
             file=${file:a}
         elif [[ "$file" == https://* ]]; then
-            local -a sha
-            local version="$($service --version)"
-            if [[ ${version##* } == 1.11.* ]]; then
-                # works for nix 1.11
-                sha=($(printf "$file" | sha256sum -))
-            else
-                # works for nix 1.12
-                local name="${file##*/}"
-                sha=($(printf "$name\0$file" | sha256sum -))
-            fi
-            local base=$(nix-hash --to-base32 --type sha256 ${sha[*]:0:1})
-            local cache=${XDG_CACHE_HOME:-~/.cache}/nix/tarballs
-            local link="$cache"/"$base"-file
-            if [[ -e "$link" ]]; then
-                file="$cache"/"$(basename $(readlink $link))"-unpacked
-            fi
+            file=$(_nix_resolve_url $file)
         fi
         defexpr="import $file"
     fi
 
     _nix_attr_paths $defexpr 2>/dev/null
+}
+
+function _nix_resolve_url () {
+    local -a sha
+    local url=$1
+    local version="$($service --version)"
+    if [[ "${version##* }" == 1.11.* ]]; then
+        # works for nix 1.11
+        sha=($(printf "$url" | sha256sum -))
+    else
+        # works for nix 1.12
+        local name="${url##*/}"
+        sha=($(printf "$name\0$url" | sha256sum -))
+    fi
+    local base=$(nix-hash --to-base32 --type sha256 \
+                          ${sha[*]:0:1})
+    local cache=${XDG_CACHE_HOME:-~/.cache}/nix/tarballs
+    local link="$cache"/"$base"-file
+    if [[ -e "$link" ]]; then
+        echo "$cache/$(basename $(readlink $link))-unpacked"
+    fi
 }
 
 _nix_profiles () {
