@@ -141,6 +141,15 @@ _nix_attr_paths () {
     done
     override+=${override:+:}${NIX_PATH}
 
+    # Resolve channel: syntax
+    while [[ "$override" == *(=|:)channel:* ]]; do
+        local channel=${override#*channel:}
+        channel="channel:"${channel%%:*}
+        local url="https://nixos.org/channels/"${channel:8}"/nixexprs.tar.xz"
+        # Replace the channel with its url
+        override=${override/"$channel"/"$url"}
+    done
+
     local cache_help=""
     # Resolve any url to a cache, else we might trigger a blocking download
     while [[ "$override" == *https://* ]]; do
