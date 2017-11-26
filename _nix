@@ -110,6 +110,10 @@ for word in $words; do
                 # Handle `run --keep/--unset` manually as there's ambiguity the NAME argument
                 if [[ $word == run && -z ${option:#(-k|--keep|-u|--unset)} ]]; then
                     command_options+=("*${option}[$description]:Environment Variable:_parameters")
+                elif [[ "$word" == add-to-store \
+                            && "$option" == (-n|--name) ]]; then
+                    # Another <NAME> ambiguity
+                    command_options+=("($option_group)"$option"[$description]:->store-name")
                 elif [[ $option == (-I|--include) ]]; then
                     # Special handling of --include due to type ambiguity
                     command_options+=("*${option}[$description]:Includes:->INCLUDE")
@@ -168,7 +172,7 @@ case "${context%%-*} $state" in
         return
         ;;
     'option NAME')
-        _message 'Argument name'
+        _nix_complete_function_arg
         return
         ;;
     'option EXPR')

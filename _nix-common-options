@@ -326,6 +326,19 @@ function _nix_get_file_arg () {
     print -n -- $file
 }
 
+function _nix_complete_function_arg () {
+    local file=$(_nix_get_file_arg)
+    local -a names=($(nix-instantiate --eval - <<NIX_FILE 2> /dev/null \
+                 | tr '"[]' ' '
+             let
+             args = builtins.functionArgs (import $file);
+             in
+                 builtins.attrNames args
+NIX_FILE
+           ))
+    _values "Argument name" $names
+}
+
 _nix_profiles () {
     local -a profiles
     profiles=($(find /nix/var/nix/profiles))
@@ -421,8 +434,8 @@ _nix_common_nixos_rebuild=(
 _nix_common_opts=(
   $_nix_common_nixos_rebuild \
   '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:Packages: _nix_complete_attr_paths'\
-  '*--arg[Argument to pass to the Nix function]:Name: :Value: '\
-  '*--argstr[Like --arg, but the value is a string]:Name: :String: '\
+  '*--arg[Argument to pass to the Nix function]:Name:_nix_complete_function_arg:Value: '\
+  '*--argstr[Like --arg, but the value is a string]:Name:_nix_complete_function_arg:String: '\
   '--max-silent-time[Builder times out after not producing stdout/stderr for x seconds]:Seconds:( )'\
   '--timeout[Timeout builder after given number of seconds]:Seconds:( )'\
   '--readonly-mode[Do not open Nix database]'\
