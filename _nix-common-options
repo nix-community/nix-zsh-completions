@@ -274,7 +274,27 @@ _nix_complete_attr_paths () {
             [[ -z "$file" ]] \
                 && cached=false
         fi
-        defexpr="import $file"
+
+        # Extract --arg and --argstr into $args
+        local i=1 args="" name="" value=""
+        for ((i=1; i < ${#words[*]}; i++)); do
+            case "${words[$i]}" in
+                --arg)
+                    name=${(Q)words[$((i+1))]}
+                    value=${(Q)words[$((i+2))]}
+                    args+="$name = $value;"
+                    i=$((i+2))
+                    ;;
+                --argstr)
+                    name=${(Q)words[$((i+1))]}
+                    value=${(Q)words[$((i+2))]}
+                    args+="$name = \"$value\";"
+                    i=$((i+2))
+                    ;;
+            esac
+        done
+
+        defexpr="import $file {$args}"
     fi
 
     _nix_attr_paths $defexpr $cached 2>/dev/null
