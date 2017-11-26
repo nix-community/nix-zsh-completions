@@ -130,6 +130,35 @@ _nix_attr_paths () {
     fi
     local prefixed_path=top${attr_path:+.$attr_path}
 
+    local -a result=($(
+                _nix_eval_stdin <<NIX_FILE
+        let
+        top_gen = $defexpr;
+        # --file arguments can be a lambda producing a record too
+        top = if builtins.typeOf top_gen == "lambda" then top_gen {} else top_gen ;
+        in
+            builtins.attrNames $prefixed_path
+NIX_FILE
+    ))
+
+    if [[ $? > 0 ]]; then
+        # Probably because of invalid attribute path or error in top-level expr
+        return 1
+    fi
+
+    local -a prefix=()
+    if [[ -n $attr_path ]]; then
+        for i in ${=attr_path//./ }; do
+            prefix+=("($i)" .)
+        done
+    fi
+
+    _wanted package package "Attribute path$cache_help" \
+            _sep_parts $prefix result \.
+    return $?
+}
+
+function _nix_eval_stdin () {
     # Build up a modified NIX_PATH using -I and --include
     local i override=""
     for ((i=1; i < ${#words[*]}; i++)); do
@@ -164,33 +193,7 @@ _nix_attr_paths () {
         override=${override/"$url"/"$cache"}
     done
 
-    local -a result=($(
-        NIX_PATH=$override nix-instantiate --eval -  2> /dev/null \
-                <<NIX_FILE | tr '[]"' ' '
-        let
-        top_gen = $defexpr;
-        # --file arguments can be a lambda producing a record too
-        top = if builtins.typeOf top_gen == "lambda" then top_gen {} else top_gen ;
-        in
-            builtins.attrNames $prefixed_path
-NIX_FILE
-    ))
-
-    if [[ $? > 0 ]]; then
-        # Probably because of invalid attribute path or error in top-level expr
-        return 1
-    fi
-
-    local -a prefix=()
-    if [[ -n $attr_path ]]; then
-        for i in ${=attr_path//./ }; do
-            prefix+=("($i)" .)
-        done
-    fi
-
-    _wanted package package "Attribute path$cache_help" \
-            _sep_parts $prefix result \.
-    return $?
+    NIX_PATH=$override nix-instantiate --eval -  2> /dev/null  | tr '[]"' ' '
 }
 
 
@@ -351,9 +354,7 @@ function _nix_complete_function_arg () {
                 ;;
         esac
     done
-    local -a names=($(nix-instantiate --eval -  2> /dev/null \
-                                      <<NIX_FILE | tr '[]"' ' '
-
+    local -a names=($(_nix_eval_stdin <<NIX_FILE
                       let
                         args = builtins.functionArgs ($func);
                       in
