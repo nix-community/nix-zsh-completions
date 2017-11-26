@@ -8,6 +8,7 @@ _nix-common-options
 _arguments \
   $_nix_boilerplate_opts \
   $_nix_common_opts \
+  '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]' \
   '--xml[Print output from --eval as XML]'\
   '--json[Print output from --eval as JSON]'\
   '--add-root[Register result as a root of the garbage collector]:Path (Hint /nix/var/nix/gcroots):_files -/'\

@@ -8,7 +8,6 @@ _nix_shell_opts=(
   '--command[Run a command instead of starting an interactive shell]:Command:_command_names' \
   '--exclude[Do not build any dependencies which match this regex]:Regex:( )' \
   '--pure[Clear the environment before starting the interactive shell]' \
-  '(--packages -p)'{--packages,-p}'[Set up an environment where the given packages are present]' \
 )
 
 local norm_arguments='*:Paths:_nix_path'
@@ -18,6 +17,10 @@ for word in $words; do
         --packages|-[^-]#p[^-]#)
             norm_arguments='*:Packages: _nix_attr_paths "import <nixpkgs>"'
             break
+            ;;
+        --expr|-[^-]#E[^-]#)
+            norm_arguments='*:Expression:'
+            ;;
     esac
 done
 
@@ -25,4 +28,8 @@ _arguments \
   $_nix_boilerplate_opts \
   $_nix_common_opts \
   $_nix_shell_opts \
-  $norm_arguments
+  $norm_arguments \
+  + '(group)' \
+  {--packages,-p}'[Set up an environment where the given packages are present]' \
+  {--expr,-E}'[Interpret command line args as Nix expressions]'\
+
