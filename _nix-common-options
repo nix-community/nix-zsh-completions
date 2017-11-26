@@ -221,7 +221,16 @@ _nix_complete_attr_paths () {
             esac
         done
 
+        local opt
         defexpr="import $file {$args}"
+        for opt in $words; do
+            case $opt in
+                --expr|-[^-]#E[^-]#)
+                    defexpr="($file) {$args}"
+                    break
+                    ;;
+            esac
+        done
     else
         if [[ $service == nix-env ]]; then
             defexpr=$(_nix_gen_defexpr ~/.nix-defexpr)
