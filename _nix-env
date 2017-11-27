@@ -120,6 +120,10 @@ case "$opt" in
         command_options=($_nix_env_common_opts '::Generations:_nix_generations')
         break
         ;;
+    --list-generations)
+        command_options=($_nix_env_common_opts)
+        break
+        ;;
 esac
 done
 
