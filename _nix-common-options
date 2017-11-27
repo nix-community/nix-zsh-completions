@@ -130,6 +130,7 @@ _nix_attr_paths () {
     fi
     local prefixed_path=top${attr_path:+.$attr_path}
 
+    local cached=""
     local -a result=($(
                 _nix_eval_stdin <<NIX_FILE
         let
@@ -140,6 +141,11 @@ _nix_attr_paths () {
             builtins.attrNames $prefixed_path
 NIX_FILE
     ))
+    local cache_help=""
+    if [[ "$cached" == false ]]; then
+        cache_help=" (an URL in the NIX_PATH isn't cached, completion might not work)"
+    fi
+
 
     if [[ $? > 0 ]]; then
         # Probably because of invalid attribute path or error in top-level expr
@@ -179,7 +185,6 @@ function _nix_eval_stdin () {
         override=${override/"$channel"/"$url"}
     done
 
-    local cache_help=""
     # Resolve any url to a cache, else we might trigger a blocking download
     while [[ "$override" == *https://* ]]; do
         # Find the first url
@@ -188,7 +193,7 @@ function _nix_eval_stdin () {
         url="https://"${url%%:*}
         local cache=$(_nix_resolve_url "$url")
         [[ -z "$cache" ]] \
-            && cache_help=" (an URL in the NIX_PATH isn't cached, completion might not work)"
+            && cached=false
         # Replace the url with the cache
         override=${override/"$url"/"$cache"}
     done
@@ -354,6 +359,7 @@ function _nix_complete_function_arg () {
                 ;;
         esac
     done
+    local cached
     local -a names=($(_nix_eval_stdin <<NIX_FILE
                       let
                         args = builtins.functionArgs ($func);
