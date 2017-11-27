@@ -337,15 +337,31 @@ function _nix_get_file_arg () {
 
 function _nix_complete_function_arg () {
     local file=$(_nix_get_file_arg)
-    local -a names=($(nix-instantiate --eval - <<NIX_FILE 2> /dev/null \
-                 | tr '"[]' ' '
-             let
-             args = builtins.functionArgs (import $file);
-             in
-                 builtins.attrNames args
+    local func="import $file" opt
+    local i exclude=""
+    for ((i=1; i < ${#words}; i++)); do
+        case "${words[$i]}" in
+            --expr|-[^-]#E[^-]#)
+                func="$file"
+                ;;
+            --arg|--argstr)
+                # Don't add the name we're currently typing
+                [[ $i == $((CURRENT - 1)) ]] && continue
+                exclude+=${exclude:+|}${words[$((i+1))]}
+                ;;
+        esac
+    done
+    local -a names=($(nix-instantiate --eval -  2> /dev/null \
+                                      <<NIX_FILE | tr '[]"' ' '
+
+                      let
+                        args = builtins.functionArgs ($func);
+                      in
+                        builtins.attrNames args
 NIX_FILE
-           ))
-    _values "Argument name" $names
+                    ))
+    names=(${names:#(${~exclude})})
+    [[ "$names" ]] && _values "Argument name" $names
 }
 
 _nix_profiles () {
