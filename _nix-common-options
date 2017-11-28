@@ -116,7 +116,6 @@ _nix_gen_defexpr () {
 # eg. _arguments won't pass it options which it doesn't expect, ie:
 #     `: _nix_attr_paths`
 _nix_attr_paths () {
-    setopt local_options pipefail
 
     local defexpr=$1
     local attr_path=""
@@ -125,8 +124,8 @@ _nix_attr_paths () {
     fi
     local prefixed_path=top${attr_path:+.$attr_path}
 
-    local -a result=($(
-                _nix_eval_stdin <<NIX_FILE
+    local -a result
+    result=($(_nix_eval_stdin 2>&1 <<NIX_FILE
         let
         top_gen = $defexpr;
         # --file arguments can be a lambda producing a record too
@@ -136,8 +135,10 @@ _nix_attr_paths () {
 NIX_FILE
     ))
 
+    # If the eval failed return the error message
     if [[ $? > 0 ]]; then
-        # Probably because of invalid attribute path or error in top-level expr
+        _message "Eval failed, can't complete (an URL might not be cached):
+$result"
         return 1
     fi
 
@@ -155,6 +156,7 @@ NIX_FILE
 }
 
 function _nix_eval_stdin () {
+    setopt local_options pipefail
     # Build up a modified NIX_PATH using -I and --include
     local i override=""
     for ((i=1; i < ${#words[*]}; i++)); do
@@ -186,7 +188,8 @@ function _nix_eval_stdin () {
         override=${override/"$url"/"$cache"}
     done
 
-    NIX_PATH=$override nix-instantiate --eval -  2> /dev/null  | tr '[]"' ' '
+    NIX_PATH=$override nix-instantiate --eval - | tr '[]"' ' '
+    return $?
 }
 
 
@@ -346,13 +349,19 @@ function _nix_complete_function_arg () {
                 ;;
         esac
     done
-    local -a names=($(_nix_eval_stdin <<NIX_FILE
+    local -a names
+    names=($(_nix_eval_stdin 2>&1 <<NIX_FILE
                       let
                         args = builtins.functionArgs ($func);
                       in
                         builtins.attrNames args
 NIX_FILE
                     ))
+    if [[ $? > 0 ]]; then
+        _message "Eval failed, can't complete (an URL might not be cached):
+$names"
+        return 1
+    fi
     names=(${names:#(${~exclude})})
     [[ "$names" ]] && _values "Argument name" $names
 }
