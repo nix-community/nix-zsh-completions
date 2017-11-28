@@ -119,18 +119,12 @@ _nix_attr_paths () {
     setopt local_options pipefail
 
     local defexpr=$1
-    if [[ "$2" == false ]]; then
-       _message "The URL isn't cached, download to get completion"
-       return
-    fi
-
     local attr_path=""
     if [[ $words[CURRENT] == *.* ]]; then
         attr_path=${words[CURRENT]%.*}
     fi
     local prefixed_path=top${attr_path:+.$attr_path}
 
-    local cached=""
     local -a result=($(
                 _nix_eval_stdin <<NIX_FILE
         let
@@ -141,11 +135,6 @@ _nix_attr_paths () {
             builtins.attrNames $prefixed_path
 NIX_FILE
     ))
-    local cache_help=""
-    if [[ "$cached" == false ]]; then
-        cache_help=" (an URL in the NIX_PATH isn't cached, completion might not work)"
-    fi
-
 
     if [[ $? > 0 ]]; then
         # Probably because of invalid attribute path or error in top-level expr
@@ -160,7 +149,7 @@ NIX_FILE
     fi
 
     local package=""
-    _wanted package package "Attribute path$cache_help" \
+    _wanted package package "Attribute path" \
             _sep_parts $prefix result \.
     return $?
 }
@@ -193,8 +182,6 @@ function _nix_eval_stdin () {
         # Strip everything starting with the first colon
         url="https://"${url%%:*}
         local cache=$(_nix_resolve_url "$url")
-        [[ -z "$cache" ]] \
-            && cached=false
         # Replace the url with the cache
         override=${override/"$url"/"$cache"}
     done
@@ -208,7 +195,7 @@ function _nix_eval_stdin () {
 # _nix_attr_paths $defexpr
 _nix_complete_attr_paths () {
 
-    local defexpr="" cached=true
+    local defexpr=""
     local file=$(_nix_get_file_arg)
     if [[ "$file" ]]; then
         # Extract --arg and --argstr into $args
@@ -273,7 +260,7 @@ _nix_complete_attr_paths () {
         fi
     fi
 
-    _nix_attr_paths $defexpr $cached 2>/dev/null
+    _nix_attr_paths $defexpr 2>/dev/null
 }
 
 function _nix_resolve_url () {
@@ -338,7 +325,6 @@ function _nix_get_file_arg () {
             file=${file:a}
         elif [[ "$file" == https://* ]]; then
             file=$(_nix_resolve_url $file)
-            [[ -z "$file" ]] && cached=false
         fi
     fi
     print -n -- $file
@@ -360,7 +346,6 @@ function _nix_complete_function_arg () {
                 ;;
         esac
     done
-    local cached
     local -a names=($(_nix_eval_stdin <<NIX_FILE
                       let
                         args = builtins.functionArgs ($func);
