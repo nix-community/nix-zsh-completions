@@ -159,6 +159,7 @@ NIX_FILE
         done
     fi
 
+    local package=""
     _wanted package package "Attribute path$cache_help" \
             _sep_parts $prefix result \.
     return $?
