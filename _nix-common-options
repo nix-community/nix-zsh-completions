@@ -29,7 +29,9 @@ _nix_shortcuts () {
     local valid_dir_globs=($^dirs"/*/default.nix(N:h:t)")
     local valid_dirs=(${~valid_dir_globs})
     local names=(${named%%=*})
-    _values shortcuts "<"${^valid_dirs}">" "<"${^names}">"
+    if [[ "$valid_dirs" || "$names" ]]; then
+        _values shortcuts "<"${^valid_dirs}">" "<"${^names}">"
+    fi
 }
 
 _nix_path() {
@@ -54,9 +56,13 @@ _nix_complete_includes () {
     if [[ $cur == *=* ]]; then
         path_names+=(${cur%=*}:Path:_nix_complete_dotnix_files)
     fi
-    _alternative \
-        "nixpath:nixpath:_values -s = 'Nix path name' $path_names" \
-        'file:Path:_files -/'
+    if [[ "$path_names" ]]; then
+        _alternative \
+            "nixpath:nixpath:_values -s = 'Nix path name' $path_names" \
+            'file:Path:_files -/'
+    else
+        _files -/
+    fi
     return
 }
 
