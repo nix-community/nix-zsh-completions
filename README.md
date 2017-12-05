@@ -38,6 +38,12 @@ fpath=($HOME/nix-zsh-completions $fpath)
 autoload -U compinit && compinit
 ```
 
+Required ZSH version
+------------------------
+
+The completion scripts are known to be broken in ZSH version `5.0.8` or older, `5.2` or newer works.
+
+
 ZSH Completions Tutorial
 ------------------------
 
