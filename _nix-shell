@@ -29,7 +29,7 @@ _arguments \
   $_nix_common_opts \
   $_nix_shell_opts \
   $norm_arguments \
-  + '(group)' \
+  - '(group)' \
   {--packages,-p}'[Set up an environment where the given packages are present]' \
   {--expr,-E}'[Interpret command line args as Nix expressions]'\
 

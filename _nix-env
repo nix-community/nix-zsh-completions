@@ -11,16 +11,16 @@ _nix-common-options
 
 local -a _1st_arguments
 _1st_arguments=(
-    '(main_options)'{--install,-i}"[Install package]"
-    '(main_options)'{--upgrade,-u}"[Upgrade package]"
-    '(main_options)'{--uninstall,-e}"[Uninstall package]"
-    '(main_options)'--set-flag'[Modify meta attribute of installed package]:Name:->flag_name:Value:->flag_value:*:Packages: _nix_installed_packages'
-    '(main_options)'{--query,-q}"[List information about derivations]"
-    '(main_options)'{--switch-profile,-S}"[Set the current profile path]"
-    "(main_options)--list-generations[Print a list of all generations in the active profile]"
-    "(main_options)--delete-generations[Delete specified generations]"
-    '(main_options)'{--switch-generation,-G}"[Activate specified generation]"
-    "(main_options)--rollback[Switch to the previous generation of active profile]"
+    {--install,-i}"[Install package]"
+    {--upgrade,-u}"[Upgrade package]"
+    {--uninstall,-e}"[Uninstall package]"
+    --set-flag'[Modify meta attribute of installed package]:Name:->flag_name:Value:->flag_value:*:Packages: _nix_installed_packages'
+    {--query,-q}"[List information about derivations]"
+    {--switch-profile,-S}"[Set the current profile path]"
+    "--list-generations[Print a list of all generations in the active profile]"
+    "--delete-generations[Delete specified generations]"
+    {--switch-generation,-G}"[Activate specified generation]"
+    "--rollback[Switch to the previous generation of active profile]"
   )
 
 local -a _nix_env_common_opts
@@ -132,7 +132,7 @@ done
 _arguments -s $command_options \
            '*'{--file,-f}'[Specify Nix expression used to obtain derivations]:Path to file:_nix_path'\
            $_nix_boilerplate_opts \
-           + main_options \
+           - '(main_options)' \
            $_1st_arguments
 
 # Handle the --set-flag option
