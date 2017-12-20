@@ -269,7 +269,7 @@ _nix_complete_attr_paths () {
         fi
     fi
 
-    _nix_attr_paths $defexpr 2>/dev/null
+    _nix_attr_paths $defexpr
 }
 
 function _nix_resolve_url () {
