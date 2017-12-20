@@ -137,7 +137,10 @@ _nix_attr_paths () {
         # --file arguments can be a lambda producing a record too
         top = if builtins.typeOf top_gen == "lambda" then top_gen {} else top_gen ;
         in
-            builtins.attrNames $prefixed_path
+            if builtins.typeOf $prefixed_path == "set" then
+                builtins.attrNames $prefixed_path
+            else
+                ""
 NIX_FILE
     ))
 
