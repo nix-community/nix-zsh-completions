@@ -228,13 +228,14 @@ _nix_complete_attr_paths () {
                     ;;
             esac
         done
+        args=${args:+{$args}}
 
         local opt
-        defexpr="import $file {$args}"
+        defexpr="import $file $args"
         for opt in $words; do
             case $opt in
                 --expr|-[^-]#E[^-]#)
-                    defexpr="($file) {$args}"
+                    defexpr="($file) $args"
                     break
                     ;;
             esac
