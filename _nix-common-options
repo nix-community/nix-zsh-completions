@@ -361,10 +361,10 @@ function _nix_complete_function_arg () {
     done
     local -a names
     names=($(_nix_eval_stdin 2>&1 <<NIX_FILE
-                      let
-                        args = builtins.functionArgs ($func);
-                      in
-                        builtins.attrNames args
+             if builtins.typeOf ($func) == "lambda" then
+                builtins.attrNames (builtins.functionArgs ($func))
+             else
+                 ""
 NIX_FILE
                     ))
     if [[ $? > 0 ]]; then
