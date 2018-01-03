@@ -345,7 +345,7 @@ function _nix_get_file_arg () {
 
 function _nix_complete_function_arg () {
     local file=$(_nix_get_file_arg)
-    local func="import $file" opt
+    local func=${file:+import $file} opt
     local i exclude=""
     for ((i=1; i < ${#words}; i++)); do
         case "${words[$i]}" in
@@ -359,6 +359,9 @@ function _nix_complete_function_arg () {
                 ;;
         esac
     done
+    if [[ ! $func ]]; then
+        return
+    fi
     local -a names
     names=($(_nix_eval_stdin 2>&1 <<NIX_FILE
              if builtins.typeOf ($func) == "lambda" then
