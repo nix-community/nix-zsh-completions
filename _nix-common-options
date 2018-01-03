@@ -273,7 +273,9 @@ _nix_complete_attr_paths () {
         fi
     fi
 
-    _nix_attr_paths $defexpr
+    if [[ $defexpr ]]; then
+        _nix_attr_paths $defexpr
+    fi
 }
 
 function _nix_resolve_url () {
