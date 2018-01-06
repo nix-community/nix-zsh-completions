@@ -255,5 +255,5 @@ case "${context%%-*} $state" in
         ;;
     *)
         # Fallback to argument name description
-        _message $state_descr
+        _message "$state_descr"
 esac
