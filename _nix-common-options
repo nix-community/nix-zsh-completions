@@ -123,6 +123,12 @@ _nix_gen_defexpr () {
 #     `: _nix_attr_paths`
 _nix_attr_paths () {
 
+    # Starting with '.' causes _sep_parts to complain, so exit early.
+    # This also guards against error output when completion './files' with nix.
+    if [[ $words[$CURRENT] == .* ]]; then
+        return
+    fi
+
     local defexpr=$1
     local attr_path=""
     if [[ $words[CURRENT] == *.* ]]; then
