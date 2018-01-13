@@ -123,16 +123,18 @@ _nix_gen_defexpr () {
 #     `: _nix_attr_paths`
 _nix_attr_paths () {
 
+    local cur=${${words[$CURRENT]#(\'|\")}%(\'|\")}
+
     # Starting with '.' causes _sep_parts to complain, so exit early.
     # This also guards against error output when completion './files' with nix.
-    if [[ $words[$CURRENT] == .* ]]; then
+    if [[ $cur == .* ]]; then
         return
     fi
 
     local defexpr=$1
     local attr_path=""
-    if [[ $words[CURRENT] == *.* ]]; then
-        attr_path=${words[CURRENT]%.*}
+    if [[ $cur == *.* ]]; then
+        attr_path=${cur%.*}
     fi
     local prefixed_path=top${attr_path:+.$attr_path}
 
