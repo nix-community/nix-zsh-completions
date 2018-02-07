@@ -136,19 +136,38 @@ _nix_attr_paths () {
     if [[ $cur == *.* ]]; then
         attr_path=${cur%.*}
     fi
-    local prefixed_path=top${attr_path:+.$attr_path}
 
+    # attr1.attr3 -> ("attr1" "attr2")
+    local -a paths=(${(s,.,)attr_path})
+    # Add quotes in a second step to avoid ("") when empty
+    paths=(${${paths/%/\"}/#/\"})
+
+    # Auto call any functions in the attribute path. This isn't a language
+    # feature, but done by nix when passing attributes on the command line.
     local -a result
     result=($(_nix_eval_stdin 2>&1 <<NIX_FILE
         let
-        top_gen = $defexpr;
-        # --file arguments can be a lambda producing a record too
-        top = if builtins.typeOf top_gen == "lambda" then top_gen {} else top_gen ;
+          autocall = setOrLambda:
+              if builtins.isFunction setOrLambda then
+                 setOrLambda {}
+              else
+                 setOrLambda;
+
+          top = autocall ($defexpr);
+          names = [ ${paths[*]} ];
+
+          # Returns attr.name calling it if it's a function
+          reducer = set: name:
+              autocall (builtins.getAttr name set);
+          result = if names == [] then
+                     top
+                   else
+                     builtins.foldl' reducer top names;
         in
-            if builtins.typeOf $prefixed_path == "set" then
-                builtins.attrNames $prefixed_path
-            else
-                ""
+          if builtins.isAttrs result then
+            builtins.attrNames result
+          else
+            ""
 NIX_FILE
     ))
 
