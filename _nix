@@ -171,6 +171,10 @@ case "${context%%-*} $state" in
         _message 'HASH to convert to a different base'
         return
         ;;
+    'option PROFILE-DIR')
+        _nix_profiles
+        return
+        ;;
     'option NAME')
         _nix_complete_function_arg
         return
