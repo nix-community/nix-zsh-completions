@@ -21,4 +21,6 @@ function prompt_nix_shell_setup {
   add-zsh-hook precmd prompt_nix_shell_precmd
 }
 
-prompt_nix_shell_setup "$@"
+# Add this to your zshrc if you want the prompt prefixed with `[nix-shell]`
+# when you're in a nix-shell environment.
+# prompt_nix_shell_setup "$@"
