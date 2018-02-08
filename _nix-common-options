@@ -409,9 +409,7 @@ $names"
 }
 
 _nix_profiles () {
-    local -a profiles
-    profiles=($(find /nix/var/nix/profiles))
-    _values "Nix Profiles" $profiles
+    _files -/ -W /nix/var/nix/profiles -P /nix/var/nix/profiles
 }
 
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixops
