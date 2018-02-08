@@ -59,9 +59,9 @@ _nix_complete_includes () {
     if [[ "$path_names" ]]; then
         _alternative \
             "nixpath:nixpath:_values -s = 'Nix path name' $path_names" \
-            'file:Path:_files -/'
+            'file:Path:_path_files -/'
     else
-        _files -/
+        _path_files -/
     fi
     return
 }

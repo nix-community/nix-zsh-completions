@@ -197,7 +197,7 @@ case "${context%%-*} $state" in
         _alternative \
             'file:Use a chroot store:_directories' \
             'url:Other: _describe "URLS and special options" others' \
-            'cache:Local binary cache (adds file url prefix):_files -P "file://" -/'
+            'cache:Local binary cache (adds file url prefix):_path_files -P "file://" -/'
         return
         ;;
     'option FILE')

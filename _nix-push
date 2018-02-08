@@ -4,7 +4,7 @@
 _nix-common-options
 
 _arguments \
-  '--dest[Set the destination directory]:Destination directory:_files -/'\
+  '--dest[Set the destination directory]:Destination directory:_path_files -/'\
   '(--none)--bzip2[Compress NARs using bzip2 instead of xz -9]'\
   '(--bzip2)--none[Do not compress NARs]'\
   '--force[Overwrite .narinfo files if they already exist]'\
