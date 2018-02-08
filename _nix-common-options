@@ -409,7 +409,12 @@ $names"
 }
 
 _nix_profiles () {
-    _files -/ -W /nix/var/nix/profiles -P /nix/var/nix/profiles
+    local prefix='-P /nix/var/nix/profiles/ -W /nix/var/nix/profiles/'
+    local cur=$words[$CURRENT]
+    if [[ $cur ]]; then
+        prefix=""
+    fi
+    _path_files -/ ${=prefix}
 }
 
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixops
