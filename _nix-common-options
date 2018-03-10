@@ -294,7 +294,7 @@ _nix_complete_attr_paths () {
             for name in ${(@k)names}; do
                 # nixos-config isn't useful or possible to complete
                 [[ $name == nixos-config ]] && continue
-                defexpr+="$name = import <${name}> {}; "
+                defexpr+="$name = import <${name}>; "
             done
             defexpr+=' }'
         fi
