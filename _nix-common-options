@@ -159,10 +159,7 @@ _nix_attr_paths () {
           # Returns attr.name calling it if it's a function
           reducer = set: name:
               autocall (builtins.getAttr name set);
-          result = if names == [] then
-                     top
-                   else
-                     builtins.foldl' reducer top names;
+          result = builtins.foldl' reducer top names; #'
         in
           if builtins.isAttrs result then
             builtins.attrNames result
