@@ -108,7 +108,7 @@ _nix_gen_defexpr () {
 
     local nix_expr="{\n"
     for p in $result; do
-        nix_expr+="$(basename $p) = import $p {};"
+        nix_expr+="$(basename $p) = import $p;"
         nix_expr+="\n"
     done
     nix_expr+="}"
