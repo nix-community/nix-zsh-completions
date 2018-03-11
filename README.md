@@ -6,7 +6,7 @@ This project aims to provide a highly complete set of ZSH completions for [Nix](
 
 NixOS
 ----------------------
-Set `programs.zsh.enableCompletion = true` in `/etc/nix/configuration.nix` and either add `nix-zsh-completions` to `systemPackages` or install it locally: `nix-env -iA nixos.nix-zsh-completions`
+Setting `programs.zsh.enable = true` in `/etc/nix/configuration.nix` will automatically install and enable `nix-zsh-compeletions`.
 
 Oh-My-ZSH Installation
 ----------------------
