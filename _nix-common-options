@@ -145,7 +145,7 @@ _nix_attr_paths () {
     # Auto call any functions in the attribute path. This isn't a language
     # feature, but done by nix when passing attributes on the command line.
     local -a result
-    result=($(_nix_eval_stdin 2>&1 <<NIX_FILE
+    result=($(_nix_eval_stdin <<NIX_FILE
         let
           autocall = setOrLambda:
               if builtins.isFunction setOrLambda then
@@ -221,7 +221,7 @@ function _nix_eval_stdin () {
         override=${override/"$url"/"$cache"}
     done
 
-    NIX_PATH=$override nix-instantiate --eval - | tr '[]"' ' '
+    NIX_PATH=$override nix-instantiate --eval - 2>/dev/null | tr '[]"' ' '
     return $?
 }
 
