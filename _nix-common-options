@@ -303,21 +303,20 @@ _nix_complete_attr_paths () {
 }
 
 function _nix_resolve_url () {
-    local -a sha
     local url=$1
     local version="$($service --version)"
+    local input
     if [[ "${version##* }" == 1.11.* ]]; then
         # works for nix 1.11
-        sha=($(printf "$url" | sha256sum -))
+        input="$url"
     else
         # works for nix 1.12
-        local name="${url##*/}"
-        sha=($(printf "$name\0$url" | sha256sum -))
+        input="${url##*/}\0$url"
     fi
-    local base=$(nix-hash --to-base32 --type sha256 \
-                          ${sha[*]:0:1})
+    local sha
+    sha=$(nix-hash --flat --base32 --type sha256 <(printf "$input"))
     local cache=${XDG_CACHE_HOME:-~/.cache}/nix/tarballs
-    local link="$cache"/"$base"-file
+    local link="$cache"/"$sha"-file
     if [[ -e "$link" ]]; then
         echo "$cache/$(basename $(readlink $link))-unpacked"
     fi
