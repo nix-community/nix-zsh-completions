@@ -201,21 +201,7 @@ case "${context%%-*} $state" in
         return
         ;;
     'option FILE')
-        _alternative \
-            'file:Local file:_nix_complete_dotnix_files' \
-            'shortcuts:Shortcuts:_nix_shortcuts' \
-            'channel:Channel:(channel:
-                       channel:nixos-13.10           channel:nixos-16.09
-                       channel:nixos-14.04           channel:nixos-16.09-small
-                       channel:nixos-14.04-small     channel:nixos-17.03
-                       channel:nixos-14.12           channel:nixos-17.03-small
-                       channel:nixos-14.12-small     channel:nixos-17.09
-                       channel:nixos-15.09           channel:nixos-17.09-small
-                       channel:nixos-15.09-small     channel:nixos-unstable
-                       channel:nixos-16.03           channel:nixos-unstable-small
-                       channel:nixos-16.03-small     channel:nixpkgs-17.09-darwin
-                       channel:nixos-16.03-testing   channel:nixpkgs-unstable)' \
-                           'url:URL:(https:// http://)'
+        _nix_complete_dotnix_files
         return
         ;;
     'option FILES'|'option PATH')
