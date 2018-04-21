@@ -442,43 +442,21 @@ _nix_options_bool () {
 # List gathered from: https://nixos.org/nix/manual/#sec-conf-file
 # TODO: Complete the value as well, not just the key
 _nix_options () {
-    _values \
-        'gc-keep-outputs' \
-        'gc-keep-derivations' \
-        'env-keep-derivations' \
-        'build-max-jobs' \
-        'build-cores' \
-        'build-max-silent-time' \
-        'build-timeout' \
-        'build-max-log-size' \
-        'build-users-group' \
-        'build-use-chroot' \
-        'build-chroot-dirs' \
-        'build-extra-chroot-dirs' \
-        'build-use-substitutes' \
-        'build-fallback' \
-        'build-cache-failure' \
-        'build-keep-log' \
-        'build-compress-log' \
-        'use-binary-caches' \
-        'binary-caches' \
-        'binary-caches-files' \
-        'trusted-binary-caches' \
-        'extra-binary-caches' \
-        'signed-binary-caches' \
-        'binary-cache-public-keys' \
-        'binary-caches-parallel-connections' \
-        'verify-https-binary-caches' \
-        'force-manifest' \
-        'system' \
-        'fsync-metadata' \
-        'auto-optimise-store' \
-        'connect-timeout' \
-        'log-servers' \
-        'trusted-users' \
-        'allowed-users' \
-        'restrict-eval' \
-        'pre-build-hook'
+    # Complete nix options with descriptions
+    local -a nix_options
+    # Strip the header line, remove leading spaces and replace separating
+    # whitespace with ':'
+    nix_options=(${${${${(f)"$(nix --help-config)"}:1:-1}/#  /}/  ##/:})
+                   _describe -t nix_options "Option" nix_options
+}
+
+_nix_options_value () {
+    # Print the description of the option we're setting
+    local OPTION=$words[$(($CURRENT - 1))]
+    # Remove lines not starting with " $OPTION " and strip eveything up to the
+    # last two consecutive spaces
+    local description=${${${(f)"$(nix --help-config)"}:#^(  $OPTION *)}/*  /}
+    _message $description
 }
 
 _nix_repair='--repair[Fix corrupted or missing store paths by redownloading or rebuilding]';
@@ -494,7 +472,7 @@ _nix_common_nixos_rebuild=(
   '(--keep-failed -K)'{--keep-failed,-K}'[Do not delete the build directory if build fails]'\
   '--fallback[If binary download fails, fall back on building from source]'\
   '--show-trace[Print stack trace of evaluation errors]'\
-  '--option[Set Nix configuration option]:Options:_nix_options:Value:( )'\
+  '--option[Set Nix configuration option]:Options:_nix_options:Value:_nix_options_value'\
   $_nix_repair
   )
 
