@@ -54,6 +54,7 @@ _nix_complete_dotnix_files () {
             channel:nixos-15.09-small     channel:nixos-unstable
             channel:nixos-16.03           channel:nixos-unstable-small
             channel:nixos-16.03-small     channel:nixpkgs-17.09-darwin
+            nixos-18.03                   nixos-18.03-small
             channel:nixos-16.03-testing   channel:nixpkgs-unstable)' \
         'url:URL:(https:// http://)'
 }
