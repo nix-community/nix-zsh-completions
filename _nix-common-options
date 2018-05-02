@@ -42,7 +42,7 @@ _nix_path() {
 
 _nix_complete_dotnix_files () {
     _alternative \
-        'file:Local file:_path_files -g *.nix(N) *(N-/)' \
+        "file:Local file:_path_files -g '*.nix(N) *(N-/)'" \
         'shortcuts:Shortcuts:_nix_shortcuts' \
         'channel:Channel:(channel:
             channel:nixos-13.10           channel:nixos-16.09
