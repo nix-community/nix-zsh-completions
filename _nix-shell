@@ -8,6 +8,7 @@ _nix_shell_opts=(
   '--command[Run a command instead of starting an interactive shell]:Command:_command_names' \
   '--exclude[Do not build any dependencies which match this regex]:Regex:( )' \
   '--pure[Clear the environment before starting the interactive shell]' \
+  '--run[Run a command in a non-interactive shell instead of starting an interactive shell]:Command:_command_names' \
 )
 
 local norm_arguments='*:Paths:_nix_path'
