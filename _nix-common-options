@@ -109,21 +109,30 @@ _nix_installed_packages () {
 # Generate nix code creating the default expression used by 'nix-env -iA'
 _nix_gen_defexpr () {
     setopt local_options null_glob
-    local -a result
-    local -a queue=($1)
+    local -A result # name -> path map
+
+    # Search depth first for directories containing 'default.nix'
+    # nix-env -iA prioritize the user's channels in case of name collision
+    # Not sure how collisions in user-created directories are resolved.
+    local -aU initialQueue=($1/channels $1/channels_root $1/*)
+    local -a queue=($initialQueue)
+
     while [[ ${#queue} > 0 ]]; do
         local current=$queue[1]
         shift queue
         if [[ -e $current/default.nix ]]; then
-            result+=($current)
+            local name=$(basename $current)
+            if [[ -z $result[$name] ]]; then
+                result[$name]=$current
+            fi
         else
-            queue+=($current/*)
+            queue=($current/* $queue)
         fi
     done
 
     local nix_expr="{\n"
-    for p in $result; do
-        nix_expr+="$(basename $p) = import $p;"
+    for name expr_path in ${(kv)result}; do
+        nix_expr+="${name} = import ${expr_path};"
         nix_expr+="\n"
     done
     nix_expr+="}"
