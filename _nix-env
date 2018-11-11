@@ -56,7 +56,7 @@ for opt in $words; do
 case "$opt" in
     --install|-[^-]#i[^-]#)
         command_options=(
-            ${_nix_env_common_opts:#'(--attr -A)'*}
+            $_nix_env_common_opts
             '(--attr -A)'{--attr,-A}'[Specify packages by attribute path instead of name]'
             $_nix_env_b
             $_nix_env_from_profile
