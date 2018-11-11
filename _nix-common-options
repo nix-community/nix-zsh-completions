@@ -503,7 +503,7 @@ _nix_common_nixos_rebuild=(
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell
 _nix_common_opts=(
   $_nix_common_nixos_rebuild \
-  '(--attr -A)'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:Packages: _nix_complete_attr_paths'\
+  '*'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:Packages: _nix_complete_attr_paths'\
   '*--arg[Argument to pass to the Nix function]:Name:_nix_complete_function_arg:Value: '\
   '*--argstr[Like --arg, but the value is a string]:Name:_nix_complete_function_arg:String: '\
   '--max-silent-time[Builder times out after not producing stdout/stderr for x seconds]:Seconds:( )'\

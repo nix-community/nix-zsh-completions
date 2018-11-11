@@ -5,7 +5,7 @@ _nix-common-options
 
 local -a _nix_build_opts
 _nix_build_opts=(
-  '(--expr -E)'{--expr,-E}'[Interpret command line args as Nix expressions]'
+  '*'{--expr,-E}'[Interpret command line args as Nix expressions]'
   '--drv-link[Add a symlink to the store derivation]:Symlink Name:( )' \
   '--add-drv-link[Shorthand for --drv-link ./derivation]' \
   '--no-out-link[Do not create a symlink to the output path]' \
