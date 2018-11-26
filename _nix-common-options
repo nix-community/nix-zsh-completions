@@ -496,7 +496,7 @@ _nix_common_nixos_rebuild=(
   '(--keep-failed -K)'{--keep-failed,-K}'[Do not delete the build directory if build fails]'\
   '--fallback[If binary download fails, fall back on building from source]'\
   '--show-trace[Print stack trace of evaluation errors]'\
-  '--option[Set Nix configuration option]:Options:_nix_options:Value:_nix_options_value'\
+  '*--option[Set Nix configuration option]:Options:_nix_options:Value:_nix_options_value'\
   $_nix_repair
   )
 
