@@ -4,6 +4,11 @@
 _nix-common-options
 
 _arguments \
-  '--type[Use the specified cryptographic hash algorithm]:Hash Algorithm:(md5 sha1 sha256 sha512)'\
-  '1:URL:_urls'\
+  $_nix_search_path_args \
+  '--unpack[Unpack tarball/zip first]'\
+  '--print-path[Print the resulting store path]'\
+  '--type[Use the specified hash algorithm]:Hash Algorithm:(md5 sha1 sha256 sha512)'\
+  '--name[Override the resulting nix store filename]:nix store filename:'\
+  '*'{--attr,-A}'[Fetch the src of derivation (eg. mpv.src)]:src (eg. mpv.src): _nix_complete_attr_paths'\
+  '1:URL or a local nix file:_nix_path'\
   '2::Hash:( )'
