@@ -1,0 +1,52 @@
+#compdef nix-review
+#autoload
+
+local context state state_descr line
+typeset -A opt_args
+
+_nix-common-options
+
+local -a common_args=(
+    '--build-args=[arguments passed to nix when building]:build args:'
+    '(-h --help)'{--help,-h}'[show help]'
+)
+
+local -a common_cmd_args=(
+    '*'{-p,--package}'[build package]:package: _nix_attr_paths "import ./. {}"'
+    '*--package-regex[only build packages matching regex]:regex:'
+)
+
+local -a pr_args=(
+    ':pr number to review:'
+    '(-c --checkout)'{-c,--checkout}'[merge before building or use exact commit]:merge or commit:(merge commit)'
+    "--eval[use ofborg's eval result]::(ofborg local)"
+    '--token[github token]:github token:'
+)
+
+if ! which __git_ref_specs > /dev/null; then
+    _git &> /dev/null
+fi
+
+local -a rev_args=(
+    ':commit/tag/ref/branch to review:__git_ref_specs'
+    '(-b --branch)'{-b,--branch}'[branch to compare against]:branch:__git_ref_specs'
+)
+
+_arguments \
+    '*: :->subcmds' && return 0
+
+local command=${line[1]}
+local -a args=()
+case $command in
+    pr)
+        args=($pr_args $common_cmd_args)
+        ;;
+    rev)
+        args=($rev_args $common_cmd_args)
+        ;;
+esac
+
+_arguments \
+    $common_args \
+    ':review PR or a local git rev:(pr rev)' \
+    $args && return 0
