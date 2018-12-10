@@ -63,73 +63,70 @@ local -a command_options=()
 local -a command_arguments=()
 # Setup the correct command_arguments and command_options depending on which
 # command we've typed
-local word
-for word in $words; do
+_arguments '*: :->subcmd' && return 0
+local cmd=${line[1]}
 
-    # Check if we're in a valid command
-    if [[ $command_lookup[$word] == 1 ]]; then
-        local -a help=(${(f)"$(nix $word --help)"})
-        # Extract an array describing the possible arguments to the command eg.
-        # (NAR PATH) for cat-nar or (INSTALLABLES) for run
-        local -a args=(${=help[1]//(*<FLAGS>|.|<|>)/})
-        # And add the appropriate _argument spec
-        local arg
-        for arg in $args; do
-            # Prefix * if $arg ends in 'S', ie. is plural
-            local plural="${${(M)arg:#*S}:+*}"
-            command_arguments+=("$plural:$arg:->$arg")
+# Check if we're in a valid command
+if [[ $command_lookup[$cmd] == 1 ]]; then
+    local -a help=(${(f)"$(nix $cmd --help)"})
+    # Extract an array describing the possible arguments to the command eg.
+    # (NAR PATH) for cat-nar or (INSTALLABLES) for run
+    local -a args=(${=help[1]//(*<FLAGS>|.|<|>)/})
+    # And add the appropriate _argument spec
+    local arg
+    for arg in $args; do
+        # Prefix * if $arg ends in 'S', ie. is plural
+        local plural="${${(M)arg:#*S}:+*}"
+        command_arguments+=("$plural:$arg:->$arg")
+    done
+
+    # Extract the lines containing the option descriptions
+    local -a option_descriptions
+    option_descriptions=(${help:#^(  -*|  ??? -*)})
+
+    local option_description
+    local option
+    for option_description in $option_descriptions; do
+
+        # Extract the description by stripping everything up to the the last
+        # two consecutive spaces
+        local description=${option_description/(*  )/}
+        # Remove the description from the help line
+        local option_spec=${option_description%$description}
+
+        # Extract the options by stripping everything starting at '<' (and ',')
+        local -a option_group=(${=option_spec//(<*|,)/})
+        # Extract any arguments, by stripping the options (and <|>)
+        local -a option_args=(${=option_spec//(*$option_group[${#option_group}]|<|>)/})
+
+        local ACTIONS=""
+        for arg in $option_args; do
+            # Prefix with ':*' if $arg ends in 'S', ie. is plural
+            local plural="${${(M)arg:#*S}:+:*}"
+            ACTIONS+="$plural:$arg:->$arg"
         done
 
-        # Extract the lines containing the option descriptions
-        local -a option_descriptions
-        option_descriptions=(${help:#^(  -*|  ??? -*)})
-
-        local option_description
-        local option
-        for option_description in $option_descriptions; do
-
-            # Extract the description by stripping everything up to the the last
-            # two consecutive spaces
-            local description=${option_description/(*  )/}
-            # Remove the description from the help line
-            local option_spec=${option_description%$description}
-
-            # Extract the options by stripping everything starting at '<' (and ',')
-            local -a option_group=(${=option_spec//(<*|,)/})
-            # Extract any arguments, by stripping the options (and <|>)
-            local -a option_args=(${=option_spec//(*$option_group[${#option_group}]|<|>)/})
-
-            local ACTIONS=""
-            for arg in $option_args; do
-                # Prefix with ':*' if $arg ends in 'S', ie. is plural
-                local plural="${${(M)arg:#*S}:+:*}"
-                ACTIONS+="$plural:$arg:->$arg"
-            done
-
-            for option in $option_group; do
-                # Handle `run --keep/--unset` manually as there's ambiguity the NAME argument
-                if [[ $word == run && -z ${option:#(-k|--keep|-u|--unset)} ]]; then
-                    command_options+=("*${option}[$description]:Environment Variable:_parameters")
-                elif [[ "$word" == add-to-store \
-                            && "$option" == (-n|--name) ]]; then
-                    # Another <NAME> ambiguity
-                    command_options+=("($option_group)"$option"[$description]:->store-name")
-                elif [[ $option == (-I|--include) ]]; then
-                    # Special handling of --include due to type ambiguity
-                    command_options+=("*${option}[$description]:Includes:->INCLUDE")
-                elif [[ -z ${option:#(--arg|--argstr|-f|--file)} ]]; then
-                    # Repeatable options
-                    command_options+=("*${option}[$description]"$ACTIONS)
-                else
-                    # Default to mutually exclusive non-repeatable options
-                    command_options+=("($option_group)"$option"[$description]"$ACTIONS)
-                fi
-            done
+        for option in $option_group; do
+            # Handle `run --keep/--unset` manually as there's ambiguity the NAME argument
+            if [[ $cmd == run && -z ${option:#(-k|--keep|-u|--unset)} ]]; then
+                command_options+=("*${option}[$description]:Environment Variable:_parameters")
+            elif [[ "$cmd" == add-to-store \
+                        && "$option" == (-n|--name) ]]; then
+                # Another <NAME> ambiguity
+                command_options+=("($option_group)"$option"[$description]:->store-name")
+            elif [[ $option == (-I|--include) ]]; then
+                # Special handling of --include due to type ambiguity
+                command_options+=("*${option}[$description]:Includes:->INCLUDE")
+            elif [[ -z ${option:#(--arg|--argstr|-f|--file)} ]]; then
+                # Repeatable options
+                command_options+=("*${option}[$description]"$ACTIONS)
+            else
+                # Default to mutually exclusive non-repeatable options
+                command_options+=("($option_group)"$option"[$description]"$ACTIONS)
+            fi
         done
-
-        break
-    fi
-done
+    done
+fi
 
 _arguments -s \
            ":Command: _describe -t main_commands Command main_commands"\
