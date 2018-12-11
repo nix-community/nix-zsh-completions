@@ -5,15 +5,15 @@ _nix-common-options
 
 local -a _1st_arguments
 _1st_arguments=(
-  'switch:Build, activate, and update boot default'\
-  'boot:Build and update boot default without activating'\
-  'test:Build and activate without updating boot default'\
-  'build:Build without activating or updating boot default'\
-  'dry-build:Show what store paths would be built or downloaded without building'\
-  'dry-activate:Build and show what changes would be performed by the activation'\
-  'build-vm:Create a script which starts a VM with the built configuration'\
+  'switch:Build, activate, and update boot default'
+  'boot:Build and update boot default without activating'
+  'test:Build and activate without updating boot default'
+  'build:Build without activating or updating boot default'
+  'dry-build:Show what store paths would be built or downloaded without building'
+  'dry-activate:Build and show what changes would be performed by the activation'
+  'build-vm:Create a script which starts a VM with the built configuration'
   'build-vm-with-bootloader:Like build-vm, but boot using regular boot loader'
-  )
+)
 
 _arguments \
   $_nix_common_nixos_rebuild \

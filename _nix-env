@@ -21,25 +21,24 @@ _1st_arguments=(
     "--delete-generations[Delete specified generations]"
     {--switch-generation,-G}"[Activate specified generation]"
     "--rollback[Switch to the previous generation of active profile]"
-  )
-
-local -a _nix_env_common_opts
-_nix_env_common_opts=(
-  $_nix_common_opts \
-  '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'\
-  $_nix_dry_run \
-  '--system-filter[Only show derivations matching the specified platform]:system:_nix_systems'\
 )
 
-local -a _nix_env_b
-_nix_env_b=('(--prebuilt-only -b)'{--prebuilt-only,-b}'[Fail if there is no pre-built binary available]')
+local -a _nix_env_common_opts=(
+  $_nix_common_opts
+  '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'
+  $_nix_dry_run
+  '--system-filter[Only show derivations matching the specified platform]:system:_nix_systems'
+)
+
+local -a _nix_env_b=(
+    '(--prebuilt-only -b)'{--prebuilt-only,-b}'[Fail if there is no pre-built binary available]'
+)
 
 local _nix_env_from_profile
 _nix_env_from_profile='--from-profile[Fetch store paths from another profile]:Profile:_nix_profiles'
 
 # Workaround:
-# opt_args doesn't contain the first option
-# so can't detect stacked options like '-iA'
+# opt_args doesn't record plain options, so we can't use that
 local expect_attr_paths=false
 local opt
 for opt in $words; do
