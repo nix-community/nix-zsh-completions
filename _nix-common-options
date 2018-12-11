@@ -512,4 +512,10 @@ _nix_common_opts=(
   '--log-type[Configure how output is formatted]:Output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'\
 )
 
+# Options for nix-store --realise, used by nix-build
+__nix_store_realise_opts=(
+    $_nix_dry_run
+    '--check[rebuild and see if output is deterministic]'
+)
+
 _NIX_SHELL_COMPLETION_LOADED=1
