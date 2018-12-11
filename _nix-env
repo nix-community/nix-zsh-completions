@@ -124,6 +124,10 @@ case "$opt" in
         command_options=($_nix_env_common_opts)
         break
         ;;
+    --[^-]*|-[^-]#)
+        # Complete common options if the user has started writing something else
+        command_options=($_nix_env_common_opts)
+        ;;
 esac
 done
 
