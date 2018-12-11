@@ -4,7 +4,7 @@
 _nix-common-options
 
 _arguments \
-  $_nix_search_path_args \
+  $__nix_search_path_args \
   '--unpack[Unpack tarball/zip first]'\
   '--print-path[Print the resulting store path]'\
   '--type[Use the specified hash algorithm]:Hash Algorithm:(md5 sha1 sha256 sha512)'\

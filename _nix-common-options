@@ -437,28 +437,6 @@ _nix_profiles () {
     _path_files -/ ${=prefix}
 }
 
-# Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixops
-_nix_boilerplate_opts=(
-  '(- *)--help[Print help message and exit]' \
-  '(- *)--version[Print version number and exit]'
-)
-
-# Used in: nix-collect-garbage, nix-env, nix-store, nixops
-_nix_dry_run='--dry-run[Show what would be done without doing it]'
-
-# Used in: nix-collect-garbage, nix-store
-_nix_gc_common=(
-  '(- --print* --delete)--print-roots[Print roots used by garbage collector]' \
-  '(- --print* --delete)--print-live[Print store paths reachable from roots]' \
-  '(- --print* --delete)--print-dead[Print store paths not reachable from roots]' \
-  '(- --print* --delete)--delete[Garbage collect all dead paths from the store]' \
-)
-
-# Used in: nixos-install, nix_common_opts
-_nix_search_path_args=(
-    '*-I+[Add path to Nix expression search path]:Include path:_nix_complete_includes'\
-)
-
 # Either true or false: useful for completing many Nix options
 _nix_options_bool () {
     _values true false
@@ -483,38 +461,77 @@ _nix_options_value () {
     _message $description
 }
 
-_nix_repair='--repair[Fix corrupted or missing store paths by redownloading or rebuilding]';
+## Common options
+
+# Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixops
+__nix_boilerplate_opts=(
+    '(- *)--help[Print help message and exit]'
+    '(- *)--version[Print version number and exit]'
+)
+
+# Used in: nix-collect-garbage, nix-env, nix-store, nixops
+__nix_dry_run='--dry-run[Show what would be done without doing it]'
+
+# Used in: nix-collect-garbage, nix-store
+__nix_gc_common=(
+    '(- --print* --delete)--print-roots[Print roots used by garbage collector]'
+    '(- --print* --delete)--print-live[Print store paths reachable from roots]'
+    '(- --print* --delete)--print-dead[Print store paths not reachable from roots]'
+    '(- --print* --delete)--delete[Garbage collect all dead paths from the store]'
+)
+
+# Used in: nixos-install, nix_common_opts
+__nix_search_path_args=(
+    '*-I[add a path to the list of locations used to look up <...> file names]:include path:_nix_complete_includes'
+)
+
+__nix_repair='--repair[Fix corrupted or missing store paths by redownloading or rebuilding]';
+
+__nix_expr_opts=(
+    '(--expr -E)'{--expr,-E}'[interpret command line args as Nix expressions]'
+)
 
 # Misc Nix options accepted by nixos-rebuild
-_nix_common_nixos_rebuild=(
-    $_nix_search_path_args \
-  '(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'\
-  '(--no-build-output -Q)'{--no-build-output,-Q}'[Silence output to stdout and stderr]'\
-  '(--max-jobs -j)'{--max-jobs,-j}'[Set the maximum number of build jobs that Nix will perform in parallel]'\
-  '--cores[Set the parallelism of the individual builders (e.g. -j argument to make)]'\
-  '(--keep-going -k)'{--keep-going,-k}'[Keep going in case of failed builds, to the greatest extent possible]'\
-  '(--keep-failed -K)'{--keep-failed,-K}'[Do not delete the build directory if build fails]'\
-  '--fallback[If binary download fails, fall back on building from source]'\
-  '--show-trace[Print stack trace of evaluation errors]'\
-  '*--option[Set Nix configuration option]:Options:_nix_options:Value:_nix_options_value'\
-  $_nix_repair
-  )
+__nix_common_nixos_rebuild=(
+    $__nix_search_path_args
+    $__nix_repair
+    '(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'
+    '(--no-build-output -Q)'{--no-build-output,-Q}'[silence output to stdout and stderr]'
+    '(--max-jobs -j)'{--max-jobs,-j}'[max number of build jobs in parallel]:jobs:'
+    '--cores[threads per job (e.g. -j argument to make)]:cores:'
+    '(--keep-going -k)'{--keep-going,-k}"[keep going until all builds are finished]"
+    '(--keep-failed -K)'{--keep-failed,-K}'[keep failed builds (usually in /tmp)]'
+    '--fallback[If binary download fails, fall back on building from source]'
+    '--show-trace[Print stack trace of evaluation errors]'
+    '*--option[set Nix configuration option]:options:_nix_options:value:_nix_options_value'
+)
+
+__nix_common_store_opts=(
+    '--add-root[register result as a root of the garbage collector]:path (Hint /nix/var/nix/gcroots):_path_files -/'
+    '--indirect[store gc root outside GC roots directory]'
+)
+
+# Used in: nix-build, nix-env, nix-instantiate, nix-shell and nix-store
+__nix_extra_build_opts=(
+    '--max-silent-time[max seconds without getting stdout/err from builder]:Seconds:'
+    '--timeout[max seconds builders should run]:seconds:'
+    '--readonly-mode[do not open Nix database]'
+    '--log-type[configure how output is formatted]:output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'
+)
 
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell
-_nix_common_opts=(
-  $_nix_common_nixos_rebuild \
-  '*'{--attr,-A}'[Select an attribute from the top-level Nix expression being evaluated]:Packages: _nix_complete_attr_paths'\
-  '*--arg[Argument to pass to the Nix function]:Name:_nix_complete_function_arg:Value: '\
-  '*--argstr[Like --arg, but the value is a string]:Name:_nix_complete_function_arg:String: '\
-  '--max-silent-time[Builder times out after not producing stdout/stderr for x seconds]:Seconds:( )'\
-  '--timeout[Timeout builder after given number of seconds]:Seconds:( )'\
-  '--readonly-mode[Do not open Nix database]'\
-  '--log-type[Configure how output is formatted]:Output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'\
+__nix_common_opts=(
+    $__nix_common_nixos_rebuild
+    $__nix_args_opts
+    $__nix_extra_build_opts
+    '*--include[add a path to the list of locations used to look up <...> file names]:include path:_nix_complete_includes'
+    '*--arg[argument to pass to the Nix function]:Name:_nix_complete_function_arg:Value: '
+    '*--argstr[pass a string]:Name:_nix_complete_function_arg:String: '
 )
 
 # Options for nix-store --realise, used by nix-build
 __nix_store_realise_opts=(
-    $_nix_dry_run
+    $__nix_dry_run
     '--check[rebuild and see if output is deterministic]'
 )
 

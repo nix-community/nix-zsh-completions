@@ -3,14 +3,15 @@
 
 _nix-common-options
 
-local -a _nix_build_opts
-_nix_build_opts=(
-  '*'{--expr,-E}'[Interpret command line args as Nix expressions]'
-  --check'[Rebuild derivation]'
-  '--drv-link[Add a symlink to the store derivation]:Symlink Name:( )' \
-  '--add-drv-link[Shorthand for --drv-link ./derivation]' \
-  '--no-out-link[Do not create a symlink to the output path]' \
-  {--out-link,-o}'[Name of the output symlink]:Output Symlink Name:( )' \
+local -a _nix_build_opts=(
+    $__nix_expr_opts
+    $__nix_common_store_opts
+    '*'{--attr,-A}'[build a package from file (default: ./default.nix)]:package:_nix_complete_attr_paths'
+    --check'[Rebuild derivation]'
+    '--drv-link[Add a symlink to the store derivation]:Symlink Name:( )'
+    '--add-drv-link[Shorthand for --drv-link ./derivation]'
+    '--no-out-link[Do not create a symlink to the output path]'
+    {--out-link,-o}'[Name of the output symlink]:Output Symlink Name:( )'
 )
 
 # TODO: Undocumented args to possibly add
@@ -25,7 +26,7 @@ _nix_build_opts=(
 # --packages,-p
 
 _arguments \
-  $_nix_boilerplate_opts \
-  $_nix_common_opts \
+  $__nix_boilerplate_opts \
+  $__nix_common_opts \
   $_nix_build_opts \
   '*:Paths:_nix_path'

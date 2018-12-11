@@ -14,6 +14,6 @@ _nixos-option-opts() {
 }
 
 _arguments \
-    $_nix_search_path_args \
+    $__nix_search_path_args \
     '--xml[Render as XML]' \
     ':NixOS module options:_nixos-option-opts'

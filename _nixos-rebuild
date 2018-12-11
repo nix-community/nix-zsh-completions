@@ -16,7 +16,7 @@ _1st_arguments=(
 )
 
 _arguments \
-  $_nix_common_nixos_rebuild \
+  $__nix_common_nixos_rebuild \
   '--upgrade[Fetch the latest version of NixOS from the NixOS channel]'\
   '--install-bootloader[(Re)install bootloader on the configured device]'\
   "--no-build-nix[Don't build Nix package manager]"\

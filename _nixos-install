@@ -4,7 +4,7 @@
 _nix-common-options
 
 _arguments \
-  $_nix_search_path_args \
+  $__nix_search_path_args \
   '--root[Treat the given directory as the root of the NixOS installation]:Installation Root:_path_files -/'\
   '--show-trace[Print a stack trace in case of evaluation errors]'\
   '--chroot[Chroot into given installation]'

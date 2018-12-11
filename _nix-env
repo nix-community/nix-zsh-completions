@@ -24,9 +24,9 @@ _1st_arguments=(
 )
 
 local -a _nix_env_common_opts=(
-  $_nix_common_opts
+  $__nix_common_opts
   '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'
-  $_nix_dry_run
+  $__nix_dry_run
   '--system-filter[Only show derivations matching the specified platform]:system:_nix_systems'
 )
 
@@ -134,7 +134,7 @@ done
 # under the main_options group
 _arguments -s $command_options \
            '*'{--file,-f}'[Specify Nix expression used to obtain derivations]:Path to file:_nix_path'\
-           $_nix_boilerplate_opts \
+           $__nix_boilerplate_opts \
            - '(main_options)' \
            $_1st_arguments
 

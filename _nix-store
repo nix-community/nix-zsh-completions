@@ -10,7 +10,7 @@ setopt extendedglob
 _nix-common-options
 
 local -a cmd_arguments=(
-  $_nix_boilerplate_opts
+  $__nix_boilerplate_opts
   {--realise,-r}'[Build the specified store paths]'
   '--serve[provide access to the nix store over stdin/stdout]'
   '--gc[Perform garbage collection on the Nix store]'
@@ -37,20 +37,10 @@ local -a cmd_arguments=(
 # Common nix-store options
 local -a common_opts=(
     '*:Store Paths:_files'
-    $_nix_repair
-    '--add-root[register result as a root of the garbage collector]:path (Hint /nix/var/nix/gcroots):_path_files -/'
-    '--indirect[store gc root outside GC roots directory]'
-    '(--no-build-output -Q)'{--no-build-output,-Q}'[silence output to stdout and stderr]'
-    '(--max-jobs -j)'{--max-jobs,-j}'[max number of build jobs in parallel]:jobs:'
-    '--cores[threads per job (e.g. -j argument to make)]:cores:'
-    '--max-silent-time[max seconds without getting stdout/err from builder]:Seconds:'
-    '--timeout[max seconds builders should run]:seconds:'
-    '(--keep-going -k)'{--keep-going,-k}"[keep going until all builds are finished]"
-    '(--keep-failed -K)'{--keep-failed,-K}'[keep failed builds (usually in /tmp)]'
-    '--fallback[If binary download fails, fall back on building from source]'
-    '--readonly-mode[do not open Nix database]'
-    '--show-trace[Print stack trace of evaluation errors]'
-    '*--option[set Nix configuration option]:options:_nix_options:value:_nix_options_value'
+    $__nix_repair
+    $__nix_common_store_opts
+    $__nix_common_nixos_rebuild
+    $__nix_extra_build_opts
 )
 
 local -a command_options
@@ -74,7 +64,7 @@ case "$opt" in
     --gc)
         command_options=(
             $common_opts
-            $_nix_gc_common
+            $__nix_gc_common
             '--max-freed[stop the gc after freeing n bytes]:bytes:'
         )
         break
