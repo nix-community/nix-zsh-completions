@@ -77,7 +77,7 @@ case "$opt" in
         break
         ;;
     --query|-[^-]#q[^-]#)
-        local -a _query_common=(
+        command_options+=(
             '(--use-output -u)'{--use-output,-u}'[Apply the query to the output path of any store derivations]'
             '(--force-realise -f)'{--force-realise,-f}'[Realise each argument to the query first]'
         )
@@ -87,13 +87,13 @@ case "$opt" in
             case "$subopt" in
                 --requisites|-R)
                     command_options+=(
-                        $common_opts $_query_common
+                        $common_opts
                         '--include-outputs[Also include the output paths of store derivations]'
                     )
                     break
                    ;;
                 --outputs|--references|--referrers|--referrers-closure|--deriver|-d|--graph|--tree|--binding|-b|--hash|--size|--roots)
-                    command_options+=($common_opts $_query_common)
+                    command_options+=($common_opts)
                     break
                     ;;
             esac
