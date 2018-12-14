@@ -357,6 +357,10 @@ function _nix_get_file_arg () {
                 --file|-f)
                     file=${words[$((i+1))]}
                     ;;
+                -f\.)
+                    # -f. is accepted shorthand for -f .
+                    file=.
+                    ;;
             esac
         done
     elif [[ $line ]]; then

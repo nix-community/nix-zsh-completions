@@ -134,6 +134,7 @@ done
 # under the main_options group
 _arguments -s $command_options \
            '*'{--file,-f}'[Specify Nix expression used to obtain derivations]:Path to file:_nix_path'\
+           '-f.[evaluate ./default.nix rather than the default]' \
            $__nix_boilerplate_opts \
            - '(main_options)' \
            $_1st_arguments

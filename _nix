@@ -120,6 +120,10 @@ if [[ $command_lookup[$cmd] == 1 ]]; then
             elif [[ -z ${option:#(--arg|--argstr|-f|--file)} ]]; then
                 # Repeatable options
                 command_options+=("*${option}[$description]"$ACTIONS)
+                if [[ $option == -f ]]; then
+                    # -f. is accepted shorthand for -f .
+                    command_options+="-f.[${description/FILE/\./default.nix}]"
+                fi
             else
                 # Default to mutually exclusive non-repeatable options
                 command_options+=("($option_group)"$option"[$description]"$ACTIONS)
