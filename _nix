@@ -156,8 +156,12 @@ case "${context%%-*} $state" in
             "file:File path to package:_files ${prefix}"
         return
         ;;
-    'argument '(PATH|PATHS|FILES))
+    'argument '(PATH|PATHS))
         _files
+        return
+        ;;
+    'argument FILES')
+        _nix_complete_dotnix_files
         return
         ;;
     'argument NAR')
