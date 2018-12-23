@@ -12,10 +12,11 @@ Oh-My-ZSH Installation
 ----------------------
 
 ```zsh
-git clone git@github.com:spwhitt/nix-zsh-completions.git ~/.oh-my-zsh/custom/plugins/nix
+cd ~/.oh-my-zsh/custom/plugins
+git clone git@github.com:spwhitt/nix-zsh-completions.git
 ```
 
-Then add `nix` to the plugins list in `~/.zshrc`
+Then add `nix-zsh-completions` to the plugins list in `~/.zshrc`
 
 If you want your prompt to be prefixed by `[nix-shell]` when you're in a nix-shell add this to your zshrc:
 
@@ -39,7 +40,7 @@ Clone this repository and add the following to `~/.zshrc` with the path to
 `nix-zsh-completions` updated as necessary.
 
 ```zsh
-source $HOME/nix-zsh-completions/nix.plugin.zsh
+source $HOME/nix-zsh-completions/nix-zsh-completions.plugin.zsh
 fpath=($HOME/nix-zsh-completions $fpath)
 autoload -U compinit && compinit
 ```
