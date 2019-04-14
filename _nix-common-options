@@ -510,6 +510,10 @@ __nix_common_nixos_rebuild=(
     '*--option[set Nix configuration option]:options:_nix_options:value:_nix_options_value'
 )
 
+__nix_common_nixos_build_vms=(
+    '*--option[set Nix configuration option]:options:_nix_options:value:_nix_options_value'
+)
+
 __nix_common_store_opts=(
     '--add-root[register result as a root of the garbage collector]:path (Hint /nix/var/nix/gcroots):_path_files -/'
     '--indirect[store gc root outside GC roots directory]'
