@@ -5,11 +5,16 @@ alias ni='nix-env -iA'
 alias ns='nix-env -qaP'
 
 function prompt_nix_shell_precmd {
-  if [[ -n ${IN_NIX_SHELL} && ${IN_NIX_SHELL} != "0" ]] then
+  if [[ -n ${IN_NIX_SHELL} && ${IN_NIX_SHELL} != "0" || ${IN_NIX_RUN} && ${IN_NIX_RUN} != "0" ]]; then
     if [[ -n ${IN_WHICH_NIX_SHELL} ]] then
       NIX_SHELL_NAME=": ${IN_WHICH_NIX_SHELL}"
     fi
-    NIX_PROMPT="%F{8}[%F{3}nix-shell${NIX_SHELL_NAME}%F{8}]%f"
+    if [[ -n ${IN_NIX_SHELL} && ${IN_NIX_SHELL} != "0" ]]; then
+      NAME="nix-shell"
+    else
+      NAME="nix-run"
+    fi
+    NIX_PROMPT="%F{8}[%F{3}${NAME}${NIX_SHELL_NAME}%F{8}]%f"
     if [[ $PROMPT != *"$NIX_PROMPT"* ]] then
       PROMPT="$NIX_PROMPT $PROMPT"
     fi
