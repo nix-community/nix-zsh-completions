@@ -28,16 +28,34 @@ typeset -A opt_args
 
 type nix &> /dev/null || return
 
+local -a top_help=(${(f)"$(nix --help)"})
+
 local -a common_options
-common_options=("(--debug)"--debug"[enable debug output]"
-                "(-h --help)"{-h,--help}"[show usage information]"
-                "(--help-config)"--help-config"[show configuration options]"
-                "*--builders[The machine to build on]:Machine eg. 'root@mac x86_64-darwin': "
-                "--store[Select a nix store]:Store:->STORE-URI"
-                "*--option[set a Nix configuration option (overriding nix.conf)]:Option:->nixoption:Value:->nixoptionvalue"
-                "(--quiet)"--quiet"[decrease verbosity level]"
-                "*"{-v,--verbose}"[increase verbosity level]"
-                "(--version)"--version"[show version information]")
+# See per command flag handling for comments
+local common_options_descriptions=(${top_help:#^(  -*|  ??? -*)})
+local option_description= option=
+for option_description in $common_options_descriptions; do
+    local description=${option_description/(*  )/}
+    local option_spec=${option_description%$description}
+    local -a option_group=(${=option_spec//(<*|,)/})
+    local -a option_args=(${=option_spec//(*$option_group[${#option_group}]|<|>)/})
+
+    local ACTIONS=""
+    for arg in $option_args; do
+        # Prefix with ':*' if $arg ends in 'S', ie. is plural
+        local plural="${${(M)arg:#*S}:+:*}"
+        ACTIONS+="$plural:$arg:->$arg"
+    done
+
+    for option in $option_group; do
+        if [[ "$option" == "--option" ]]; then
+            common_options+=("*${option}[$description]:option:->nixoption:value:->nixoptionvalue")
+        else
+            # Default to mutually exclusive non-repeatable options
+            common_options+=("($option_group)"$option"[$description]"$ACTIONS)
+        fi
+    done
+done
 
 local -a main_commands
 # Extract the commands with descriptions
@@ -45,7 +63,7 @@ local -a main_commands
 #
 # Split the help output on newlines, and remove all lines which doesn't start
 # with two spaces and a lower case character,
-main_commands=(${${(f)"$(nix --help)"}:#^(  [a-z]*)})
+main_commands=(${top_help:#^(  [a-z]*)})
 # Strip the leading spaces
 main_commands=(${main_commands/#  /})
 # And replace the whitespace separating the command and description with ':'
@@ -84,8 +102,7 @@ if [[ $command_lookup[$cmd] == 1 ]]; then
     local -a option_descriptions
     option_descriptions=(${help:#^(  -*|  ??? -*)})
 
-    local option_description
-    local option
+    local option_description= option=
     for option_description in $option_descriptions; do
 
         # Extract the description by stripping everything up to the the last
