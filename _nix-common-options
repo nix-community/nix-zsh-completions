@@ -462,7 +462,15 @@ _nix_options_value () {
     # Remove lines not starting with " $OPTION " and strip eveything up to the
     # last two consecutive spaces
     local description=${${${(f)"$(nix --help-config)"}:#^(  $OPTION *)}/*  /}
-    _message $description
+    local -a values=()
+    case "$description" in
+        Whether*)
+            _values $description true false
+        ;;
+        *)
+            _path_files
+        ;;
+    esac
 }
 
 ## Common options
