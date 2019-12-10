@@ -9,11 +9,9 @@ _nixos-option-opts() {
     fi
     local options='
       with import <nixpkgs/lib>;
-      filterAttrsRecursive
-        (k: _: substring 0 1 k != "_")
-        (evalModules {
-          modules = import <nixpkgs/nixos/modules/module-list.nix> ++ [ '"$mods"' ];
-        }).options
+      (evalModules {
+        modules = import <nixpkgs/nixos/modules/module-list.nix> ++ [ '"$mods"' ];
+      }).config
     '
 
     _nix_attr_paths $options
@@ -21,5 +19,5 @@ _nixos-option-opts() {
 
 _arguments \
     $__nix_search_path_args \
-    '--xml[Render as XML]' \
+    '--all[Print the values of all options.]' \
     ':NixOS module options:_nixos-option-opts'
