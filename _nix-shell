@@ -30,6 +30,6 @@ _arguments \
   $__nix_common_opts \
   $_nix_shell_opts \
   $norm_arguments \
-  + '(group)' \
+  - '(group)' \
   $__nix_expr_opts \
   {--packages,-p}'[run with packages from <nixpkgs> (override usinge -I)]'
