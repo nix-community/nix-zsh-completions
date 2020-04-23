@@ -10,6 +10,7 @@ local -a common_args=(
     '--build-args=[arguments passed to nix when building]:build args:'
     '--no-shell[Only evaluate and build without executing nix-shell]'
     '(-h --help)'{--help,-h}'[show help]'
+    '--token[github token]:github token:'
 )
 
 local -a common_cmd_args=(
@@ -22,7 +23,6 @@ local -a pr_args=(
     '(-c --checkout)'{-c,--checkout}'[merge before building or use exact commit]:merge or commit:(merge commit)'
     "--eval[use ofborg's eval result]::(ofborg local)"
     "--post-result[Post the nixpkgs-review results as a PR comment]"
-    '--token[github token]:github token:'
 )
 
 local -a wip_args=(
@@ -55,9 +55,12 @@ case $command in
     wip)
         args=($wip_args $common_cmd_args)
         ;;
+    post-result|merge|approve)
+        args=($common_cmd_args)
+        ;;
 esac
 
 _arguments \
     $common_args \
-    ':review PR, a local git rev or uncommited changes:(pr rev wip)' \
+    ':review PR, a local git rev or uncommited changes:(pr rev wip post-result merge approve)' \
     $args && return 0
