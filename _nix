@@ -130,6 +130,8 @@ if [[ $command_lookup[$cmd] == 1 ]]; then
             # Handle `run --keep/--unset` manually as there's ambiguity the NAME argument
             if [[ $cmd == run && -z ${option:#(-k|--keep|-u|--unset)} ]]; then
                 command_options+=("*${option}[$description]:Environment Variable:_parameters")
+            elif [[ $cmd = run && $option == (-c|--command) ]]; then
+                command_options+=("${option}[$description]:command: _nix_run_command_names:*::args: _normal")
             elif [[ "$cmd" == add-to-store \
                         && "$option" == (-n|--name) ]]; then
                 # Another <NAME> ambiguity
@@ -234,7 +236,7 @@ case "${context%%-*} $state" in
         return
         ;;
     'option COMMAND')
-        _command_names
+        _command_names -e
         return
         ;;
     'option ARGS')

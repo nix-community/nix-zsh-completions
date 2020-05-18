@@ -473,6 +473,57 @@ _nix_options_value () {
     esac
 }
 
+_nix_run_command_names () {
+    local cmd chan
+
+    if (( ${+commands[sqlite3]} )); then
+        # Extract the channels from NIX_PATH and -I/--include
+        # Add -I/--include afterwards, so they will shadow the NIX_PATH
+        local -a nix_path=(
+            ${(s.:.)NIX_PATH}
+            ${(s.:.)opt_args[-I]}
+            ${(s.:.)opt_args[--include]}
+        )
+
+        # channels: key - channel name, value - path to channel
+        local -A channels
+        for chan in $nix_path; do
+            if [[ $chan = *=* ]]; then
+                # name=path
+                channels[${chan%%=*}]=${chan#*=}
+            else
+                # path to directory with channels
+                for chan in $chan/*(-/); do
+                    channels[$chan:t]=$chan
+                done
+            fi
+        done
+
+        # pkg_cmds is list of commands inside packages
+        # This is an associative array to avoid duplicates.
+        local -A pkg_cmds
+        for chan in ${(k)channels}; do
+            # Extract args with prefix "$chan."
+            local -a pkgs=( "${${(M)words[@]:#"$chan".*}[@]##"$chan".}" )
+            (( ${#pkgs} )) || continue
+
+            local db=${channels[$chan]}/programs.sqlite
+            [ -f "$db" ] || continue
+
+            pkgs=( "'${^pkgs[@]//\'/''}'" ) # SQL-quote
+            local query="SELECT name FROM programs WHERE package IN (${(j:,:)pkgs})"
+
+            for cmd in $(sqlite3 "$db" "$query"); do
+                pkg_cmds[$cmd]=
+            done
+        done
+
+        compadd -X 'Package commands' -- ${(k)pkg_cmds}
+    fi
+
+    _command_names -e -X 'All commands'
+}
+
 ## Common options
 
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixops
