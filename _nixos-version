@@ -4,4 +4,4 @@
 _nix-common-options
 
 _arguments \
-  '(- *)'{--hash,--revision}'[Print only the git hash of the channel]'\
+  '(- *)'{--hash,--revision}'[print only the git hash of the channel]'\

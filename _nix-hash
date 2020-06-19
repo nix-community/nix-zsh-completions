@@ -7,10 +7,10 @@ local -a ig
 ig=( '--to-base16' '--to-base32' )
 
 _arguments \
-  '(- *)--to-base16[Convert a base 32 hash to hexadecimal]:Hash:( )' \
-  '(- *)--to-base32[Convert a hexadecimal hash to base 32]:Hash:( )' \
-  "($ig)--flat[Print hash of regular files rather than their NAR dump]" \
-  "($ig)--base32[Print hash in base 32 rather than hexadecimal]" \
-  "($ig)--truncate[Truncate hashes to 160 bits]" \
-  "($ig)--type[Hash algorithm to use]:hashAlgo:(md5 sha1 sha256 sha512)" \
+  '(- *)--to-base16[convert a base 32 hash to hexadecimal]:Hash:( )' \
+  '(- *)--to-base32[convert a hexadecimal hash to base 32]:Hash:( )' \
+  "($ig)--flat[print hash of regular files rather than their NAR dump]" \
+  "($ig)--base32[print hash in base 32 rather than hexadecimal]" \
+  "($ig)--truncate[truncate hashes to 160 bits]" \
+  "($ig)--type[hash algorithm to use]:hashAlgo:(md5 sha1 sha256 sha512)" \
   "($ig)*:Store Paths:_files" && return 0

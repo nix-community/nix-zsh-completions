@@ -4,11 +4,11 @@
 _nix-common-options
 
 _arguments \
-  '(--from)--to[Copy the closure to the remote machine (default)]'\
-  '(--to)--from[Copy the closure from the remote machine]'\
-  '--sign[Cryptographically sign to allow sharing between untrusted users on trusted machines]'\
-  '--gzip[Enable compression of the SSH connection]'\
-  '--include-outputs[Also copy outputs of store derivations included in the closure]'\
-  '(--use-substitutes -s)'{--use-substitutes,-s}'[Download files from the binary cache if possible]'\
+  '(--from)--to[copy the closure to the remote machine (default)]'\
+  '(--to)--from[copy the closure from the remote machine]'\
+  '--sign[cryptographically sign to allow sharing between untrusted users on trusted machines]'\
+  '--gzip[enable compression of the SSH connection]'\
+  '--include-outputs[also copy outputs of store derivations included in the closure]'\
+  '(--use-substitutes -s)'{--use-substitutes,-s}'[download files from the binary cache if possible]'\
   '1:user@machine:_user_at_host'\
   '2:paths:_files'

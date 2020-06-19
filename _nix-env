@@ -11,31 +11,31 @@ _nix-common-options
 
 local -a _1st_arguments
 _1st_arguments=(
-    {--install,-i}"[Install package]"
-    {--upgrade,-u}"[Upgrade package]"
-    {--uninstall,-e}"[Uninstall package]"
-    --set-flag'[Modify meta attribute of installed package]:Name:->flag_name:Value:->flag_value:*:Packages: _nix_installed_packages'
-    {--query,-q}"[List information about derivations]"
-    {--switch-profile,-S}"[Set the current profile path]"
-    "--list-generations[Print a list of all generations in the active profile]"
-    "--delete-generations[Delete specified generations]"
-    {--switch-generation,-G}"[Activate specified generation]"
-    "--rollback[Switch to the previous generation of active profile]"
+    {--install,-i}"[install package]"
+    {--upgrade,-u}"[upgrade package]"
+    {--uninstall,-e}"[uninstall package]"
+    --set-flag'[modify meta attribute of installed package]:Name:->flag_name:Value:->flag_value:*:Packages: _nix_installed_packages'
+    {--query,-q}"[list information about derivations]"
+    {--switch-profile,-S}"[set the current profile path]"
+    "--list-generations[print a list of all generations in the active profile]"
+    "--delete-generations[delete specified generations]"
+    {--switch-generation,-G}"[activate specified generation]"
+    "--rollback[switch to the previous generation of active profile]"
 )
 
 local -a _nix_env_common_opts=(
   $__nix_common_opts
-  '(--profile -p)'{--profile,-p}'[Specify the profile to use]:Path:_nix_profiles'
+  '(--profile -p)'{--profile,-p}'[specify the profile to use]:Path:_nix_profiles'
   $__nix_dry_run
-  '--system-filter[Only show derivations matching the specified platform]:system:_nix_systems'
+  '--system-filter[only show derivations matching the specified platform]:system:_nix_systems'
 )
 
 local -a _nix_env_b=(
-    '(--prebuilt-only -b)'{--prebuilt-only,-b}'[Fail if there is no pre-built binary available]'
+    '(--prebuilt-only -b)'{--prebuilt-only,-b}'[fail if there is no pre-built binary available]'
 )
 
 local _nix_env_from_profile
-_nix_env_from_profile='--from-profile[Fetch store paths from another profile]:Profile:_nix_profiles'
+_nix_env_from_profile='--from-profile[fetch store paths from another profile]:Profile:_nix_profiles'
 
 # Workaround:
 # opt_args doesn't record plain options, so we can't use that
@@ -56,11 +56,11 @@ case "$opt" in
     --install|-[^-]#i[^-]#)
         command_options=(
             $_nix_env_common_opts
-            '(--attr -A)'{--attr,-A}'[Specify packages by attribute path instead of name]'
+            '(--attr -A)'{--attr,-A}'[specify packages by attribute path instead of name]'
             $_nix_env_b
             $_nix_env_from_profile
-            '(--preserve-installed -P)'{--preserve-installed,-P}'[Do not remove derivations with the same name]'
-            '(--remove-all -r)'{--remove-all,-r}'[Remove all previously installed packages prior to installing]'
+            '(--preserve-installed -P)'{--preserve-installed,-P}'[do not remove derivations with the same name]'
+            '(--remove-all -r)'{--remove-all,-r}'[remove all previously installed packages prior to installing]'
             '*:Package:{if $expect_attr_paths; then
                            _nix_complete_attr_paths;
                         else
@@ -73,10 +73,10 @@ case "$opt" in
             $_nix_env_common_opts
             $_nix_env_b
             $_nix_env_from_profile
-            '(-lt -leq -eq --always)--lt[Upgrade derivations with newer versions (default)]'
-            '(-lt -leq -eq --always)--leq[Upgrade derivations with the same or newer version]'
-            '(-lt -leq -eq --always)--eq[Upgrade derivations with equivalent versions]'
-            '(-lt -leq -eq --always)--always[Upgrade even if version number decreases]'
+            '(-lt -leq -eq --always)--lt[upgrade derivations with newer versions (default)]'
+            '(-lt -leq -eq --always)--leq[upgrade derivations with the same or newer version]'
+            '(-lt -leq -eq --always)--eq[upgrade derivations with equivalent versions]'
+            '(-lt -leq -eq --always)--always[upgrade even if version number decreases]'
             '*:Packages: _nix_installed_packages')
         break
         ;;
@@ -104,7 +104,7 @@ case "$opt" in
             '--description[print description]'
             '--xml[print output as xml]'
             '--json[print output as json]'
-            '--meta[Print all meta attributes: only available with --xml]')
+            '--meta[print all meta attributes: only available with --xml]')
         break
         ;;
     --switch-profile|-[^-]#S[^-]#)
@@ -133,7 +133,7 @@ done
 # Let _arguments handle the rest, with _1st_arguments being mutually exclusive
 # under the main_options group
 _arguments -s $command_options \
-           '*'{--file,-f}'[Specify Nix expression used to obtain derivations]:Path to file:_nix_path'\
+           '*'{--file,-f}'[specify Nix expression used to obtain derivations]:Path to file:_nix_path'\
            '-f.[evaluate ./default.nix rather than the default]' \
            $__nix_boilerplate_opts \
            - '(main_options)' \

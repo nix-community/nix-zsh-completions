@@ -4,12 +4,12 @@
 _nix-common-options
 
 _arguments \
-  '--dest[Set the destination directory]:Destination directory:_path_files -/'\
-  '(--none)--bzip2[Compress NARs using bzip2 instead of xz -9]'\
-  '(--bzip2)--none[Do not compress NARs]'\
-  '--force[Overwrite .narinfo files if they already exist]'\
-  '--link[Hard link files into the destination directory rather than copying]'\
-  '(--manifest-path)--manifest[Force the generation of a manifest suitable for use by nix-pull]'\
-  '(--manifest)--manifest-path[Like --manifest, but specify the manifest filename]:Manifest filename:_files'\
-  '--url-prefix[Specify the prefix URL used in the Manifest]:Prefix URL:_urls'\
+  '--dest[set the destination directory]:Destination directory:_path_files -/'\
+  '(--none)--bzip2[compress NARs using bzip2 instead of xz -9]'\
+  '(--bzip2)--none[do not compress NARs]'\
+  '--force[overwrite .narinfo files if they already exist]'\
+  '--link[hard link files into the destination directory rather than copying]'\
+  '(--manifest-path)--manifest[force the generation of a manifest suitable for use by nix-pull]'\
+  '(--manifest)--manifest-path[like --manifest, but specify the manifest filename]:Manifest filename:_files'\
+  '--url-prefix[specify the prefix URL used in the Manifest]:Prefix URL:_urls'\
   '*:Derivation Paths:_files'

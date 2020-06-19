@@ -12,12 +12,12 @@ _arguments \
   $__nix_common_store_opts \
   $__nix_expr_opts \
   '*'{--attr,-A}'[build a .drv from file (default: ./default.nix)]:package:_nix_complete_attr_paths' \
-  '--xml[Print output from --eval as XML]'\
-  '--json[Print output from --eval as JSON]'\
-  '--parse[Just parse the input files and print their abstract syntax trees]'\
-  '--eval[Just parse and evaluate the input files, and print the resulting values]'\
-  '--strict[Cause --eval to recursively evaluate list elements and attributes]'\
-  '--read-write-mode[Perform evaluation in read/write mode]'\
+  '--xml[print output from --eval as XML]'\
+  '--json[print output from --eval as JSON]'\
+  '--parse[just parse the input files and print their abstract syntax trees]'\
+  '--eval[just parse and evaluate the input files, and print the resulting values]'\
+  '--strict[cause --eval to recursively evaluate list elements and attributes]'\
+  '--read-write-mode[perform evaluation in read/write mode]'\
   '*:File to instantiate (default\: ./default.nix):_nix_path' \
   - find-file \
-  "--find-file[Look up the given files on Nix's search path]:*:Lookup file using <...> logic:"\
+  "--find-file[look up the given files on Nix's search path]:*:Lookup file using <...> logic:"\

@@ -58,7 +58,7 @@ for option_description in $common_options_descriptions; do
 done
 
 # The --store option is undocumented for some reason
-common_options+=("--store[Select a nix store]:Store:->STORE-URI")
+common_options+=("--store[select a nix store]:Store:->STORE-URI")
 
 local -a main_commands
 # Extract the commands with descriptions

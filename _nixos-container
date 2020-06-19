@@ -25,7 +25,7 @@ _1st_arguments=(
   )
 
 _arguments \
-  '(- 1 *)--help[Display help]'\
+  '(- 1 *)--help[display help]'\
   '*:: :->subcmds' && return 0
 
 if (( CURRENT==1 )); then
@@ -34,8 +34,8 @@ if (( CURRENT==1 )); then
 fi
 
 local _container_name='1:Container Name:_containers';
-local _container_config='--config[Config]:Config:( )';
-local _container_file='--config-file[Path to the container config file]:Path:_files';
+local _container_config='--config[config]:Config:( )';
+local _container_file='--config-file[path to the container config file]:Path:_files';
 
 case "$words[1]" in
   create)
@@ -43,14 +43,14 @@ case "$words[1]" in
       $_container_name\
       $_container_config\
       $_container_file\
-      '--system-path[System path]:Path:_files'\
-      '--ensure-unique-name[Avoid name conflicts with other containers]'\
-      '--auto-start[Start the container immediately]'\
-      '--nixos-path[Path to <nixpkgs/nixos>]:Path:_files'\
-      '--host-address[Host IP of the veth interface]:host address:'\
+      '--system-path[system path]:Path:_files'\
+      '--ensure-unique-name[avoid name conflicts with other containers]'\
+      '--auto-start[start the container immediately]'\
+      '--nixos-path[path to <nixpkgs/nixos>]:Path:_files'\
+      '--host-address[host IP of the veth interface]:host address:'\
       '--local-address[IPv4 address assined to the interface in the container]:local address:'\
-      '--bridge[Put the host-side of the veth-pair into the named bridge]:Bridge interface'\
-      '--port[Port forwarding]:port forwarding'
+      '--bridge[put the host-side of the veth-pair into the named bridge]:Bridge interface'\
+      '--port[port forwarding]:port forwarding'
     ;;
   run)
     # TODO: There are a few more arguments in this case

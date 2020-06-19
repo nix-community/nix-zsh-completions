@@ -5,7 +5,7 @@ _nix-common-options
 
 _arguments \
   $__nix_common_nixos_build_vms \
-  '--show-trace[Show a trace of the output]'\
-  "--no-out-link[Do not create a 'result' symlink]"\
-  "--help[Show help]"\
+  '--show-trace[show a trace of the output]'\
+  "--no-out-link[do not create a 'result' symlink]"\
+  "--help[show help]"\
   '1:Network Nix Expression:_nix_complete_dotnix_files'

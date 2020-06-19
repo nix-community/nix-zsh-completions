@@ -4,10 +4,10 @@
 _nix-common-options
 
 local -a _nix_shell_opts=(
-  '--command[Run a command instead of starting an interactive shell]:Command:_command_names'
-  '--exclude[Do not build any dependencies which match this regex]:Regex:( )'
-  '--pure[Clear the environment before starting the interactive shell]'
-  '--run[Run a command in a non-interactive shell instead of starting an interactive shell]:Command:_command_names'
+  '--command[run a command instead of starting an interactive shell]:Command:_command_names'
+  '--exclude[do not build any dependencies which match this regex]:Regex:( )'
+  '--pure[clear the environment before starting the interactive shell]'
+  '--run[run a command in a non-interactive shell instead of starting an interactive shell]:Command:_command_names'
   '*'{--attr,-A}"[setup a build shell for package]:package:_nix_complete_attr_paths"
 )
 

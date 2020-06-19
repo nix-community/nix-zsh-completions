@@ -19,5 +19,5 @@ _nixos-option-opts() {
 
 _arguments \
     $__nix_search_path_args \
-    '--all[Print the values of all options.]' \
+    '--all[print the values of all options.]' \
     ':NixOS module options:_nixos-option-opts'

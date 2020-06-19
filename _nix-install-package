@@ -4,8 +4,8 @@
 _nix-common-options
 
 _arguments \
-  '--non-interactive[Do not open a terminal window and do not ask for confirmation]' \
-  '(--profile -p)'{--profile,-p}'[Profile to install the package into]:Profile:_nix_profiles' \
-  '--set[Install the package as the profile so that the profile contains nothing else]' \
+  '--non-interactive[do not open a terminal window and do not ask for confirmation]' \
+  '(--profile -p)'{--profile,-p}'[profile to install the package into]:Profile:_nix_profiles' \
+  '--set[install the package as the profile so that the profile contains nothing else]' \
   '(1)--url[URL to download the package file from]:URL:_urls' \
   '(--url)1:Package File:_files -g \*.nixpkg'

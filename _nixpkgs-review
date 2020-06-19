@@ -8,9 +8,9 @@ _nix-common-options
 
 local -a common_args=(
     '--build-args=[arguments passed to nix when building]:build args:'
-    '--no-shell[Only evaluate and build without executing nix-shell]'
+    '--no-shell[only evaluate and build without executing nix-shell]'
     '(-h --help)'{--help,-h}'[show help]'
-    '--token[github token]:github token:'
+    '--token[GitHub token]:GitHub token:'
 )
 
 local -a common_cmd_args=(
@@ -22,13 +22,13 @@ local -a pr_args=(
     ':pr number to review:'
     '(-c --checkout)'{-c,--checkout}'[merge before building or use exact commit]:merge or commit:(merge commit)'
     "--eval[use ofborg's eval result]::(ofborg local)"
-    "--post-result[Post the nixpkgs-review results as a PR comment]"
+    "--post-result[post the nixpkgs-review results as a PR comment]"
 )
 
 local -a wip_args=(
-    '(-b --branch)'{-b,--branch}'[Branch to compare against with]:branch:__git_ref_specs'
-    '(-s --staged)'{-s,--staged}'[Whether to build staged changes]'
-    '(-r --remote)'{-r,--remote}'[Name of the nixpkgs repo to review]:remote:'
+    '(-b --branch)'{-b,--branch}'[branch to compare against with]:branch:__git_ref_specs'
+    '(-s --staged)'{-s,--staged}'[whether to build staged changes]'
+    '(-r --remote)'{-r,--remote}'[name of the nixpkgs repo to review]:remote:'
 )
 
 if ! which __git_ref_specs > /dev/null; then

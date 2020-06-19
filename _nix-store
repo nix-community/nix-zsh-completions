@@ -11,26 +11,26 @@ _nix-common-options
 
 local -a cmd_arguments=(
   $__nix_boilerplate_opts
-  {--realise,-r}'[Build the specified store paths]'
+  {--realise,-r}'[build the specified store paths]'
   '--serve[provide access to the nix store over stdin/stdout]'
-  '--gc[Perform garbage collection on the Nix store]'
-  '--delete[Delete store paths from the Nix store if it is safe to do so]'
-  {--query,-q}'[Display information about store paths]'
-  '--add[Add paths to the Nix store]'
-  '--verify[Verify the consistency of the Nix database and store]'
-  '--verify-path[Compare the contents of each store path to the hashes stored in the database]'
-  '--repair-path[Attempt to repair the specified paths by redownloading them]'
-  '--dump[Produce a NAR file containing the contents of the given path]'
-  '--restore[Unpack a NAR archive, read from stdin, to the given path]'
-  '--export[Serialize the specified store paths to stdout in a format which can be imported]'
-  '--import[Read searialized store paths from stdin and add them to the Nix store]'
-  '--optimise[Find identical files in the Nix store and hardlink them together to reduce disk usage]'
-  {--read-log,-l}'[Print the build log of the specified store paths]'
-  '--dump-db[Dump Nix database to stdout]'
-  '--load-db[Read a dump of the Nix database]'
-  '--print-env[Print the environment of a derivation as shell code]'
-  '--query-failed-paths[Print out store paths which failed to build]'
-  '--clear-failed-paths[Clear the "failed" state of the given store path]'
+  '--gc[perform garbage collection on the Nix store]'
+  '--delete[delete store paths from the Nix store if it is safe to do so]'
+  {--query,-q}'[display information about store paths]'
+  '--add[add paths to the Nix store]'
+  '--verify[verify the consistency of the Nix database and store]'
+  '--verify-path[compare the contents of each store path to the hashes stored in the database]'
+  '--repair-path[attempt to repair the specified paths by redownloading them]'
+  '--dump[produce a NAR file containing the contents of the given path]'
+  '--restore[unpack a NAR archive, read from stdin, to the given path]'
+  '--export[serialize the specified store paths to stdout in a format which can be imported]'
+  '--import[read searialized store paths from stdin and add them to the Nix store]'
+  '--optimise[find identical files in the Nix store and hardlink them together to reduce disk usage]'
+  {--read-log,-l}'[print the build log of the specified store paths]'
+  '--dump-db[dump Nix database to stdout]'
+  '--load-db[read a dump of the Nix database]'
+  '--print-env[print the environment of a derivation as shell code]'
+  '--query-failed-paths[print out store paths which failed to build]'
+  '--clear-failed-paths[clear the "failed" state of the given store path]'
   '--generate-binary-cache-key[generate an Ed25519 key pair to sign build outputs]:key-name::secret-key-file:_files:public-key-file:_files'
 )
 
@@ -72,14 +72,14 @@ case "$opt" in
     --delete)
         command_options=(
             $common_opts
-            '--ignore-liveness[Ignore reachability from roots]'
+            '--ignore-liveness[ignore reachability from roots]'
         )
         break
         ;;
     --query|-[^-]#q[^-]#)
         command_options+=(
-            '(--use-output -u)'{--use-output,-u}'[Apply the query to the output path of any store derivations]'
-            '(--force-realise -f)'{--force-realise,-f}'[Realise each argument to the query first]'
+            '(--use-output -u)'{--use-output,-u}'[apply the query to the output path of any store derivations]'
+            '(--force-realise -f)'{--force-realise,-f}'[realise each argument to the query first]'
         )
 
         local subopt
@@ -88,7 +88,7 @@ case "$opt" in
                 --requisites|-R)
                     command_options+=(
                         $common_opts
-                        '--include-outputs[Also include the output paths of store derivations]'
+                        '--include-outputs[also include the output paths of store derivations]'
                     )
                     break
                    ;;
@@ -101,25 +101,25 @@ case "$opt" in
 
         command_options+=(
             + '(query_subcmds)'
-            '--outputs[Print the output paths of the given store derivations]'
-            {--requisites,-R}'[Print the closure of the given store paths]'
-            '--references[Print immediate dependencies of the given store paths]'
-            '--referrers[Print store paths which refer to these paths]'
-            '--referrers-closure[Print the closure under the referrers relation]'
-            '--deriver[Print the deriver of the store paths]'
-            '--graph[Print the references graph of the store paths in Graphviz format]'
-            '--tree[Print the references graph of the store paths as an ASCII tree]'
-            {--binding,-b}'[Print the value of an attribute of the store derivations]:name:'
-            '--hash[Print the SHA-256 hash of the contents of the store paths]'
-            '--size[Print the size in bytes of the contents of the store paths]'
-            '--roots[Print the garbage collector roots that point to the store paths]'
+            '--outputs[print the output paths of the given store derivations]'
+            {--requisites,-R}'[print the closure of the given store paths]'
+            '--references[print immediate dependencies of the given store paths]'
+            '--referrers[print store paths which refer to these paths]'
+            '--referrers-closure[print the closure under the referrers relation]'
+            '--deriver[print the deriver of the store paths]'
+            '--graph[print the references graph of the store paths in Graphviz format]'
+            '--tree[print the references graph of the store paths as an ASCII tree]'
+            {--binding,-b}'[print the value of an attribute of the store derivations]:name:'
+            '--hash[print the SHA-256 hash of the contents of the store paths]'
+            '--size[print the size in bytes of the contents of the store paths]'
+            '--roots[print the garbage collector roots that point to the store paths]'
         )
         break
         ;;
     --verify)
         command_options=(
             $common_opts
-            '--check-contents[Compute and validate the SHA-256 hash of each store item]'
+            '--check-contents[compute and validate the SHA-256 hash of each store item]'
         )
         break
         ;;

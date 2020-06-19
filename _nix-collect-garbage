@@ -4,6 +4,6 @@
 _nix-common-options
 
 _arguments \
-  '(--delete-old -d)'{--delete-old,-d}'[Delete all old generations of all profiles]'\
-  '--delete-older-than[Delete generations older than the given time]:Time such as 30d:( )'\
+  '(--delete-old -d)'{--delete-old,-d}'[delete all old generations of all profiles]'\
+  '--delete-older-than[delete generations older than the given time]:Time such as 30d:( )'\
   $__nix_dry_run \

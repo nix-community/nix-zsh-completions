@@ -17,12 +17,12 @@ _1st_arguments=(
 
 _arguments \
   $__nix_common_nixos_rebuild \
-  '--upgrade[Fetch the latest version of NixOS from the NixOS channel]'\
+  '--upgrade[fetch the latest version of NixOS from the NixOS channel]'\
   '--install-bootloader[(Re)install bootloader on the configured device]'\
-  "--no-build-nix[Don't build Nix package manager]"\
-  '--fast[Equivalent to --no-build-nix --show-trace]'\
-  '--rollback[Roll back to the previous configuration]'\
-  '(--profile-name -p)'{--profile-name,-p}'[Profile to use to track current and previous system configurations]:Profile:_nix_profiles'\
+  "--no-build-nix[don't build Nix package manager]"\
+  '--fast[equivalent to --no-build-nix --show-trace]'\
+  '--rollback[roll back to the previous configuration]'\
+  '(--profile-name -p)'{--profile-name,-p}'[profile to use to track current and previous system configurations]:Profile:_nix_profiles'\
   '1:: :->subcmds' && return 0
 
 case $state in

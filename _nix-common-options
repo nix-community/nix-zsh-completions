@@ -528,19 +528,19 @@ _nix_run_command_names () {
 
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell, nixops
 __nix_boilerplate_opts=(
-    '(- *)--help[Print help message and exit]'
-    '(- *)--version[Print version number and exit]'
+    '(- *)--help[print help message and exit]'
+    '(- *)--version[print version number and exit]'
 )
 
 # Used in: nix-collect-garbage, nix-env, nix-store, nixops
-__nix_dry_run='--dry-run[Show what would be done without doing it]'
+__nix_dry_run='--dry-run[show what would be done without doing it]'
 
 # Used in: nix-collect-garbage, nix-store
 __nix_gc_common=(
-    '(- --print* --delete)--print-roots[Print roots used by garbage collector]'
-    '(- --print* --delete)--print-live[Print store paths reachable from roots]'
-    '(- --print* --delete)--print-dead[Print store paths not reachable from roots]'
-    '(- --print* --delete)--delete[Garbage collect all dead paths from the store]'
+    '(- --print* --delete)--print-roots[print roots used by garbage collector]'
+    '(- --print* --delete)--print-live[print store paths reachable from roots]'
+    '(- --print* --delete)--print-dead[print store paths not reachable from roots]'
+    '(- --print* --delete)--delete[garbage collect all dead paths from the store]'
 )
 
 # Used in: nixos-install, nix_common_opts
@@ -548,7 +548,7 @@ __nix_search_path_args=(
     '*-I[add a path to the list of locations used to look up <...> file names]:include path:_nix_complete_includes'
 )
 
-__nix_repair='--repair[Fix corrupted or missing store paths by redownloading or rebuilding]';
+__nix_repair='--repair[fix corrupted or missing store paths by redownloading or rebuilding]';
 
 __nix_expr_opts=(
     '(--expr -E)'{--expr,-E}'[interpret command line args as Nix expressions]'
@@ -558,14 +558,14 @@ __nix_expr_opts=(
 __nix_common_nixos_rebuild=(
     $__nix_search_path_args
     $__nix_repair
-    '(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'
+    '(--verbose -v)*'{--verbose,-v}'[increase verbosity of diagnostic messages]'
     '(--no-build-output -Q)'{--no-build-output,-Q}'[silence output to stdout and stderr]'
     '(--max-jobs -j)'{--max-jobs,-j}'[max number of build jobs in parallel]:jobs:'
     '--cores[threads per job (e.g. -j argument to make)]:cores:'
     '(--keep-going -k)'{--keep-going,-k}"[keep going until all builds are finished]"
     '(--keep-failed -K)'{--keep-failed,-K}'[keep failed builds (usually in /tmp)]'
-    '--fallback[If binary download fails, fall back on building from source]'
-    '--show-trace[Print stack trace of evaluation errors]'
+    '--fallback[if binary download fails, fall back on building from source]'
+    '--show-trace[print stack trace of evaluation errors]'
     '*--option[set Nix configuration option]:options:_nix_options:value:_nix_options_value'
 )
 

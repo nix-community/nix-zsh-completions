@@ -4,8 +4,8 @@
 _nix-common-options
 
 _arguments \
-  '--force[Overwrite /etc/nixos/configuration.nix if it exists]:'\
-  '--root[Directory to treat as root of filesystem]:Root directory:_path_files -/'\
-  '--dir[Directory to write configuration files to (Default /etc/nixos)]:Output directory:_path_files -/'\
-  '--no-filesystems[Omit file system information from hardware configuration]'\
-  '--show-hardware-config[Print hardware configuration to stdout without writing anything to disk]'
+  '--force[overwrite /etc/nixos/configuration.nix if it exists]:'\
+  '--root[directory to treat as root of filesystem]:Root directory:_path_files -/'\
+  '--dir[directory to write configuration files to (Default /etc/nixos)]:Output directory:_path_files -/'\
+  '--no-filesystems[omit file system information from hardware configuration]'\
+  '--show-hardware-config[print hardware configuration to stdout without writing anything to disk]'

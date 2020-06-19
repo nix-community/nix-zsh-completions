@@ -44,21 +44,21 @@ _1st_arguments=(
 # Options valid for every command
 local -a _nixops_common_arguments
 _nixops_common_arguments=(
-  '(--state -s)'{--state,-s}'[Path to state file that contains the deployments]:Statefile:_files -g \*.nixops'\
+  '(--state -s)'{--state,-s}'[path to state file that contains the deployments]:Statefile:_files -g \*.nixops'\
   '(--deployment -d)'{--deployment,-d}'[UUID or symbolic name of deployment on which to operate]'\
-  '--confirm[Automatically confirm "dangerous" actions]'\
-  '--debug[Turn on debugging output]'\
+  '--confirm[automatically confirm "dangerous" actions]'\
+  '--debug[turn on debugging output]'\
 )
 
 local -a _nixops_include_exclude
 _nixops_include_exclude=(
-  '--include[Only operate on the specified machines]:Machine Names:_hosts' \
-  '--exclude[Do not operate on the specified machines]:Machine Names:_hosts' \
+  '--include[only operate on the specified machines]:Machine Names:_hosts' \
+  '--exclude[do not operate on the specified machines]:Machine Names:_hosts' \
 )
 
 local -a _nixops_search_path_args
 _nixops_search_path_args=(
-  '-I[Add path to the Nix expression search path for all future evaluations]:Path:_nix_complete_includes' \
+  '-I[add path to the Nix expression search path for all future evaluations]:Path:_nix_complete_includes' \
 )
 
 _arguments \
@@ -81,40 +81,40 @@ case "$words[1]" in
     _arguments \
       $_nixops_common_arguments\
       $_nixops_search_path_args \
-      '(--name -n)'{--name,-n}'[Change the symbolic name]:New Name:( )'\
+      '(--name -n)'{--name,-n}'[change the symbolic name]:New Name:( )'\
     ;;
   clone)
     _arguments \
       $_nixops_common_arguments\
-      '(--name -n)'{--name,-n}'[Symbolic name for the new deployment]'\
+      '(--name -n)'{--name,-n}'[symbolic name for the new deployment]'\
     ;;
   delete)
     _arguments \
       $_nixops_common_arguments\
-      '--all[Delete all deployments in the state file]'\
+      '--all[delete all deployments in the state file]'\
       '--force[]'
     ;;
   deploy)
     _arguments \
       $_nixops_common_arguments\
-      '(--kill-obsolete -k)'{--kill-obsolete,-k}'[Destroy machines no longer listed in the deployment specification]'\
+      '(--kill-obsolete -k)'{--kill-obsolete,-k}'[destroy machines no longer listed in the deployment specification]'\
       $__nix_dry_run \
 	  $__nix_repair \
-      '--create-only[Create missing machines only: build nothing and do not touch existing machines]'\
-      '--build-only[Build the configuration without creating or deploying machines]'\
-      '--copy-only[Do everything except activate the new configuration]'\
-      '--check[Check that deployed machines are correctly configured]'\
-      '--allow-reboot[Allow NixOps to reboot the instance if necessary]'\
-      '--force-reboot[Reboot the machine to activate the new configuration]'\
-      '--allow-recreate[Recreate resources that have disappeared]'\
+      '--create-only[create missing machines only: build nothing and do not touch existing machines]'\
+      '--build-only[build the configuration without creating or deploying machines]'\
+      '--copy-only[do everything except activate the new configuration]'\
+      '--check[check that deployed machines are correctly configured]'\
+      '--allow-reboot[allow NixOps to reboot the instance if necessary]'\
+      '--force-reboot[reboot the machine to activate the new configuration]'\
+      '--allow-recreate[recreate resources that have disappeared]'\
       $_nixops_include_exclude \
       $_nixops_search_path_args \
-      '--max-concurrent-copy[Set the maximum concurrent nix-copy-closure processes (Default 5)]:Number:( )'
+      '--max-concurrent-copy[set the maximum concurrent nix-copy-closure processes (Default 5)]:Number:( )'
     ;;
   destroy)
     _arguments \
       $_nixops_common_arguments\
-      '--all[Destroy all deployments]'\
+      '--all[destroy all deployments]'\
       $_nixops_include_exclude \
     ;;
   stop)
@@ -130,14 +130,14 @@ case "$words[1]" in
   info)
     _arguments \
       $_nixops_common_arguments\
-      '--all[Print information about all resources in all known deployments]'\
-      '--plain[Print in a more easily parsed format]'\
-      '--no-eval[Do not evaluate the deployment specification]'
+      '--all[print information about all resources in all known deployments]'\
+      '--plain[print in a more easily parsed format]'\
+      '--no-eval[do not evaluate the deployment specification]'
     ;;
   check)
     _arguments \
       $_nixops_common_arguments\
-      '--all[Check all machines in all known deployments]'
+      '--all[check all machines in all known deployments]'
     ;;
   ssh)
     _arguments \
@@ -147,14 +147,14 @@ case "$words[1]" in
   ssh-for-each)
     _arguments \
       $_nixops_common_arguments\
-      '(--parallel -p)'{--parallel,-p}'[Execute the command on each machine in parallel]'\
+      '(--parallel -p)'{--parallel,-p}'[execute the command on each machine in parallel]'\
       $_nixops_include_exclude \
     ;;
   reboot)
     _arguments \
       $_nixops_common_arguments\
       $_nixops_include_exclude \
-      '--no-wait[Do not wait until the machines have finished rebooting]'
+      '--no-wait[do not wait until the machines have finished rebooting]'
     ;;
   backup)
     _arguments \
@@ -165,22 +165,22 @@ case "$words[1]" in
     _arguments \
       $_nixops_common_arguments\
       $_nixops_include_exclude \
-      '--devices[Restore only the persistent disks which are mapped to the specified device names]:Device names:( )'\
-      '--backup-id[Restore the persistent disks of all machines to a given backup except the ones listed here.]:Backup ids:( )'
+      '--devices[restore only the persistent disks which are mapped to the specified device names]:Device names:( )'\
+      '--backup-id[restore the persistent disks of all machines to a given backup except the ones listed here.]:Backup ids:( )'
     ;;
   show-option)
     _arguments \
       $_nixops_common_arguments\
-      '--xml[Format output as XML]'\
+      '--xml[format output as XML]'\
       '1:machine:_hosts'\
       '2:option:( )'
     ;;
   set-args)
     _arguments \
       $_nixops_common_arguments\
-      '--arg[Set the function argument]:Name:( ):Value:( )'\
-      '--argstr[Like --arg but the value is a string]:Name:( ):Value:( )'\
-      '--unset[Remove a previously set function argument]:Name:( )'
+      '--arg[set the function argument]:Name:( ):Value:( )'\
+      '--argstr[like --arg but the value is a string]:Name:( ):Value:( )'\
+      '--unset[remove a previously set function argument]:Name:( )'
     ;;
   show-console-output)
     _arguments \
@@ -190,7 +190,7 @@ case "$words[1]" in
   export)
     _arguments \
       $_nixops_common_arguments\
-      '--all[Apply to all deployments]'
+      '--all[apply to all deployments]'
     ;;
   import)
     _arguments \

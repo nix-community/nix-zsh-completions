@@ -7,11 +7,11 @@ typeset -A opt_args
 _nix-common-options
 
 _arguments \
-  '(- *)--add[Subscribe to a channel]:Channel URL:_urls::Channel Name:( )'\
-  '(- *)--remove[Unsubscribe from a channel]:Channel Name:->nix_channels'\
-  '(- *)--list[List subscribed channels]'\
-  '(- *)--update[Update and activate channels]:Channel Name:->nix_channels'\
-  '(- *)--rollback[Revert the previous nix-channel --update]'
+  '(- *)--add[subscribe to a channel]:Channel URL:_urls::Channel Name:( )'\
+  '(- *)--remove[unsubscribe from a channel]:Channel Name:->nix_channels'\
+  '(- *)--list[list subscribed channels]'\
+  '(- *)--update[update and activate channels]:Channel Name:->nix_channels'\
+  '(- *)--rollback[revert the previous nix-channel --update]'
 
 case $state in
     nix-channels)

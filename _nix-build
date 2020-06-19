@@ -7,11 +7,11 @@ local -a _nix_build_opts=(
     $__nix_expr_opts
     $__nix_common_store_opts
     '*'{--attr,-A}'[build a package from file (default: ./default.nix)]:package:_nix_complete_attr_paths'
-    --check'[Rebuild derivation]'
-    '--drv-link[Add a symlink to the store derivation]:Symlink Name:( )'
-    '--add-drv-link[Shorthand for --drv-link ./derivation]'
-    '--no-out-link[Do not create a symlink to the output path]'
-    {--out-link,-o}'[Name of the output symlink]:Output Symlink Name:( )'
+    --check'[rebuild derivation]'
+    '--drv-link[add a symlink to the store derivation]:Symlink Name:( )'
+    '--add-drv-link[shorthand for --drv-link ./derivation]'
+    '--no-out-link[do not create a symlink to the output path]'
+    {--out-link,-o}'[name of the output symlink]:Output Symlink Name:( )'
 )
 
 # TODO: Undocumented args to possibly add
