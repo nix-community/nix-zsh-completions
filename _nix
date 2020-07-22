@@ -37,8 +37,8 @@ local option_description= option=
 for option_description in $common_options_descriptions; do
     local description=${option_description/(*  )/}
     local option_spec=${option_description%$description}
-    local -a option_group=(${=option_spec//(<*|,)/})
-    local -a option_args=(${=option_spec//(*$option_group[${#option_group}]|<|>)/})
+    local -a option_group=(${=option_spec//($'\e\[3m'*|,)/})
+    local -a option_args=(${=option_spec//(*$option_group[${#option_group}]|$'\e\[3m'|$'\e\[0m')/})
 
     local ACTIONS=""
     for arg in $option_args; do
@@ -92,7 +92,7 @@ if [[ $command_lookup[$cmd] == 1 ]]; then
     local -a help=(${(f)"$(nix $cmd --help)"})
     # Extract an array describing the possible arguments to the command eg.
     # (NAR PATH) for cat-nar or (INSTALLABLES) for run
-    local -a args=(${=help[1]//(*<FLAGS>|.|<|>)/})
+    local -a args=(${=${help[1]//$'\e\[1m'Usage:$'\e\[0m'}//(*FLAGS|.|$'\e\[3m'|$'\e\[0m')/})
     # And add the appropriate _argument spec
     local arg
     for arg in $args; do
@@ -115,9 +115,9 @@ if [[ $command_lookup[$cmd] == 1 ]]; then
         local option_spec=${option_description%$description}
 
         # Extract the options by stripping everything starting at '<' (and ',')
-        local -a option_group=(${=option_spec//(<*|,)/})
+        local -a option_group=(${=option_spec//($'\e\[3m'*|,)/})
         # Extract any arguments, by stripping the options (and <|>)
-        local -a option_args=(${=option_spec//(*$option_group[${#option_group}]|<|>)/})
+        local -a option_args=(${=option_spec//(*$option_group[${#option_group}]|$'\e\[3m'|$'\e\[0m')/})
 
         local ACTIONS=""
         for arg in $option_args; do
