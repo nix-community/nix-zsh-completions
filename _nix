@@ -28,7 +28,7 @@ typeset -A opt_args
 
 type nix &> /dev/null || return
 
-local -a top_help=(${(f)"$(nix --help)"})
+local -a top_help=(${(f)"$(nix --help 2>/dev/null)"})
 
 local -a common_options
 # See per command flag handling for comments
@@ -89,7 +89,7 @@ local cmd=${line[1]}
 
 # Check if we're in a valid command
 if [[ $command_lookup[$cmd] == 1 ]]; then
-    local -a help=(${(f)"$(nix $cmd --help)"})
+    local -a help=(${(f)"$(nix $cmd --help 2>/dev/null)"})
     # Extract an array describing the possible arguments to the command eg.
     # (NAR PATH) for cat-nar or (INSTALLABLES) for run
     local -a args=(${=${help[1]//$'\e\[1m'Usage:$'\e\[0m'}//(*FLAGS|.|$'\e\[3m'|$'\e\[0m')/})

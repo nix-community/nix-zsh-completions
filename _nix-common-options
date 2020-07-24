@@ -298,7 +298,7 @@ _nix_complete_attr_paths () {
         elif [[ $service == nix ]]; then
             sep="#"
             # Add the names in an associative array to avoid duplicates
-            local -a channels=(${(f)"$(nix registry list)"})
+            local -a channels=(${(f)"$(nix registry list 2>/dev/null)"})
             local -A names
             local channel name
             for channel in $channels; do
@@ -411,7 +411,7 @@ function _nix_complete_function_arg () {
         return
     fi
     local -a names
-    names=($(_nix_eval_stdin 2>&1 <<NIX_FILE
+    names=($(_nix_eval_stdin 2>/dev/null <<NIX_FILE
              if builtins.typeOf ($func) == "lambda" then
                 builtins.attrNames (builtins.functionArgs ($func))
              else
@@ -447,7 +447,7 @@ _nix_options () {
     local -a nix_options
     # Strip the header line, remove leading spaces and replace separating
     # whitespace with ':'
-    nix_options=(${${${${(f)"$(nix --help-config)"}:1:-1}/#  /}/  ##/:})
+    nix_options=(${${${${(f)"$(nix --help-config 2>/dev/null)"}:1:-1}/#  /}/  ##/:})
                    _describe -t nix_options "Option" nix_options
 }
 
@@ -456,7 +456,7 @@ _nix_options_value () {
     local OPTION=$words[$(($CURRENT - 1))]
     # Remove lines not starting with " $OPTION " and strip eveything up to the
     # last two consecutive spaces
-    local description=${${${(f)"$(nix --help-config)"}:#^(  $OPTION *)}/*  /}
+    local description=${${${(f)"$(nix --help-config 2>/dev/null)"}:#^(  $OPTION *)}/*  /}
     local -a values=()
     case "$description" in
         Whether*)
