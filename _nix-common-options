@@ -156,9 +156,10 @@ _nix_attr_paths () {
     fi
 
     local defexpr=$1
+    local sep=${2:-.}
     local attr_path=""
-    if [[ $cur == *.* ]]; then
-        attr_path=${cur%.*}
+    if [[ $cur == *${sep}* ]] || [[ $cur == *.* ]]; then
+        attr_path=${${cur//\\\#/.}%.*}
     fi
 
     # attr1.attr3 -> ("attr1" "attr2")
@@ -202,13 +203,14 @@ $result"
     local -a prefix=()
     if [[ -n $attr_path ]]; then
         for i in ${=attr_path//./ }; do
-            prefix+=("($i)" .)
+            prefix+=("($i)" $sep)
+            sep="."
         done
     fi
 
     local package=""
     _wanted package package "Attribute path" \
-            _sep_parts $prefix result \.
+            _sep_parts $prefix result ${sep//\./\.}
     return $?
 }
 
@@ -257,6 +259,7 @@ _nix_complete_attr_paths () {
 
     local defexpr=""
     local file=$(_nix_get_file_arg)
+    local sep="."
     if [[ "$file" ]]; then
         # Extract --arg and --argstr into $args
         local i=1 args="" name="" value=""
@@ -293,36 +296,28 @@ _nix_complete_attr_paths () {
             defexpr=$(_nix_gen_defexpr ~/.nix-defexpr)
 
         elif [[ $service == nix ]]; then
-            # Extract the channels from NIX_PATH and -I/--include
-            local -a channels=(${(s.:.)NIX_PATH})
-            # Add -I/--include afterwards, so they will shadow the NIX_PATH
-            channels+=(${(s.:.)opt_args[-I]})
-            channels+=(${(s.:.)opt_args[--include]})
-
+            sep="#"
             # Add the names in an associative array to avoid duplicates
+            local -a channels=(${(f)"$(nix registry list)"})
             local -A names
             local channel name
             for channel in $channels; do
-                name=${channel%%=*}
-                nix_path=${channel#*=}
-                if [[ $name != $channel ]]; then
-                    # Only add paths with a name, not sure how they work
-                    names[$name]=1
-                fi
+                name=${${channel#*flake:}// */}
+                names[$name]=1
             done
 
             defexpr=$'{ '
             for name in ${(@k)names}; do
                 # nixos-config isn't useful or possible to complete
                 [[ $name == nixos-config ]] && continue
-                defexpr+="$name = import <${name}>; "
+                defexpr+="\"$name\" = builtins.getFlake \"${name}\"; "
             done
             defexpr+=' }'
         fi
     fi
 
     if [[ $defexpr ]]; then
-        _nix_attr_paths $defexpr
+        _nix_attr_paths $defexpr $sep
     fi
 }
 
