@@ -18,6 +18,15 @@ _nix_systems () {
         i686-cygwin x86_64-cygwin
 }
 
+_nix_log_formats() {
+  _values 'Formats' \
+    raw internal-json bar bar-with-logs
+}
+_nix_exp_feat() {
+  _values -s ' ' 'Formats' \
+    flakes nix-command recursive-nix ca-derivations ca-references
+}
+
 # Completion function to select an angle-bracket expression from the nix path
 # Assumptions: No '=' in the actual path components in NIX_PATH
 # TODO: Complete files in /some/path for expressions like <nixpkgs/pkgs/...>
@@ -589,6 +598,8 @@ __nix_common_opts=(
     '*--include[add a path to the list of locations used to look up <...> file names]:include path:_nix_complete_includes'
     '*--arg[argument to pass to the Nix function]:Name:_nix_complete_function_arg:Value: '
     '*--argstr[pass a string]:Name:_nix_complete_function_arg:String: '
+    '--log-format[Format of log output]:format:_nix_log_formats'
+    '--experimental-features[Which Features to enable]:features:_nix_exp_feat'
 )
 
 # Options for nix-store --realise, used by nix-build

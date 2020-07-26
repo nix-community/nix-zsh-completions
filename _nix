@@ -50,6 +50,8 @@ for option_description in $common_options_descriptions; do
     for option in $option_group; do
         if [[ "$option" == "--option" ]]; then
             common_options+=("*${option}[$description]:option:->nixoption:value:->nixoptionvalue")
+        elif  [[ "$option" == "--log-format" ]]; then
+            common_options+=('--log-format[format of log output]:format:_nix_log_formats')
         else
             # Default to mutually exclusive non-repeatable options
             common_options+=("($option_group)"$option"[$description]"$ACTIONS)
@@ -59,6 +61,7 @@ done
 
 # The --store option is undocumented for some reason
 common_options+=("--store[Select a nix store]:Store:->STORE-URI")
+common_options+=('--experimental-features[Which Features to enable]:features:_nix_exp_feat')
 
 local -a main_commands
 # Extract the commands with descriptions
