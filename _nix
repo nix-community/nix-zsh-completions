@@ -96,9 +96,10 @@ if [[ $command_lookup[$cmd] == 1 ]]; then
     # And add the appropriate _argument spec
     local arg
     for arg in $args; do
+        local _arg=${arg%?}
         # Prefix * if $arg ends in 'S', ie. is plural
-        local plural="${${(M)arg:#*S}:+*}"
-        command_arguments+=("$plural:$arg:->$arg")
+        local plural="${${(M)_arg:#*S}:+*}"
+        command_arguments+=("$plural:$_arg:->$_arg")
     done
 
     # Extract the lines containing the option descriptions
