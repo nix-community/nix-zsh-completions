@@ -315,11 +315,19 @@ _nix_complete_attr_paths () {
                 names[$name]=1
             done
 
+            cmd_name=$words[$CURRENT-1]
+            attr_derefs=''
+            tpl='((n.@attr@ or {}).${builtins.currentSystem} or {})'
+            if [ "$cmd_name" = "run" ]; then
+              attr_derefs="${tpl/@attr@/apps}"
+            elif [[ "$cmd_name" =~ (build|shell|edit|log|verify|why-depends) ]]; then
+              attr_derefs="${tpl/@attr@/packages} // ${tpl/@attr@/legacyPackages}"
+            fi
             defexpr=$'{ '
             for name in ${(@k)names}; do
                 # nixos-config isn't useful or possible to complete
                 [[ $name == nixos-config ]] && continue
-                defexpr+="\"$name\" = builtins.getFlake \"${name}\"; "
+                defexpr+="\"$name\" = let n = builtins.getFlake \"${name}\"; in n // ${attr_derefs:-"{}"}; "
             done
             defexpr+=' }'
         fi
