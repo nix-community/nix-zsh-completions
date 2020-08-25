@@ -55,3 +55,22 @@ ZSH Completions Tutorial
 ------------------------
 
 [zsh-completions-howto](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
+
+Hacking
+-------
+
+When working on this module in an active `zsh` session you can test your changes
+like this:
+
+```
+$ fpath=(`pwd` $fpath)
+$ compinit
+```
+
+And reload after each change you made:
+```
+$ unfunction _nix && compinit
+```
+
+Instead of `_nix` you can also `unfunction` any other completion such as `_nix-build`, `_nix-shell`
+and so on.
