@@ -5,7 +5,8 @@
 
 # There's four different types of options and arguments which is passed to _arguments:
 #
-# 1. The main commands which we get from nix --help
+# 1. The main commands which we get from nix --help or a subcommand accepting commands
+#    such as nix flake --help
 #
 # 2. The common options which are hardcoded for the moment
 #
@@ -29,8 +30,45 @@ function _nix_cmd_dispatch_comp {
     local context state state_descr line
     typeset -A opt_args
 
-    local subcmd="${1:-}"
-    local -a top_help=(${(f)"$(nix $subcmd --help 2>/dev/null)"})
+    # This is a ternary value which indicates whether a subcommand of a subcommand
+    # (e.g. nix flake <COMMAND>) is about to get completed. It will be assigned to one of
+    # the following three states:
+    # * -1: No subcommand-completion needs to happen.
+    # *  0: No subcommand completion will happen since a subcommand of a subcommand that
+    #       doesn't have further subcommands needs to be completed.
+    # *  1: We are in a subcommand and want to complete the available commands such as
+    #       nix flake update.
+    local has_subcmd=-1
+
+    # Extract the main commands of `nix` or a "recursive" subcommand such as `nix flake`.
+    # For this purpose, the current command (`$words`) gets shortened until there's only a
+    # command left that accepts subcommands.
+    #
+    # This is needed to either complete subcommands or to extract the information for
+    # the currently active command to complete (see above comment for the general workflow
+    # of this completion).
+    local -a top_help
+    local words_p="${words[@]}"
+    while [ -z "${top_help}" ]; do
+        local -a result=(${(f)"$(${=words_p:-nix} --help 2>/dev/null)"})
+
+        # Check if the current helptext is displayed for a command accepting subcommands.
+        if grep -q $'\e'"\[1m.*commands:"$'\e'"\[0m" <<< "$result"; then
+            if [ "${#${=$(sed -re 's/-[^ ]+//g' <<< "$words_p")}}" -gt 1 ] && [ $has_subcmd -eq -1 ]; then
+                has_subcmd=1
+            fi
+            top_help=($result)
+            break
+        fi
+
+        # If a shortened version of `$words` is the main-command, no subcommand will
+        # be completed. Otherwise e.g. `nix flake update` would still complete subcommands
+        # for `nix flake`.
+        if [ -n "${result}" ]; then
+            has_subcmd=0
+        fi
+        words_p="$(sed -re "s/(.*)[ ]+\$/\1/" -re "s/(.*) [^ ]+\$/\1/" <<< "$words_p")"
+    done
 
     local -a common_options
     # See per command flag handling for comments
@@ -90,12 +128,22 @@ function _nix_cmd_dispatch_comp {
     # Setup the correct command_arguments and command_options depending on which
     # command we've typed
     _arguments '*: :->subcmd' && return 0
-    local cmd=${line[1]}
-    [ -n "$subcmd" ] && cmd=${line[2]}
+
+    # Extract the command we're about to complete. The command must be the first string
+    # after the current (sub)command (which can be e.g. `nix` or `nix flake`) that is not
+    # an option.
+    local cmd
+    for i in "${=${words[@]}/$words_p/}"; do
+        if [[ "$i" == -* ]] || [[ -z "$i" ]]; then
+            continue
+        fi
+        cmd="$i"
+        break
+    done
 
     # Check if we're in a valid command
     if [[ $command_lookup[$cmd] == 1 ]]; then
-        local -a help=(${(f)"$(nix $subcmd $cmd --help 2>/dev/null)"})
+        local -a help=(${(f)"$(${=words_p} $cmd --help 2>/dev/null)"})
         # Extract an array describing the possible arguments to the command eg.
         # (NAR PATH) for cat-nar or (INSTALLABLES) for run
         local -a args=(${=${help[1]//$'\e\[1m'Usage:$'\e\[0m'}//(*FLAGS|.|$'\e\[3m'|$'\e\[0m')/})
@@ -121,9 +169,9 @@ function _nix_cmd_dispatch_comp {
             # Remove the description from the help line
             local option_spec=${option_description%$description}
 
-            # Extract the options by stripping everything starting at '<' (and ',')
+            # Extract the options by stripping everything starting at '\e[3m' (and ',')
             local -a option_group=(${=option_spec//($'\e\[3m'*|,)/})
-            # Extract any arguments, by stripping the options (and <|>)
+            # Extract any arguments, by stripping the options (and \e[3m|\e[0m)
             local -a option_args=(${=option_spec//(*$option_group[${#option_group}]|$'\e\[3m'|$'\e\[0m')/})
 
             local ACTIONS=""
@@ -161,7 +209,9 @@ function _nix_cmd_dispatch_comp {
         done
     fi
 
-    [ -n "$subcmd" ] && _describe -t main_commands Command main_commands && return 0
+    if [ $has_subcmd -eq 1 ]; then
+        _describe -t main_commands Command main_commands && return 0
+    fi
     _arguments -s \
                ":Command: _describe -t main_commands Command main_commands"\
                $command_arguments \
@@ -170,6 +220,10 @@ function _nix_cmd_dispatch_comp {
 
     # Handle arguments to commands and options
     case "${context%%-*} $state" in
+        'argument FLAKE-URL')
+            _message "Not implemented yet"
+            return
+            ;;
         'argument '(INSTALLABLES|INSTALLABLE|PACKAGE|DEPENDENCY))
             # Complete attribute paths and files starting with either "/" or "./"
 
@@ -191,8 +245,7 @@ function _nix_cmd_dispatch_comp {
             return
             ;;
         'argument ARG')
-            cmd_name=$words[$CURRENT-1]
-            _nix_cmd_dispatch_comp "$cmd_name"
+            _nix_cmd_dispatch_comp
             return
             ;;
         'argument FILES')
