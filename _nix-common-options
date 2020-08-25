@@ -161,7 +161,7 @@ _nix_attr_paths () {
     # Starting with '.' causes _sep_parts to complain, so exit early.
     # This also guards against error output when completion './files' with nix.
     if [[ $cur == .* ]]; then
-        return
+        cur="__nix_zsh_mark_current_flake__$cur"
     fi
 
     local defexpr=$1
@@ -175,6 +175,7 @@ _nix_attr_paths () {
     local -a paths=(${(s,.,)attr_path})
     # Add quotes in a second step to avoid ("") when empty
     paths=(${${paths/%/\"}/#/\"})
+    paths[1]="${paths[1]/__nix_zsh_mark_current_flake__/.}"
 
     # Auto call any functions in the attribute path. This isn't a language
     # feature, but done by nix when passing attributes on the command line.
@@ -212,7 +213,7 @@ $result"
     local -a prefix=()
     if [[ -n $attr_path ]]; then
         for i in ${=attr_path//./ }; do
-            prefix+=("($i)" $sep)
+            prefix+=("(${i/__nix_zsh_mark_current_flake__/.})" $sep)
             sep="."
         done
     fi
@@ -313,7 +314,8 @@ _nix_complete_attr_paths () {
             for channel in $channels; do
                 name=${${channel#*flake:}// */}
                 names[$name]=1
-            done
+              done
+              names[.]=1
 
             cmd_name=$words[$CURRENT-1]
             attr_derefs=''
@@ -327,7 +329,7 @@ _nix_complete_attr_paths () {
             for name in ${(@k)names}; do
                 # nixos-config isn't useful or possible to complete
                 [[ $name == nixos-config ]] && continue
-                defexpr+="\"$name\" = let n = builtins.getFlake \"${name}\"; in n // ${attr_derefs:-"{}"}; "
+                defexpr+="\"$name\" = let n = builtins.getFlake \"$(sed -e "s/^\.\$/${$(pwd)//\//\\/}/" <<< $name)\"; in n // ${attr_derefs:-"{}"}; "
             done
             defexpr+=' }'
         fi
