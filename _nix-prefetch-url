@@ -3,6 +3,16 @@
 
 _nix-common-options
 
+_resource() {
+  local -a others=(
+    'https\://:HTTPS URL'
+    'http\://:HTTP URL'
+    'mirror\://:Mirror defined in nixpkgs')
+  _alternative \
+                'url:Other: _describe "URLS and special options" others' \
+                'path:Local path (adds file url prefix):_path_files -P "file://"'
+}
+
 _arguments \
   $__nix_search_path_args \
   '--unpack[Unpack tarball/zip first]'\
@@ -10,5 +20,5 @@ _arguments \
   '--type[Use the specified hash algorithm]:Hash Algorithm:(md5 sha1 sha256 sha512)'\
   '--name[Override the resulting nix store filename]:nix store filename:'\
   '*'{--attr,-A}'[Fetch the src of derivation (eg. mpv.src)]:src (eg. mpv.src): _nix_complete_attr_paths'\
-  '1:URL or a local nix file:_nix_path'\
+  '1:URL or a local nix file:_resource'\
   '2::Hash:( )'
