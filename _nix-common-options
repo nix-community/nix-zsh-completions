@@ -307,15 +307,7 @@ _nix_complete_attr_paths () {
 
         elif [[ $service == nix ]]; then
             sep="#"
-            # Add the names in an associative array to avoid duplicates
-            local -a channels=(${(f)"$(nix registry list 2>/dev/null)"})
-            local -A names
-            local channel name
-            for channel in $channels; do
-                name=${${channel#*flake:}// */}
-                names[$name]=1
-              done
-              names[.]=1
+            local -A names=( ${(@fkv)${(@Fs: :)$(_nix_registry_entries)}} )
 
             cmd_name=$words[$CURRENT-1]
             attr_derefs=''
@@ -338,6 +330,25 @@ _nix_complete_attr_paths () {
     if [[ $defexpr ]]; then
         _nix_attr_paths $defexpr $sep
     fi
+}
+
+_nix_complete_registry() {
+    local -A names=( ${(@fkv)${(@Fs: :)$(_nix_registry_entries)}} )
+    _values 'Entries' ${(@k)names}
+}
+
+function _nix_registry_entries() {
+    # Add the names in an associative array to avoid duplicates
+    local -a channels=(${(f)"$(nix registry list 2>/dev/null)"})
+    local -A names
+    local channel name
+    for channel in $channels; do
+        name=${${channel#*flake:}// */}
+        names[$name]=1
+    done
+    names[.]=1
+
+    echo "${(kv)names}"
 }
 
 function _nix_resolve_url () {

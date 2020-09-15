@@ -212,7 +212,17 @@ function _nix_cmd_dispatch_comp {
     if [ $has_subcmd -eq 1 ]; then
         _describe -t main_commands Command main_commands && return 0
     fi
+
+    # Determine if a subcommand is completed in order to make sure that the
+    # proper positional argument is selected for completion.
+    local main=
+    local _words_p="$words_p "
+    if [ "${#${=_words_p}}" -gt 1 ]; then
+        main=":Main: "
+    fi
+
     _arguments -s \
+               $main \
                ":Command: _describe -t main_commands Command main_commands"\
                $command_arguments \
                $common_options \
@@ -220,8 +230,19 @@ function _nix_cmd_dispatch_comp {
 
     # Handle arguments to commands and options
     case "${context%%-*} $state" in
-        'argument FLAKE-URL')
-            _message "Not implemented yet"
+        'argument FROM-URL')
+            local -a others=(
+                'github:GitHub Repository'
+                'gitlab:GitLab Repository'
+                'git:Git Repository'
+                'https\://:HTTPS')
+            _alternative \
+                'url:Other: _describe "URLS and special options" others' \
+                'path:Local path (adds path url prefix):_path_files -P "path://"'
+            return
+            ;;
+        'argument '(TO-URL|URL|FLAKE-URL))
+            _nix_complete_registry
             return
             ;;
         'argument '(INSTALLABLES|INSTALLABLE|PACKAGE|DEPENDENCY))
