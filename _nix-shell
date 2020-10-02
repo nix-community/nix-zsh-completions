@@ -28,6 +28,7 @@ done
 _arguments \
   $__nix_boilerplate_opts \
   $__nix_common_opts \
+  $__nix_dry_run \
   $_nix_shell_opts \
   $norm_arguments \
   - '(group)' \

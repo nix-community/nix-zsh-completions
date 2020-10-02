@@ -16,7 +16,6 @@ local -a _nix_build_opts=(
 
 # TODO: Undocumented args to possibly add
 # --add-root
-# --dry-run
 # --check
 # --quiet
 # --command
@@ -28,5 +27,6 @@ local -a _nix_build_opts=(
 _arguments \
   $__nix_boilerplate_opts \
   $__nix_common_opts \
+  $__nix_dry_run \
   $_nix_build_opts \
   '*:Paths:_nix_path'
