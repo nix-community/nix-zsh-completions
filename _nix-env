@@ -95,7 +95,7 @@ case "$opt" in
             '(--available -a)'{--available,-a}'[display all installable derivations]'
             $_nix_env_b
             '(--status -s)'{--status,-s}'[print status of derivation]'
-            '(--attr-path -p)'{--attr-path,-p}'[print attribute path of derivations]'
+            '(--attr-path -P)'{--attr-path,-P}'[print attribute path of derivations]'
             '--no-name[suppress printing of name attribute]'
             '(--compare-versions -c)'{--compare-versions,-c}'[compare installed and available version]'
             '--system[print system attribute]'
