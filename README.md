@@ -13,7 +13,7 @@ Oh-My-ZSH Installation
 
 ```zsh
 cd ~/.oh-my-zsh/custom/plugins
-git clone git@github.com:spwhitt/nix-zsh-completions.git
+git clone git@github.com:nix-community/nix-zsh-completions.git
 ```
 
 Then add `nix-zsh-completions` to the plugins list in `~/.zshrc`
@@ -30,7 +30,7 @@ Antigen Installation
 Add the following to `~/.zshrc`
 
 ```zsh
-antigen bundle git@github.com:spwhitt/nix-zsh-completions.git
+antigen bundle git@github.com:nix-community/nix-zsh-completions.git
 ```
 
 Plain ZSH Installation
