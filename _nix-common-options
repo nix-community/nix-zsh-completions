@@ -592,7 +592,7 @@ __nix_extra_build_opts=(
     '--max-silent-time[max seconds without getting stdout/err from builder]:Seconds:'
     '--timeout[max seconds builders should run]:seconds:'
     '--readonly-mode[do not open Nix database]'
-    '--log-type[configure how output is formatted]:output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'
+    '--log-format[configure how output is formatted]:output format:((pretty\:"Default" escapes\:"Indicate nesting with escape codes" flat\:"Remove all nesting"))'
 )
 
 # Used in: nix-build, nix-env, nix-instantiate, nix-shell
