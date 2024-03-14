@@ -4,4 +4,6 @@
 _nix-common-options
 
 _arguments \
-  '(- *)'{--hash,--revision}'[Print only the git hash of the channel]'\
+  '(- *)'{--hash,--revision}'[Show the full SHA1 hash of the Git commit from which this configuration was built.]'\
+  '--configuration-revision[Show the configuration revision if available.]'\
+  '--json[Print a JSON representation of the versions of NixOS and the top-level configuration flake.]'
