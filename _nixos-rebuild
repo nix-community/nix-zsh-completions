@@ -18,6 +18,7 @@ _1st_arguments=(
 _arguments \
   $__nix_common_nixos_rebuild \
   '--upgrade[Fetch the latest version of NixOS from the NixOS channel]'\
+  '--upgrade-all[Fetch the latest version of all channels]'\
   '--install-bootloader[(Re)install bootloader on the configured device]'\
   "--no-build-nix[Don't build Nix package manager]"\
   '--fast[Equivalent to --no-build-nix --show-trace]'\
