@@ -6,6 +6,8 @@ _nixos-option-opts() {
     local mods=
     if [[ -n "$NIX_PATH" && "$NIX_PATH" =~ "nixos-config=" ]]; then
         mods="(import <nixos-config>)"
+    else
+        mods="{ nixpkgs.hostPlatform = builtins.currentSystem; }"
     fi
     local options='
       with import <nixpkgs/lib>;
