@@ -1,9 +1,3 @@
-# Nix Install
-alias ni='nix-env -iA'
-
-# Nix Search
-alias ns='nix-env -qaP'
-
 function prompt_nix_shell_precmd {
   if [[ -n ${IN_NIX_SHELL} && ${IN_NIX_SHELL} != "0" || ${IN_NIX_RUN} && ${IN_NIX_RUN} != "0" ]]; then
     if [[ -n ${IN_WHICH_NIX_SHELL} ]] then
