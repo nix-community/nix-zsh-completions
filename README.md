@@ -13,7 +13,7 @@ Oh-My-ZSH Installation
 
 ```zsh
 cd ~/.oh-my-zsh/custom/plugins
-git clone git@github.com:nix-community/nix-zsh-completions.git
+git clone https://github.com/nix-community/nix-zsh-completions.git
 ```
 
 Then add `nix-zsh-completions` to the plugins list in `~/.zshrc`
