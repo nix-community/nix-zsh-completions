@@ -10,7 +10,7 @@ _nixos-option-opts() {
         mods="{ nixpkgs.hostPlatform = builtins.currentSystem; }"
     fi
     local options='
-      with import <nixpkgs/lib>;
+      with import <nixpkgs/nixos/lib> { };
       (evalModules {
         modules = import <nixpkgs/nixos/modules/module-list.nix> ++ [ '"$mods"' ];
       }).config
